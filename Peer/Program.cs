@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
-using DBS;
 
 namespace Peer
 {
@@ -9,13 +8,24 @@ namespace Peer
     {
         static void Main(string[] args)
         {
-            var msg = Message.BuildPutChunkMessage(1, 0, new byte[] { 1, 2, 3}, 50, 5, new byte[] { 65, 65, 65 });
-            var byteArray = msg.Serialize();
+            if (args.Length != 6)
+            {
+                PrintUsage();
+                Console.ReadKey();
+                return;
+            }
 
-            var charArray = new char[Encoding.ASCII.GetCharCount(byteArray)];
-            Encoding.ASCII.GetChars(byteArray, 0, charArray.Length, charArray, 0);
-            Console.WriteLine(charArray);
+            // TODO: Read arguments
+
             Console.ReadKey();
+        }
+
+        private static void PrintUsage()
+        {
+            Console.WriteLine("Usage: {0} <MC:IP> <MC:Port> <MDB:IP> <MDB:PORT> <MDR:IP> <MDR:Port>", Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName));
+            Console.WriteLine("  <MC:IP> <MC:Port>: IP multicast address and port of control channel");
+            Console.WriteLine("  <MDB:IP> <MDB:Port>: IP multicast address and port of data backup channel");
+            Console.WriteLine("  <MDR:IP> <MDR:Port>: IP multicast address and port of data restore channel");
         }
     }
 }
