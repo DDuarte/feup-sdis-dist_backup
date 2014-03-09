@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,33 @@ namespace DBS
     {
         public MessageType MessageType { get; set; }
 
+        private void SetMessageType(string type)
+        {
+            switch (type)
+            {
+                case "PUTCHUNK":
+                    MessageType = MessageType.PutChunk;
+                    break;
+                case "STORED":
+                    MessageType = MessageType.Stored;
+                    break;
+                case "GETCHUNK":
+                    MessageType = MessageType.GetChunk;
+                    break;
+                case "CHUNK":
+                    MessageType = MessageType.Chunk;
+                    break;
+                case "REMOVED":
+                    MessageType = MessageType.Removed;
+                    break;
+                case "DELETE":
+                    MessageType = MessageType.Delete;
+                    break;
+                default:
+                    throw new ArgumentException("Invalid MessageType", "type");
+            }
+        }
+
         private int? _versionN;
         public int? VersionN
         {
@@ -56,6 +84,15 @@ namespace DBS
             }
         }
 
+        private void SetVersion(string version)
+        {
+            if (version.Length != 3)
+                throw new ArgumentException("Invalid version string", "version");
+
+            VersionM = int.Parse(version[0].ToString(CultureInfo.InvariantCulture));
+            VersionN = int.Parse(version[2].ToString(CultureInfo.InvariantCulture));
+        }
+
         private byte[] _fileId;
         public byte[] FileId
         {
@@ -65,6 +102,17 @@ namespace DBS
                 if (value != null && value.Length != 32)
                     throw new ArgumentException("File identifier must be a 32 byte array", "value");
                 _fileId = value;
+            }
+        }
+
+        private void SetFileId(string fileId)
+        {
+            if (fileId.Length != 64)
+                throw new ArgumentException("Invalid fileId string", "fileId");
+
+            for (int i = 0, index = 0; i < fileId.Length; i += 2, index++)
+            {
+                FileId[index] = Convert.ToByte(string.Format("{0}{1}", fileId[i], fileId[i + 1]), 16);
             }
         }
 
@@ -80,6 +128,11 @@ namespace DBS
             }
         }
 
+        private void SetChunkNo(string chunkNo)
+        {
+            _chunkNo = int.Parse(chunkNo);
+        }
+
         private int? _replicationDeg;
         public int? ReplicationDeg
         {
@@ -92,7 +145,76 @@ namespace DBS
             }
         }
 
+        private void SetReplicationDeg(string replicationDeg)
+        {
+            ReplicationDeg = int.Parse(replicationDeg);
+        }
+
         public byte[] Body { get; set; }
+
+        public static Message Deserialize(byte[] data)
+        {
+            var message = new Message();
+
+            using (var stream = new MemoryStream(data))
+            {
+                using (var reader = new StreamReader(stream, Encoding.ASCII))
+                {
+                    var header = reader.ReadLine(); // until crlf
+                    if (header != null)
+                    {
+                        var fields = header.Split(' ');
+                        var messageType = fields[0];
+                        message.SetMessageType(messageType);
+                        switch (message.MessageType)
+                        {
+                            // PUTCHUNK <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body>
+                            // STORED <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
+                            // GETCHUNK <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
+                            // CHUNK <Version> <FileId> <ChunkNo> <CRLF> <CRLF> <Body>
+                            // DELETE <FileId> <CRLF> <CRLF>
+                            // REMOVED <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
+                            case MessageType.PutChunk:
+                            {
+                                message.SetVersion(fields[1]);
+                                message.SetFileId(fields[2]);
+                                message.SetChunkNo(fields[3]);
+                                message.SetReplicationDeg(fields[4]);
+                                break;
+                            }
+                            case MessageType.Stored:
+                            case MessageType.GetChunk:
+                            case MessageType.Chunk:
+                            case MessageType.Removed:
+                            {
+                                message.SetVersion(fields[1]);
+                                message.SetFileId(fields[2]);
+                                message.SetChunkNo(fields[3]);
+                                break;
+                            }
+                            case MessageType.Delete:
+                            {
+                                message.SetVersion(fields[1]);
+                                message.SetFileId(fields[2]);
+                                message.SetChunkNo(fields[3]);
+                                break;
+                            }
+                        }
+                    }
+
+                    reader.ReadLine(); // empty line
+
+                    if (!reader.EndOfStream) // PUTCHUNK or CHUNK
+                    {
+                        var bodySize = reader.BaseStream.Length - reader.BaseStream.Position /* +/- 1? */;
+                        message.Body = new byte[bodySize];
+                        reader.BaseStream.Read(message.Body, 0, (int)bodySize);
+                    }
+                }
+            }
+
+            return message;
+        }
 
         public byte[] Serialize()
         {

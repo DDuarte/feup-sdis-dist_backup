@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBS", "DBS\DBS.csproj", "{9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peer", "Peer\Peer.csproj", "{312ADE6B-ECED-4E35-8A40-888D47BB2CCE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBSTests", "DBSTests\DBSTests.csproj", "{BEB18EAF-57E2-4A67-AD7F-97A11E04A0BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{312ADE6B-ECED-4E35-8A40-888D47BB2CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{312ADE6B-ECED-4E35-8A40-888D47BB2CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{312ADE6B-ECED-4E35-8A40-888D47BB2CCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEB18EAF-57E2-4A67-AD7F-97A11E04A0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEB18EAF-57E2-4A67-AD7F-97A11E04A0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEB18EAF-57E2-4A67-AD7F-97A11E04A0BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEB18EAF-57E2-4A67-AD7F-97A11E04A0BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
