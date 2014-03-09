@@ -34,5 +34,10 @@ namespace DBS
             var checksum = sha.ComputeHash(checksumSum.ToArray());
             return checksum;
         }
+
+        public static string FileIdToString(IEnumerable<byte> bytes)
+        {
+            return bytes.Aggregate("", (current, b) => current + b.ToString("X2"));
+        }
     }
 }
