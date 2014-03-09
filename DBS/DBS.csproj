@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileIdGenerator.cs" />
-    <Compile Include="MemoryStreamExtensionscs.cs" />
+    <Compile Include="MemoryStreamExtensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="NetworkUtilities.cs" />
     <Compile Include="Properties\Annotations.cs" />

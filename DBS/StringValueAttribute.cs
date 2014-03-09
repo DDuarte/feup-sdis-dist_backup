@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace DBS
 {
@@ -12,7 +13,7 @@ namespace DBS
             _value = value;
         }
 
-        public static string Get(Enum value)
+        public static string Get<T>(T value)
         {
             string output = null;
             var type = value.GetType();
@@ -22,6 +23,13 @@ namespace DBS
                 output = attrs[0]._value;
 
             return output;
+        }
+
+        public static T Get<T>(string value)
+        {
+            // Iterate over all enum values and find the one with StringValue equal to the value we want 
+            var values = Enum.GetValues(typeof(T)).Cast<T>();
+            return values.FirstOrDefault(v => value == Get(v));
         }
     }
 }

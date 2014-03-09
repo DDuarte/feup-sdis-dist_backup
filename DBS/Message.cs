@@ -9,6 +9,8 @@ namespace DBS
 {
     public enum MessageType
     {
+        [StringValue("NONE")]
+        None,
         // Chunk backup subprotocol
         [StringValue("PUTCHUNK")] // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body>
         PutChunk,
@@ -36,29 +38,10 @@ namespace DBS
 
         internal void SetMessageType(string type)
         {
-            switch (type)
-            {
-                case "PUTCHUNK":
-                    MessageType = MessageType.PutChunk;
-                    break;
-                case "STORED":
-                    MessageType = MessageType.Stored;
-                    break;
-                case "GETCHUNK":
-                    MessageType = MessageType.GetChunk;
-                    break;
-                case "CHUNK":
-                    MessageType = MessageType.Chunk;
-                    break;
-                case "REMOVED":
-                    MessageType = MessageType.Removed;
-                    break;
-                case "DELETE":
-                    MessageType = MessageType.Delete;
-                    break;
-                default:
-                    throw new ArgumentException("Invalid MessageType", "type");
-            }
+            var mt = StringValueAttribute.Get<MessageType>(type);
+            if (mt == MessageType.None)
+                throw new ArgumentException("Invalid MessageType", "type");
+            MessageType = mt;
         }
 
         private int? _versionN;

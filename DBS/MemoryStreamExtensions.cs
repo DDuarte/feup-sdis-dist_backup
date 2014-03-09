@@ -1,10 +1,9 @@
-﻿using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace DBS
 {
-    public static class MemoryStreamExtensionscs
+    public static class MemoryStreamExtensions
     {
         public static void Write(this MemoryStream stream, byte[] bytes)
         {
