@@ -12,7 +12,7 @@ namespace DBS
         [StringValue("NONE")]
         None,
         // Chunk backup subprotocol
-        [StringValue("PUTCHUNK")] // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body>
+        [StringValue("PUTCHUNK")] // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body> 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 + 64000
         PutChunk,
         [StringValue("STORED")] // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
         Stored,
@@ -95,7 +95,7 @@ namespace DBS
                 throw new ArgumentException("Invalid fileId string", "fileId");
 
             FileId = new byte[32];
-            for (int i = 0, index = 0; i < fileId.Length; i += 2, index++)
+            for (int i = 0, index = 31; i < fileId.Length; i += 2, index--)
             {
                 FileId[index] = Convert.ToByte(string.Format("{0}{1}", fileId[i], fileId[i + 1]), 16);
             }

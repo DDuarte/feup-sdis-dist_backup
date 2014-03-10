@@ -19,7 +19,7 @@ namespace DBSTests
                                                   165, 129, 245, 225, 22, 146, 233, 6,
                                                   108, 212, 233, 31, 99, 150, 106, 201 };
 
-        private const string FileIdStr2 = "0BBDB4CE080EFDA8E8574EBF73212F0BA581F5E11692E9066CD4E91F63966AC9";
+        private const string FileIdStr2 = "C96A96631FE9D46C06E99216E1F581A50B2F2173BF4E57E8A8FD0E08CEB4BD0B";
 
         [TestMethod]
         public void TestBuildPutChunkMessage()

@@ -37,7 +37,7 @@ namespace DBS
 
         public static string FileIdToString(IEnumerable<byte> bytes)
         {
-            return bytes.Aggregate("", (current, b) => current + b.ToString("X2"));
+            return bytes.Reverse().Aggregate("", (current, b) => current + b.ToString("X2"));
         }
     }
 }
