@@ -46,11 +46,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="settings.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DBS\DBS.csproj">
       <Project>{9C3182A3-B748-4AD7-97F4-85749EF4E85C}</Project>
       <Name>DBS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JsonConfig\JsonConfig.csproj">
+      <Project>{c6298220-3e7e-4061-8c7d-d0d1dee3ee05}</Project>
+      <Name>JsonConfig</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
