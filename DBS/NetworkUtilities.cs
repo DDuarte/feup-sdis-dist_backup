@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using DBS.Annotations;
 
@@ -17,6 +18,16 @@ namespace DBS
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray();
+        }
+
+        /// <summary>
+        /// Returns identifier of the first network adapter or empty string, if no interface is found
+        /// </summary>
+        /// <returns>Identifier of a network adapter</returns>
+        public static string GetNetworkId()
+        {
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            return networkInterfaces.Length > 0 ? networkInterfaces.First().Id : "";
         }
     }
 }

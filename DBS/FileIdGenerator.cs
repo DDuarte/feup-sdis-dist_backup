@@ -10,6 +10,11 @@ namespace DBS
 {
     public static class FileIdGenerator
     {
+        public static IEnumerable<byte> Build(string fileName)
+        {
+            return Build(new FileInfo(fileName));
+        }
+
         public static IEnumerable<byte> Build(FileInfo file)
         {
             var sha = new SHA256Managed();
@@ -18,7 +23,7 @@ namespace DBS
             var createDateChecksum = sha.ComputeHash(createDate);
             var modifyDate = Encoding.ASCII.GetBytes(file.LastWriteTime.ToString(CultureInfo.InvariantCulture));
             var modifyDateChecksum = sha.ComputeHash(modifyDate);
-            var fileName = Encoding.ASCII.GetBytes(file.Name.ToCharArray());
+            var fileName = Encoding.ASCII.GetBytes(file.Name);
             var fileNameChecksum = sha.ComputeHash(fileName);
 
             byte[] fileChecksum = null;
@@ -30,7 +35,10 @@ namespace DBS
                 }
             }
 
-            var checksumSum = createDateChecksum.Concat(modifyDateChecksum).Concat(fileNameChecksum).Concat(fileChecksum);
+            var networkId = Encoding.ASCII.GetBytes(NetworkUtilities.GetNetworkId());
+            var networkIdChecksum = sha.ComputeHash(networkId);
+
+            var checksumSum = createDateChecksum.Concat(modifyDateChecksum).Concat(fileNameChecksum).Concat(fileChecksum).Concat(networkIdChecksum);
             var checksum = sha.ComputeHash(checksumSum.ToArray());
             return checksum;
         }

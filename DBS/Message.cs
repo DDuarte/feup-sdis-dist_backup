@@ -185,12 +185,13 @@ namespace DBS
                     pos += 4; // 2x CRLF
                 }
 
-                if (stream.Position != pos) // PUTCHUNK or CHUNK
+                if (message.MessageType == MessageType.PutChunk || message.MessageType == MessageType.Chunk)
                 {
                     stream.Position = pos;
                     var bodySize = stream.Length - stream.Position;
                     message.Body = new byte[bodySize];
-                    stream.Read(message.Body, 0, (int)bodySize);
+                    if (bodySize != 0) // body can be 0 bytes if the size of the file to be sent is multiple of 64KB
+                        stream.Read(message.Body, 0, (int)bodySize);
                 }
             }
 
