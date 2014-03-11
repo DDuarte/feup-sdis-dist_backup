@@ -6,11 +6,34 @@ using System.Net;
 using DBS;
 using JsonConfig;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace Peer
 {
     static class Program
     {
+        static void SendFileInChunks(Channel channel, Tuple<string, FileEntry> fileInfo, Func<int> chunkIntervalDist)
+        {
+            const int chunkSize = 64000; // read the file in chunks of 64KB
+            using (var file = File.OpenRead(fileInfo.Item1))
+            {
+                int bytesRead, chunkNo = 0;
+                var fileSize = file.Length;
+                var buffer = new byte[chunkSize];
+                while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
+                    channel.Send(Message.BuildPutChunkMessage(1, 0, fileInfo.Item2.FileId, chunkNo, fileInfo.Item2.ReplicationDegree, data));
+                    ++chunkNo;
+
+                    System.Threading.Thread.Sleep(chunkIntervalDist());
+                }
+                
+                if((fileSize % chunkSize) == 0)
+                    channel.Send(Message.BuildPutChunkMessage(1, 0, fileInfo.Item2.FileId, chunkNo, fileInfo.Item2.ReplicationDegree, new byte[] {})); // last chunk with an empty body
+            }
+        }
+
         static void Main(string[] args)
         {
             if (args.Length != 6)
