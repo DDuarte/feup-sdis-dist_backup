@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace DBS
@@ -40,6 +41,7 @@ namespace DBS
         {
             var bytes = msg.Serialize();
             _udpClient.Send(bytes, bytes.Length, _remotePoint);
+            Console.WriteLine("Sent {0} to {1}", msg, _remotePoint);
         }
 
         public Message Receive()

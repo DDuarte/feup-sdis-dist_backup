@@ -13,7 +13,7 @@ namespace Peer
 {
     static class Program
     {
-        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo, Func<int> chunkIntervalDist)
+        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo)
         {
             const int chunkSize = 64000; // read the file in chunks of 64KB
             using (var file = File.OpenRead(fileName))
@@ -26,12 +26,10 @@ namespace Peer
                     var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
                     channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, data));
                     ++chunkNo;
-
-                    System.Threading.Thread.Sleep(chunkIntervalDist());
                 }
-                
-                if((fileSize % chunkSize) == 0)
-                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {})); // last chunk with an empty body
+
+                if ((fileSize % chunkSize) == 0) // last chunk with an empty body
+                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {}));
             }
         }
 
@@ -100,9 +98,9 @@ namespace Peer
 
             // Create channels
             
-            var mcChannel = new Channel(mcIP, mcPort) {Name = "MC"};
-            var mdbChannel = new Channel(mdbIP, mdbPort) {Name = "MDB"};
-            var mdrChannel = new Channel(mdrIP, mdrPort) {Name = "MDR"};
+            IChannel mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
+            IChannel mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
+            IChannel mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
             
             // Join multicast groups
             
@@ -116,7 +114,7 @@ namespace Peer
 
             foreach (var f in files)
             {
-                mdbChannel.Send(Message.BuildPutChunkMessage(1, 0, f.Value.FileId, chunkNo, f.Value.ReplicationDegree, data));
+                SendFileInChunks(mdbChannel, f.Key, f.Value);
             }
 
             Console.ReadKey();

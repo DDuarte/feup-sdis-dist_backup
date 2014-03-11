@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace DBS
@@ -264,6 +265,18 @@ namespace DBS
                 default:
                     throw new ArgumentException("field needs to be one of MessageType, VersionM, FileId, ChunkNo or ReplicationDeg", "field");
             }
+        }
+
+        public override string ToString()
+        {
+            var ret = MessageType + " ";
+            if (FileId != null)
+                ret += FileIdGenerator.FileIdToString(FileId).Substring(0, 6) + "... ";
+            if (ChunkNo.HasValue)
+                ret += "#" + ChunkNo.Value + " ";
+            if (ReplicationDeg.HasValue)
+                ret += ReplicationDeg.Value;
+            return ret;
         }
 
         public static Message BuildPutChunkMessage(byte[] fileId, int chunkNo, int replicationDeg, byte[] body)
