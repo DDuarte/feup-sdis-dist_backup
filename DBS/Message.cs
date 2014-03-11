@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace DBS
@@ -34,6 +32,9 @@ namespace DBS
 
     public struct Message
     {
+        public const int VERSION_M = 1;
+        public const int VERSION_N = 0;
+
         public MessageType MessageType { get; set; }
 
         internal void SetMessageType(string type)
@@ -263,6 +264,31 @@ namespace DBS
                 default:
                     throw new ArgumentException("field needs to be one of MessageType, VersionM, FileId, ChunkNo or ReplicationDeg", "field");
             }
+        }
+
+        public static Message BuildPutChunkMessage(byte[] fileId, int chunkNo, int replicationDeg, byte[] body)
+        {
+            return BuildPutChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, replicationDeg, body);
+        }
+
+        public static Message BuildStoredMessage(byte[] fileId, int chunkNo)
+        {
+            return BuildStoredMessage(VERSION_M, VERSION_N, fileId, chunkNo);
+        }
+
+        public static Message BuildGetChunkMessage(byte[] fileId, int chunkNo)
+        {
+            return BuildGetChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo);
+        }
+
+        public static Message BuildChunkMessage(byte[] fileId, int chunkNo, byte[] body)
+        {
+            return BuildChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, body);
+        }
+
+        public static Message BuildRemovedMessage(byte[] fileId, int chunkNo)
+        {
+            return BuildRemovedMessage(VERSION_M, VERSION_N, fileId, chunkNo);
         }
 
         public static Message BuildPutChunkMessage(int versionM, int versionN, byte[] fileId, int chunkNo,

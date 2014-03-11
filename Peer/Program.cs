@@ -24,14 +24,14 @@ namespace Peer
                 while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    channel.Send(Message.BuildPutChunkMessage(1, 0, fileInfo.Item2.FileId, chunkNo, fileInfo.Item2.ReplicationDegree, data));
+                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, data));
                     ++chunkNo;
 
                     System.Threading.Thread.Sleep(chunkIntervalDist());
                 }
                 
                 if((fileSize % chunkSize) == 0)
-                    channel.Send(Message.BuildPutChunkMessage(1, 0, fileInfo.Item2.FileId, chunkNo, fileInfo.Item2.ReplicationDegree, new byte[] {})); // last chunk with an empty body
+                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {})); // last chunk with an empty body
             }
         }
 
