@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using DBS;
 
-namespace Peer
+namespace DBS
 {
-    public class Channel
+    public interface IChannel
+    {
+        void JoinMulticast();
+        void DropMulticast();
+        void Send(Message msg);
+        Message Receive();
+    }
+
+    public class Channel : IChannel
     {
         public string Name { get; set; }
 

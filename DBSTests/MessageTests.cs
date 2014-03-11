@@ -99,7 +99,6 @@ namespace DBSTests
             for (var i = 0; i < body.Length; ++i)
                     body[i] = (byte)i;
 
-
             var getChunkMsg = Message.BuildGetChunkMessage(9, 9, FileId1, 999999);
             var bytes = getChunkMsg.Serialize();
             var getChunkMsg2 = Message.Deserialize(bytes);
@@ -174,7 +173,6 @@ namespace DBSTests
             for (var i = 0; i < body.Length; ++i)
                 body[i] = (byte)i;
 
-
             var getChunkMsg = Message.BuildGetChunkMessage(0, 0, FileId1, 0);
             var bytes = getChunkMsg.Serialize();
             var getChunkMsg2 = Message.Deserialize(bytes);
@@ -246,7 +244,7 @@ namespace DBSTests
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TestMessageOutOfRangeField()
         {
-            var getChunkMsg = Message.BuildGetChunkMessage(10, 10, FileId1, 0);
+            Message.BuildGetChunkMessage(10, 10, FileId1, 0);
         }
     }
 }

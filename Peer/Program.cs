@@ -5,17 +5,18 @@ using System.IO;
 using System.Net;
 using DBS;
 using JsonConfig;
-using System.Net.Sockets;
 using System.Linq;
+
+/* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
 
 namespace Peer
 {
     static class Program
     {
-        static void SendFileInChunks(Channel channel, Tuple<string, FileEntry> fileInfo, Func<int> chunkIntervalDist)
+        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo, Func<int> chunkIntervalDist)
         {
             const int chunkSize = 64000; // read the file in chunks of 64KB
-            using (var file = File.OpenRead(fileInfo.Item1))
+            using (var file = File.OpenRead(fileName))
             {
                 int bytesRead, chunkNo = 0;
                 var fileSize = file.Length;

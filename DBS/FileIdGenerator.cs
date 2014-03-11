@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,10 +11,10 @@ namespace DBS
     {
         public static IEnumerable<byte> Build(string fileName)
         {
-            return Build(new FileInfo(fileName));
+            return Build(new SystemWrapper.IO.FileInfoWrap(new FileInfo(fileName)));
         }
 
-        public static IEnumerable<byte> Build(FileInfo file)
+        public static IEnumerable<byte> Build(SystemWrapper.IO.IFileInfoWrap file)
         {
             var sha = new SHA256Managed();
 
@@ -26,10 +25,10 @@ namespace DBS
             var fileName = Encoding.ASCII.GetBytes(file.Name);
             var fileNameChecksum = sha.ComputeHash(fileName);
 
-            byte[] fileChecksum = null;
+            byte[] fileChecksum;
             using (var fileStream = file.Open(FileMode.Open, FileAccess.Read))
             {
-                using (var bufferedStream = new BufferedStream(fileStream, 64*1000))
+                using (var bufferedStream = new BufferedStream(fileStream.StreamInstance, 64*1000))
                 {
                     fileChecksum = sha.ComputeHash(bufferedStream);
                 }
