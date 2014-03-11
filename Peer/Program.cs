@@ -37,6 +37,9 @@ namespace Peer
 
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+                args = new[] {"225.0.0.1", "31000", "225.0.0.1", "31001", "225.0.0.1", "31002"}; // defaults
+
             if (args.Length != 6)
             {
                 PrintUsage();
@@ -45,16 +48,56 @@ namespace Peer
             }
 
             // Get console arguments
+            IPAddress mcIP, mdbIP, mdrIP;
+            int mcPort, mdbPort, mdrPort;
 
-            var mcIP = IPAddress.Parse(args[0]);
-            var mcPort = int.Parse(args[1]);
+            if (!IPAddress.TryParse(args[0], out mcIP))
+            {
+                Console.WriteLine("Invalid MC:IP");
+                return;
+            }
+            if (!int.TryParse(args[1], out mcPort))
+            {
+                Console.WriteLine("Invalid MC:Port");
+                return;
+            }
+            if (!IPAddress.TryParse(args[2], out mdbIP))
+            {
+                Console.WriteLine("Invalid MDB:IP");
+                return;
+            }
+            if (!int.TryParse(args[3], out mdbPort))
+            {
+                Console.WriteLine("Invalid MDB:Port");
+                return;
+            }
+            if (!IPAddress.TryParse(args[4], out mdrIP))
+            {
+                Console.WriteLine("Invalid MDR:IP");
+                return;
+            }
+            if (!int.TryParse(args[5], out mdrPort))
+            {
+                Console.WriteLine("Invalid MDR:Port");
+                return;
+            }
 
-            var mdbIP = IPAddress.Parse(args[2]);
-            var mdbPort = int.Parse(args[3]);
-            
-            var mdrIP = IPAddress.Parse(args[4]);
-            var mdrPort = int.Parse(args[5]);
-            
+            if (!NetworkUtilities.IsMulticastAddress(mcIP))
+            {
+                Console.WriteLine("MC:IP is not a multicast address");
+                return;
+            }
+            if (!NetworkUtilities.IsMulticastAddress(mdbIP))
+            {
+                Console.WriteLine("MDB:IP is not a multicast address");
+                return;
+            }
+            if (!NetworkUtilities.IsMulticastAddress(mdrIP))
+            {
+                Console.WriteLine("MDR:IP is not a multicast address");
+                return;
+            }
+
             // Create channels
             
             var mcChannel = new Channel(mcIP, mcPort) {Name = "MC"};

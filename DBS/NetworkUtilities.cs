@@ -29,5 +29,16 @@ namespace DBS
             var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             return networkInterfaces.Length > 0 ? networkInterfaces.First().Id : "";
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public static bool IsMulticastAddress(IPAddress address)
+        {
+
+            return address.IsIPv6Multicast  || (address.GetAddressBytes()[0] & 0xF0) == 224;
+        }
     }
 }
