@@ -38,7 +38,7 @@ namespace DBS.Multicast
 
         private void BindAndJoin()
         {
-            LocalIPEndPoint = new IPEndPoint(Config.Global.LocalIP, Settings.Port);
+            LocalIPEndPoint = new IPEndPoint(IPAddress.Parse(Config.Global.LocalIP), Settings.Port);
             UdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             UdpClient.ExclusiveAddressUse = false;
             UdpClient.EnableBroadcast = true;
