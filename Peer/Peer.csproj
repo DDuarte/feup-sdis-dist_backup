@@ -51,7 +51,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <EmbeddedResource Include="settings.conf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
