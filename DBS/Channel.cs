@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using DBS.Multicast;
 
 namespace DBS
 {
     public interface IChannel
     {
-        void JoinMulticast();
-        void DropMulticast();
+        //void JoinMulticast();
+        //void DropMulticast();
         void Send(Message msg);
         Message Receive();
     }
@@ -16,41 +17,27 @@ namespace DBS
     {
         public string Name { get; set; }
 
-        private readonly IPAddress _ip; 
-        private readonly UdpClient _udpClient;
-        private IPEndPoint _remotePoint;
+        private IMulticastListener Listener;
+        private IMulticastBroadcaster Broadcaster;
 
         public Channel(IPAddress ip, int port)
         {
-            _udpClient = new UdpClient {Ttl = 1};
-            _ip = ip;
-            _remotePoint = new IPEndPoint(IPAddress.Any, port);
-            _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpClient.ExclusiveAddressUse = false;
-            _udpClient.Client.Bind(_remotePoint);
-        }
+            var settings = new MulticastSettings {Address = ip, Port = port, TimeToLive = 3};
 
-        public void JoinMulticast()
-        {
-            _udpClient.JoinMulticastGroup(_ip);
-        }
+            Listener = new MulticastListener(settings, true);
+            Broadcaster = new MulticastBroadcaster(settings, true);
 
-        public void DropMulticast()
-        {
-            _udpClient.DropMulticastGroup(_ip);
+            Listener.StartListening(data => Console.WriteLine(Message.Deserialize(data)));
         }
 
         public void Send(Message msg)
         {
-            var bytes = msg.Serialize();
-            _udpClient.Send(bytes, bytes.Length, _remotePoint);
-            Console.WriteLine("Sent {0} to {1}", msg, _remotePoint);
+            Broadcaster.Broadcast(msg.Serialize());
         }
 
         public Message Receive()
         {
-            var data = _udpClient.Receive(ref _remotePoint);
-            return Message.Deserialize(data);
+            return new Message();
         }
     }
 }

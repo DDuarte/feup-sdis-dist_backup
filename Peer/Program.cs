@@ -36,7 +36,7 @@ namespace Peer
         static void Main(string[] args)
         {
             if (args.Length == 0)
-                args = new[] {"225.0.0.1", "31000", "225.0.0.1", "31001", "225.0.0.1", "31002"}; // defaults
+                args = new[] {"225.0.0.10", "31000", "225.0.0.10", "31001", "225.0.0.10", "31002"}; // defaults
 
             if (args.Length != 6)
             {
@@ -98,15 +98,15 @@ namespace Peer
 
             // Create channels
             
-            IChannel mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
-            IChannel mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
-            IChannel mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
+            var mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
+            var mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
+            var mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
             
             // Join multicast groups
             
-            mcChannel.JoinMulticast();
-            mdbChannel.JoinMulticast();
-            mdrChannel.JoinMulticast();
+            //mcChannel.JoinMulticast();
+            //mdbChannel.JoinMulticast();
+            //mdrChannel.JoinMulticast();
 
             var files = new Dictionary<string, FileEntry>();
             foreach (var f in Config.Global.Files)

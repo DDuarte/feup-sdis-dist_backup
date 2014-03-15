@@ -275,7 +275,9 @@ namespace DBS
             if (ChunkNo.HasValue)
                 ret += "#" + ChunkNo.Value + " ";
             if (ReplicationDeg.HasValue)
-                ret += ReplicationDeg.Value;
+                ret += ReplicationDeg.Value + " ";
+            if (Body != null)
+                ret += "|" + Body.Length + "|";
             return ret;
         }
 
