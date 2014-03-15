@@ -26,8 +26,6 @@ namespace DBS
 
             Listener = new MulticastListener(settings, true);
             _broadcaster = new MulticastBroadcaster(settings, true);
-
-            Listener.StartListening(data => Console.WriteLine("R: " + Message.Deserialize(data)));
         }
 
         public void Send(Message msg)
@@ -37,7 +35,7 @@ namespace DBS
 
         public Message Receive()
         {
-            return new Message();
+            return Message.Deserialize(Listener.Receive());
         }
     }
 }

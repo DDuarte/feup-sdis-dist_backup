@@ -47,18 +47,14 @@ namespace DBS.Multicast
             UdpClient.JoinMulticastGroup(Settings.Address, Settings.TimeToLive);
         }
 
-        public void StartListening(ReceiveHandler handler)
+        public byte[] Receive()
         {
-            if (!IsBound) BindAndJoin();
-
-            OnReceive += handler;
-            var receiveCallback = new AsyncCallback(ReceiveCallback);
-            UdpClient.BeginReceive(receiveCallback, this);
+            var ipEndPoint = LocalIPEndPoint;
+            return UdpClient.Receive(ref ipEndPoint);
         }
 
         public void StopListening()
         {
-            OnReceive = null;
             if (IsBound) UnbindAndLeave();
         }
 
@@ -68,27 +64,6 @@ namespace DBS.Multicast
             {
                 UdpClient.DropMulticastGroup(Settings.Address);
                 UdpClient.Close();
-            }
-            catch (ObjectDisposedException)
-            {
-                // expected exception fired when we close - swallow it up
-            }
-        }
-
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var receiver = (MulticastListener)(ar.AsyncState);
-
-                var udpClient = receiver.UdpClient;
-                var ipEndPoint = receiver.LocalIPEndPoint;
-
-                var receiveBytes = udpClient.EndReceive(ar, ref ipEndPoint);
-                OnReceive(receiveBytes);
-
-                var receiveCallback = new AsyncCallback(ReceiveCallback);
-                UdpClient.BeginReceive(receiveCallback, this);
             }
             catch (ObjectDisposedException)
             {

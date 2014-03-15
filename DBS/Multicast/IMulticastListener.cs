@@ -12,7 +12,8 @@ namespace DBS.Multicast
 
         bool IsBound { get; }
 
-        void StartListening(ReceiveHandler handler);
+        byte[] Receive();
+
         void StopListening();
     }
 }
