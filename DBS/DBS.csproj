@@ -57,6 +57,12 @@
     <Compile Include="StringValueAttribute.cs" />
     <Compile Include="Subprotocol.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JsonConfig\JsonConfig.csproj">
+      <Project>{C6298220-3E7E-4061-8C7D-D0D1DEE3EE05}</Project>
+      <Name>JsonConfig</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -18,21 +18,21 @@ namespace DBS
         public string Name { get; set; }
 
         private IMulticastListener Listener;
-        private IMulticastBroadcaster Broadcaster;
+        private readonly IMulticastBroadcaster _broadcaster;
 
         public Channel(IPAddress ip, int port)
         {
             var settings = new MulticastSettings {Address = ip, Port = port, TimeToLive = 3};
 
             Listener = new MulticastListener(settings, true);
-            Broadcaster = new MulticastBroadcaster(settings, true);
+            _broadcaster = new MulticastBroadcaster(settings, true);
 
-            Listener.StartListening(data => Console.WriteLine(Message.Deserialize(data)));
+            Listener.StartListening(data => Console.WriteLine("R: " + Message.Deserialize(data)));
         }
 
         public void Send(Message msg)
         {
-            Broadcaster.Broadcast(msg.Serialize());
+            _broadcaster.Broadcast(msg.Serialize());
         }
 
         public Message Receive()

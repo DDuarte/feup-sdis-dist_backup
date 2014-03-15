@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using JsonConfig;
 
 namespace DBS.Multicast
 {
@@ -37,7 +38,7 @@ namespace DBS.Multicast
 
         private void BindAndJoin()
         {
-            LocalIPEndPoint = new IPEndPoint(IPAddress.Any, Settings.Port);
+            LocalIPEndPoint = new IPEndPoint(Config.Global.LocalIP, Settings.Port);
             UdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             UdpClient.ExclusiveAddressUse = false;
             UdpClient.EnableBroadcast = true;
@@ -83,7 +84,7 @@ namespace DBS.Multicast
                 var udpClient = receiver.UdpClient;
                 var ipEndPoint = receiver.LocalIPEndPoint;
 
-                byte[] receiveBytes = udpClient.EndReceive(ar, ref ipEndPoint);
+                var receiveBytes = udpClient.EndReceive(ar, ref ipEndPoint);
                 OnReceive(receiveBytes);
 
                 var receiveCallback = new AsyncCallback(ReceiveCallback);
