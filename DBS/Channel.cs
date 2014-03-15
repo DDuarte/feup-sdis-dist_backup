@@ -24,7 +24,10 @@ namespace DBS
         {
             _udpClient = new UdpClient {Ttl = 1};
             _ip = ip;
-            _remotePoint = new IPEndPoint(_ip, port);
+            _remotePoint = new IPEndPoint(IPAddress.Any, port);
+            _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            _udpClient.ExclusiveAddressUse = false;
+            _udpClient.Client.Bind(_remotePoint);
         }
 
         public void JoinMulticast()
