@@ -26,7 +26,7 @@ namespace DBS
             var fileNameChecksum = sha.ComputeHash(fileName);
 
             byte[] fileChecksum;
-            using (var fileStream = file.Open(FileMode.Open, FileAccess.Read))
+            using (var fileStream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 using (var bufferedStream = new BufferedStream(fileStream.StreamInstance, 64*1000))
                 {

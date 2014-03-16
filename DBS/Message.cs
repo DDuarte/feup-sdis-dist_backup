@@ -311,6 +311,11 @@ namespace DBS
             return BuildRemovedMessage(VERSION_M, VERSION_N, fileId, chunkNo);
         }
 
+        public static Message BuildRemovedMessage(string fileIdStr, int chunkNo)
+        {
+            return BuildRemovedMessage(VERSION_M, VERSION_N, fileIdStr, chunkNo);
+        }
+
         public static Message BuildPutChunkMessage(int versionM, int versionN, byte[] fileId, int chunkNo,
             int replicationDeg, byte[] body)
         {
@@ -383,6 +388,19 @@ namespace DBS
                 FileId = fileId,
                 ChunkNo = chunkNo
             };
+        }
+
+        public static Message BuildRemovedMessage(int versionM, int versionN, string fileIdStr, int chunkNo)
+        {
+            var msg = new Message
+            {
+                MessageType = MessageType.Removed,
+                VersionM = versionM,
+                VersionN = versionN,
+                ChunkNo = chunkNo
+            };
+            msg.SetFileId(fileIdStr);
+            return msg;
         }
     }
 }

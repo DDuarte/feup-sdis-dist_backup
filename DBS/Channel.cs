@@ -6,20 +6,23 @@ using DBS.Multicast;
 
 namespace DBS
 {
+    public delegate bool OnReceive(Message msg);
+
     public interface IChannel
     {
+        event OnReceive OnReceive;
+
+        string Name { get; set; }
+        ConcurrentQueue<Message> Messages { get; set; }
+
         void Send(Message msg);
     }
 
-    public delegate bool OnReceive(Message msg);
-
     public class Channel : IChannel
     {
-        public string Name { get; set; }
-
-        public readonly ConcurrentQueue<Message> Messages;
-
         public event OnReceive OnReceive;
+        public string Name { get; set; }
+        public ConcurrentQueue<Message> Messages { get; set; }
 
         private void StartReceiving()
         {

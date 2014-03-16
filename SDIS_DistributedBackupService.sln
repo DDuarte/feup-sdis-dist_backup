@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBSTests", "DBSTests\DBSTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonConfig", "JsonConfig\JsonConfig.csproj", "{C6298220-3E7E-4061-8C7D-D0D1DEE3EE05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BplusDotNet", "BplusDotNet\BplusDotNet.csproj", "{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{C6298220-3E7E-4061-8C7D-D0D1DEE3EE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6298220-3E7E-4061-8C7D-D0D1DEE3EE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6298220-3E7E-4061-8C7D-D0D1DEE3EE05}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

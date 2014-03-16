@@ -35,6 +35,9 @@
     <StartupObject>Peer.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Esent.Collections">
+      <HintPath>..\References\Esent.Collections.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,10 +50,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BplusTreeExt.cs" />
-    <Compile Include="FileEntry.cs" />
+    <Compile Include="PersistentStore.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpaceReclaimingWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -59,10 +62,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BplusDotNet\BplusDotNet.csproj">
-      <Project>{5038b05b-bc8c-4efc-82b0-c69ccefe9a12}</Project>
-      <Name>BplusDotNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DBS\DBS.csproj">
       <Project>{9C3182A3-B748-4AD7-97F4-85749EF4E85C}</Project>
       <Name>DBS</Name>

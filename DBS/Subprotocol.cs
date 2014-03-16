@@ -31,6 +31,7 @@ namespace DBS
             {
                 File.Delete(file);
                 Console.WriteLine("Deleting file {0}", file);
+                //PersistentStore.RemoveDegrees(file);
             }
         }
 

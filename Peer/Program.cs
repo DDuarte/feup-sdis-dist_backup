@@ -15,7 +15,7 @@ namespace Peer
 {
     static class Program
     {
-        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo, Func<int, bool> f)
+        static void SendFileInChunks(string fileName, FileEntry fileEntry)
         {
             const int chunkSize = 64000; // read the file in chunks of 64KB
             using (var file = File.OpenRead(fileName))
@@ -26,23 +26,12 @@ namespace Peer
                 while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    var msg = Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, data);
-
-                    do
-                    {
-                        channel.Send(msg);
-                    } while (!f(chunkNo));
+                    BackupChunk(fileEntry.FileId, chunkNo, data, fileEntry.ReplicationDegree);
                     ++chunkNo;
                 }
 
                 if ((fileSize%chunkSize) == 0) // last chunk with an empty body
-                {
-                    var msg = Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {});
-                    do
-                    {
-                        channel.Send(msg);
-                    } while (!f(chunkNo));
-                }
+                    BackupChunk(fileEntry.FileId, chunkNo, new byte[] {}, fileEntry.ReplicationDegree);
             }
         }
 
@@ -115,15 +104,31 @@ namespace Peer
             _mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
             _mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
 
+            // Create dictionary of files to mantain
+
             var files = new Dictionary<string, FileEntry>();
             foreach (var f in Config.Global.Files)
                 files.Add(f.Name, new FileEntry { FileId = FileIdGenerator.Build(f.Name), ReplicationDegree = f.ReplicationDegree});
 
+            // Setup directories
+            string backupDir = Config.Global.BackupDir;
+            string storeDir = Config.Global.StoreDir;
 
-            Task.Factory.StartNew(() => StoreFiles("backup"));
+            if (!Directory.Exists(backupDir))
+                Directory.CreateDirectory(backupDir);
+            if (!Directory.Exists(storeDir))
+                Directory.CreateDirectory(storeDir);
+
+            // Start Tasks
+
+            Task.Factory.StartNew(() => StoreFiles(backupDir));
+            Task.Factory.StartNew(() => ListenRemoved(backupDir));
 
             foreach (var f in files)
-                BackupFile(f.Key, f.Value);
+                Task.Factory.StartNew(() => SendFileInChunks(f.Key, f.Value));
+
+            var spaceRecl = new SpaceReclaimingWatcher(_mcChannel);
+            spaceRecl.Run(backupDir);
 
             Console.ReadKey();
         }
@@ -131,6 +136,69 @@ namespace Peer
         private static Channel _mcChannel;
         private static Channel _mdbChannel;
         private static Channel _mdrChannel;
+
+        private static void ListenRemoved(string dir)
+        {
+            var rnd = new Random();
+
+            _mcChannel.OnReceive += msg =>
+            {
+                if (msg.MessageType != MessageType.Removed)
+                    return false; // not what we want
+
+                if (!msg.ChunkNo.HasValue)
+                {
+                    Console.WriteLine("ListenRemoved: bad msg, ChunkNo has no value.");
+                    return true;
+                }
+
+                var chunkNo = msg.ChunkNo.Value;
+                var fileId = msg.FileId;
+
+                var key = FileIdGenerator.FileIdToString(fileId) + "_" + chunkNo;
+                if (!PersistentStore.Dict.ContainsKey(key))
+                    return true;
+
+                var fullPath = Path.Combine(dir, key);
+
+                PersistentStore.DecrementActualDegree(key, 0 /* won't be used, dict contains key*/);
+                ReplicationDegrees rd;
+                PersistentStore.TryGetDegrees(key, out rd);
+
+                if (rd.ActualDegree < rd.WantedDegree)
+                {
+                    var cts = new CancellationTokenSource();
+                    var token = cts.Token;
+
+                    Task.Factory.StartNew(async () =>
+                    {
+                        await Task.Delay(rnd.Next(0, 401), token);
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        var fs = File.OpenRead(fullPath);
+                        var buffer = new byte[64000];
+                        var bytesRead = fs.Read(buffer, 0, buffer.Length);
+                        var data = buffer.Take(bytesRead).ToArray();
+
+                        BackupChunk(fileId, chunkNo, data, rd.WantedDegree);
+                    }, token);
+
+                    _mcChannel.OnReceive += msg2 =>
+                    {
+                        if (msg2.MessageType != MessageType.PutChunk ||
+                              msg2.ChunkNo != chunkNo ||
+                              !msg2.FileId.SequenceEqual(fileId))
+                            return false;
+
+                        cts.Cancel();
+                        return true;
+                    };
+                }
+
+                return true;
+            };
+        }
 
         private static void StoreFiles(string dir)
         {
@@ -152,8 +220,11 @@ namespace Peer
                     return true;
                 }
 
-                if (!msg.ChunkNo.HasValue) // TODO: error
+                if (!msg.ChunkNo.HasValue)
+                {
+                    Console.WriteLine("StoreFiles: bad msg, ChunkNo has no value.");
                     return true;
+                }
 
                 var fileName = FileIdGenerator.FileIdToString(msg.FileId) + "_" + msg.ChunkNo;
                 var fullPath = Path.Combine(dir, fileName);
@@ -164,6 +235,8 @@ namespace Peer
                         var fs = File.Create(fullPath);
                         fs.Write(msg.Body, 0, msg.Body.Length);
                         fs.Close();
+
+                        PersistentStore.IncrementActualDegree(fileName, msg.ReplicationDeg.Value);
                     }
                     catch (Exception ex)
                     {
@@ -179,81 +252,75 @@ namespace Peer
             };
         }
 
-        private static void BackupFile(string fileName, FileEntry fileEntry)
+        private static void BackupChunk(byte[] fileId, int chunkNo, byte[] data, int repDegree)
         {
-            const int initialTimeout = 500;
-            var timeoutValue = initialTimeout;
-            const int maxRetries = 5;
-            var retryCount = 0;
-
-            var oldChunkNo = -1;
-
-            SendFileInChunks(_mdbChannel, fileName, fileEntry, chunkNo =>
+            var t = new Func<int, int>(timeout =>
             {
-                if (oldChunkNo != chunkNo)
+                var cts = new CancellationTokenSource(timeout);
+                var token = cts.Token;
+                var storeTask = new Task<int>(() =>
                 {
-                    timeoutValue = initialTimeout;
-                    retryCount = 0;
-                }
-                oldChunkNo = chunkNo;
+                    var receivedMessagesFrom = new HashSet<string>();
 
-                var t = new Func<int, int>(timeout =>
-                {
-                    var cts = new CancellationTokenSource(timeout);
-                    var token = cts.Token;
-                    var storeTask = new Task<int>(() =>
+                    OnReceive onReceivedStored = msg =>
                     {
-                        var receivedMessagesFrom = new HashSet<string>();
+                        if (msg.MessageType != MessageType.Stored ||
+                              msg.ChunkNo != chunkNo ||
+                              !msg.FileId.SequenceEqual(fileId))
+                            return false;
 
-                        OnReceive onReceivedStored = msg =>
+                        receivedMessagesFrom.Add(msg.RemoteEndPoint.Address.ToString());
+                        return true;
+                    };
+
+                    try
+                    {
+
+                        _mcChannel.OnReceive += onReceivedStored;
+                        while (true)
                         {
-                            if (msg.MessageType != MessageType.Stored ||
-                                  msg.ChunkNo != chunkNo ||
-                                  !msg.FileId.SequenceEqual(fileEntry.FileId))
-                                return false;
-
-                            receivedMessagesFrom.Add(msg.RemoteEndPoint.Address.ToString());
-                            return true;
-                        };
-
-                        try
-                        {
-                            
-                            _mcChannel.OnReceive += onReceivedStored;
-                            while (true)
-                            {
-                                token.ThrowIfCancellationRequested();
-                                Thread.Sleep(10);
-                            }
+                            token.ThrowIfCancellationRequested();
+                            Thread.Sleep(10);
                         }
-                        catch (OperationCanceledException)
-                        {
-                            _mcChannel.OnReceive -= onReceivedStored;
-                            return receivedMessagesFrom.Count;
-                        }
-                    });
-
-                    storeTask.RunSynchronously();
-                    return storeTask.Result;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _mcChannel.OnReceive -= onReceivedStored;
+                        return receivedMessagesFrom.Count;
+                    }
                 });
 
-                retryCount++;
-                var count = t(timeoutValue);
-                if (count < fileEntry.ReplicationDegree && retryCount < maxRetries)
-                {
-                    timeoutValue *= 2;
-                    Console.WriteLine("Replication degree is {0} but wanted {1}. Timeout increased to {2}", count, fileEntry.ReplicationDegree, timeoutValue);
-                    return false;
-                }
-
-                Console.WriteLine("Stored or giving up: retries {0}, rep degree {1}", retryCount, count);
-                fileEntry.ActualReplicationDegree = count;
-
-                return true;
+                storeTask.RunSynchronously();
+                return storeTask.Result;
             });
 
-            Console.WriteLine("File back'ed up");
+            const int initialTimeout = 500;
+            const int maxRetries = 5;
+
+            var timeoutValue = initialTimeout;
+
+            var count = 0;
+            for (var retryCount = 0; retryCount < maxRetries; retryCount++)
+            {
+                var msg = Message.BuildPutChunkMessage(fileId, chunkNo, repDegree, data);
+                _mdbChannel.Send(msg);
+
+                count = t(timeoutValue);
+                if (count < repDegree)
+                {
+                    timeoutValue *= 2;
+                    Console.WriteLine("Replication degree is {0} but wanted {1}. Timeout increased to {2}", count, repDegree, timeoutValue);
+                }
+                else
+                {
+                    Console.WriteLine("Stored or giving up: retries {0}, rep degree {1}", retryCount, count);
+                    break;
+                }
+            }
+
+            PersistentStore.UpdateDegrees(FileIdGenerator.FileIdToString(fileId) + "_" + chunkNo, count, repDegree);
         }
+
 
         private static void PrintUsage()
         {
