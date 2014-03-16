@@ -44,6 +44,7 @@ namespace DBS.Multicast
             UdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             UdpClient.ExclusiveAddressUse = false;
             UdpClient.EnableBroadcast = true;
+            UdpClient.MulticastLoopback = false;
 
             UdpClient.Client.Bind(LocalIPEndPoint);
             UdpClient.JoinMulticastGroup(Settings.Address, Settings.TimeToLive);

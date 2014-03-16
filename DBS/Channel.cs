@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Threading.Tasks;
 using DBS.Multicast;
@@ -27,6 +28,7 @@ namespace DBS
                 while (true)
                 {
                     var msg = Receive();
+                    Console.WriteLine("R -  {0}: {1}", Name, msg);
                     if (OnReceive != null)
                     {
                         if (!OnReceive(msg))
@@ -55,7 +57,7 @@ namespace DBS
         public void Send(Message msg)
         {
             _broadcaster.Broadcast(msg.Serialize());
-            //Console.WriteLine("S: " + msg);
+            Console.WriteLine("S -  {0}: {1}", Name, msg);
         }
 
         private Message Receive()
