@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{312ADE6B-ECED-4E35-8A40-888D47BB2CCE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{5038B05B-BC8C-4EFC-82B0-C69CCEFE9A12}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Peer</RootNamespace>
-    <AssemblyName>Peer</AssemblyName>
+    <RootNamespace>BplusDotNet</RootNamespace>
+    <AssemblyName>BplusDotNet</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,16 +22,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Peer.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,35 +37,20 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="SystemWrapper">
-      <HintPath>..\References\SystemWrapper.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BplusTreeExt.cs" />
-    <Compile Include="FileEntry.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="BplusTree.cs" />
+    <Compile Include="BplusTreeBytes.cs" />
+    <Compile Include="BplusTreeLong.cs" />
+    <Compile Include="BufferFile.cs" />
+    <Compile Include="hBplusTree.cs" />
+    <Compile Include="hBplusTreeBytes.cs" />
+    <Compile Include="ITreeIndex.cs" />
+    <Compile Include="LinkedFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <EmbeddedResource Include="settings.conf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BplusDotNet\BplusDotNet.csproj">
-      <Project>{5038b05b-bc8c-4efc-82b0-c69ccefe9a12}</Project>
-      <Name>BplusDotNet</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DBS\DBS.csproj">
-      <Project>{9C3182A3-B748-4AD7-97F4-85749EF4E85C}</Project>
-      <Name>DBS</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\JsonConfig\JsonConfig.csproj">
-      <Project>{c6298220-3e7e-4061-8c7d-d0d1dee3ee05}</Project>
-      <Name>JsonConfig</Name>
-    </ProjectReference>
+    <Compile Include="SerializedTree.cs" />
+    <Compile Include="xBplusTree.cs" />
+    <Compile Include="xBplusTreeBytes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
