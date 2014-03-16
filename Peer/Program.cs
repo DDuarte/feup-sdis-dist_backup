@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using DBS;
 using JsonConfig;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace Peer
 {
     static class Program
     {
-        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo)
+        static void SendFileInChunks(IChannel channel, string fileName, FileEntry fileInfo, Func<int, bool> f)
         {
             const int chunkSize = 64000; // read the file in chunks of 64KB
             using (var file = File.OpenRead(fileName))
@@ -24,12 +26,23 @@ namespace Peer
                 while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                 {
                     var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, data));
+                    var msg = Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, data);
+
+                    do
+                    {
+                        channel.Send(msg);
+                    } while (!f(chunkNo));
                     ++chunkNo;
                 }
 
-                if ((fileSize % chunkSize) == 0) // last chunk with an empty body
-                    channel.Send(Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {}));
+                if ((fileSize%chunkSize) == 0) // last chunk with an empty body
+                {
+                    var msg = Message.BuildPutChunkMessage(fileInfo.FileId, chunkNo, fileInfo.ReplicationDegree, new byte[] {});
+                    do
+                    {
+                        channel.Send(msg);
+                    } while (!f(chunkNo));
+                }
             }
         }
 
@@ -98,26 +111,147 @@ namespace Peer
 
             // Create channels
             
-            var mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
-            var mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
-            var mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
-            
-            // Join multicast groups
-            
-            //mcChannel.JoinMulticast();
-            //mdbChannel.JoinMulticast();
-            //mdrChannel.JoinMulticast();
+            _mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
+            _mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
+            _mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
 
             var files = new Dictionary<string, FileEntry>();
             foreach (var f in Config.Global.Files)
                 files.Add(f.Name, new FileEntry { FileId = FileIdGenerator.Build(f.Name), ReplicationDegree = f.ReplicationDegree});
 
+
+            Task.Factory.StartNew(() => StoreFiles("backup"));
+
             foreach (var f in files)
-            {
-                SendFileInChunks(mdbChannel, f.Key, f.Value);
-            }
+                BackupFile(f.Key, f.Value);
 
             Console.ReadKey();
+        }
+
+        private static Channel _mcChannel;
+        private static Channel _mdbChannel;
+        private static Channel _mdrChannel;
+
+        private static void StoreFiles(string dir)
+        {
+            var rnd = new Random();
+
+            _mdbChannel.OnReceive += msg =>
+            {
+                if (msg.MessageType != MessageType.PutChunk)
+                    return false; // not what we want
+
+                try
+                {
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("StoreFiles: " + ex);
+                    return true;
+                }
+
+                if (!msg.ChunkNo.HasValue) // TODO: error
+                    return true;
+
+                var fileName = FileIdGenerator.FileIdToString(msg.FileId) + "_" + msg.ChunkNo;
+                var fullPath = Path.Combine(dir, fileName);
+                if (!File.Exists(fullPath))
+                {
+                    try
+                    {
+                        var fs = File.Create(fullPath);
+                        fs.Write(msg.Body, 0, msg.Body.Length);
+                        fs.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("StoreFiles: " + ex);
+                        return true;
+                    }
+                }
+
+                Thread.Sleep(rnd.Next(0, 401)); // random delay uniformly distributed between 0 and 400 ms
+
+                _mcChannel.Send(Message.BuildStoredMessage(msg.FileId, msg.ChunkNo.Value));
+                return true;
+            };
+        }
+
+        private static void BackupFile(string fileName, FileEntry fileEntry)
+        {
+            const int initialTimeout = 500;
+            var timeoutValue = initialTimeout;
+            const int maxRetries = 5;
+            var retryCount = 0;
+
+            var oldChunkNo = -1;
+
+            SendFileInChunks(_mdbChannel, fileName, fileEntry, chunkNo =>
+            {
+                if (oldChunkNo != chunkNo)
+                {
+                    timeoutValue = initialTimeout;
+                    retryCount = 0;
+                }
+                oldChunkNo = chunkNo;
+
+                var t = new Func<int, int>(timeout =>
+                {
+                    var cts = new CancellationTokenSource(timeout);
+                    var token = cts.Token;
+                    var storeTask = new Task<int>(() =>
+                    {
+                        var storedCount = 0;
+
+                        try
+                        {
+                            while (true)
+                            {
+                                token.ThrowIfCancellationRequested();
+
+                                if (_mcChannel.Messages.IsEmpty)
+                                    continue;
+
+                                Message msg;
+                                if (_mcChannel.Messages.TryDequeue(out msg))
+                                {
+                                    if (msg.MessageType != MessageType.Stored ||
+                                          msg.ChunkNo != chunkNo ||
+                                          !msg.FileId.SequenceEqual(fileEntry.FileId))
+                                        _mcChannel.Messages.Enqueue(msg);
+                                    else
+                                        storedCount++;
+                                }
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return storedCount;
+                        }
+                    }, cts.Token);
+
+                    storeTask.RunSynchronously();
+                    return storeTask.Result;
+                });
+
+                retryCount++;
+                var count = t(timeoutValue);
+                if (count < fileEntry.ReplicationDegree && retryCount < maxRetries)
+                {
+                    timeoutValue *= 2;
+                    Console.WriteLine("Replication degree is {0} but wanted {1}. Timeout increased to {2}", count, fileEntry.ReplicationDegree, timeoutValue);
+                    return false;
+                }
+
+                Console.WriteLine("Stored or giving up: retries {0}, rep degree {1}", retryCount, count);
+                fileEntry.ActualReplicationDegree = count;
+
+                return true;
+            });
+
+            Console.WriteLine("File back'ed up");
         }
 
         private static void PrintUsage()

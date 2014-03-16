@@ -1,41 +1,66 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Sockets;
+using System.Threading.Tasks;
 using DBS.Multicast;
 
 namespace DBS
 {
     public interface IChannel
     {
-        //void JoinMulticast();
-        //void DropMulticast();
         void Send(Message msg);
-        Message Receive();
     }
+
+    public delegate bool OnReceive(Message msg);
 
     public class Channel : IChannel
     {
         public string Name { get; set; }
 
-        private IMulticastListener Listener;
+        public readonly ConcurrentQueue<Message> Messages;
+
+        public event OnReceive OnReceive;
+
+        private void StartReceiving()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    var msg = Receive();
+                    if (OnReceive != null)
+                    {
+                        if (!OnReceive(msg))
+                            Messages.Enqueue(msg);
+                    }
+                    else
+                        Messages.Enqueue(msg);
+                }
+            });
+        }
+
+        private readonly IMulticastListener _listener;
         private readonly IMulticastBroadcaster _broadcaster;
 
         public Channel(IPAddress ip, int port)
         {
             var settings = new MulticastSettings {Address = ip, Port = port, TimeToLive = 3};
 
-            Listener = new MulticastListener(settings, true);
-            _broadcaster = new MulticastBroadcaster(settings, true);
+            _listener = new MulticastListener(settings);
+            _broadcaster = new MulticastBroadcaster(settings);
+
+            Messages = new ConcurrentQueue<Message>();
+            StartReceiving();
         }
 
         public void Send(Message msg)
         {
             _broadcaster.Broadcast(msg.Serialize());
+            //Console.WriteLine("S: " + msg);
         }
 
-        public Message Receive()
+        private Message Receive()
         {
-            return Message.Deserialize(Listener.Receive());
+            return Message.Deserialize(_listener.Receive());
         }
     }
 }

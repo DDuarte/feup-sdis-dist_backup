@@ -7,8 +7,6 @@ namespace DBS.Multicast
 {
     class MulticastListener : IMulticastListener
     {
-        public event ReceiveHandler OnReceive;
-
         public MulticastSettings Settings { get; protected set; }
 
         public bool IsBound
@@ -50,7 +48,16 @@ namespace DBS.Multicast
         public byte[] Receive()
         {
             var ipEndPoint = LocalIPEndPoint;
-            return UdpClient.Receive(ref ipEndPoint);
+            //UdpClient.Client.ReceiveTimeout = 50;
+
+            try
+            {
+                return UdpClient.Receive(ref ipEndPoint);
+            }
+            catch (SocketException)
+            {
+                return null;
+            }
         }
 
         public void StopListening()

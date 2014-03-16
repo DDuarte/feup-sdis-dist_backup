@@ -31,7 +31,7 @@ namespace DBS
         Removed
     }
 
-    public struct Message
+    public class Message
     {
         public const int VERSION_M = 1;
         public const int VERSION_N = 0;
@@ -142,6 +142,8 @@ namespace DBS
         public static Message Deserialize(byte[] data)
         {
             var message = new Message();
+            if (data == null)
+                return message;
 
             using (var stream = new MemoryStream(data))
             {
