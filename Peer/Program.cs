@@ -203,34 +203,35 @@ namespace Peer
                     var token = cts.Token;
                     var storeTask = new Task<int>(() =>
                     {
-                        var storedCount = 0;
+                        var receivedMessagesFrom = new HashSet<string>();
+
+                        OnReceive onReceivedStored = msg =>
+                        {
+                            if (msg.MessageType != MessageType.Stored ||
+                                  msg.ChunkNo != chunkNo ||
+                                  !msg.FileId.SequenceEqual(fileEntry.FileId))
+                                return false;
+
+                            receivedMessagesFrom.Add(msg.RemoteEndPoint.Address.ToString());
+                            return true;
+                        };
 
                         try
                         {
+                            
+                            _mcChannel.OnReceive += onReceivedStored;
                             while (true)
                             {
                                 token.ThrowIfCancellationRequested();
-
-                                if (_mcChannel.Messages.IsEmpty)
-                                    continue;
-
-                                Message msg;
-                                if (_mcChannel.Messages.TryDequeue(out msg))
-                                {
-                                    if (msg.MessageType != MessageType.Stored ||
-                                          msg.ChunkNo != chunkNo ||
-                                          !msg.FileId.SequenceEqual(fileEntry.FileId))
-                                        _mcChannel.Messages.Enqueue(msg);
-                                    else
-                                        storedCount++;
-                                }
+                                Thread.Sleep(10);
                             }
                         }
                         catch (OperationCanceledException)
                         {
-                            return storedCount;
+                            _mcChannel.OnReceive -= onReceivedStored;
+                            return receivedMessagesFrom.Count;
                         }
-                    }, cts.Token);
+                    });
 
                     storeTask.RunSynchronously();
                     return storeTask.Result;
