@@ -62,7 +62,10 @@ namespace DBS
 
         private Message Receive()
         {
-            return Message.Deserialize(_listener.Receive());
+            IPEndPoint ep;
+            var msg = Message.Deserialize(_listener.Receive(out ep));
+            msg.RemoteEndPoint = ep;
+            return msg;
         }
     }
 }

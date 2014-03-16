@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace DBS.Multicast
 {
@@ -9,6 +10,7 @@ namespace DBS.Multicast
         bool IsBound { get; }
 
         byte[] Receive();
+        byte[] Receive(out IPEndPoint ep);
 
         void StopListening();
     }

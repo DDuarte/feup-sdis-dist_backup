@@ -45,19 +45,27 @@ namespace DBS.Multicast
             UdpClient.JoinMulticastGroup(Settings.Address, Settings.TimeToLive);
         }
 
-        public byte[] Receive()
+        public byte[] Receive(out IPEndPoint ep)
         {
             var ipEndPoint = LocalIPEndPoint;
-            //UdpClient.Client.ReceiveTimeout = 50;
 
             try
             {
-                return UdpClient.Receive(ref ipEndPoint);
+                var msg = UdpClient.Receive(ref ipEndPoint);
+                ep = ipEndPoint;
+                return msg;
             }
             catch (SocketException)
             {
+                ep = null;
                 return null;
             }
+        }
+
+        public byte[] Receive()
+        {
+            IPEndPoint _;
+            return Receive(out _);
         }
 
         public void StopListening()

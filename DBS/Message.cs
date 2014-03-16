@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace DBS
@@ -138,6 +139,8 @@ namespace DBS
         }
 
         public byte[] Body { get; set; }
+
+        public IPEndPoint RemoteEndPoint { get; set; }
 
         public static Message Deserialize(byte[] data)
         {
