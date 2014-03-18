@@ -108,7 +108,7 @@ namespace Peer
 
             var files = new Dictionary<string, FileEntry>();
             foreach (var f in Config.Global.Files)
-                files.Add(f.Name, new FileEntry { FileId = FileIdGenerator.Build(f.Name), ReplicationDegree = f.ReplicationDegree});
+                files.Add(f.Name, new FileEntry { FileId = new FileId(f.Name), ReplicationDegree = f.ReplicationDegree});
 
             // Setup directories
             string backupDir = Config.Global.BackupDir;
@@ -155,7 +155,7 @@ namespace Peer
                 var chunkNo = msg.ChunkNo.Value;
                 var fileId = msg.FileId;
 
-                var key = FileIdGenerator.FileIdToString(fileId) + "_" + chunkNo;
+                var key = fileId.ToString() + "_" + chunkNo;
                 if (!PersistentStore.Dict.ContainsKey(key))
                     return true;
 
@@ -187,8 +187,7 @@ namespace Peer
                     _mcChannel.OnReceive += msg2 =>
                     {
                         if (msg2.MessageType != MessageType.PutChunk ||
-                              msg2.ChunkNo != chunkNo ||
-                              !msg2.FileId.SequenceEqual(fileId))
+                              msg2.ChunkNo != chunkNo || msg2.FileId != fileId)
                             return false;
 
                         cts.Cancel();
@@ -226,7 +225,7 @@ namespace Peer
                     return true;
                 }
 
-                var fileName = FileIdGenerator.FileIdToString(msg.FileId) + "_" + msg.ChunkNo;
+                var fileName = msg.FileId.ToString() + "_" + msg.ChunkNo;
                 var fullPath = Path.Combine(dir, fileName);
                 if (!File.Exists(fullPath))
                 {
@@ -252,7 +251,7 @@ namespace Peer
             };
         }
 
-        private static void BackupChunk(byte[] fileId, int chunkNo, byte[] data, int repDegree)
+        private static void BackupChunk(FileId fileId, int chunkNo, byte[] data, int repDegree)
         {
             var t = new Func<int, int>(timeout =>
             {
@@ -265,8 +264,7 @@ namespace Peer
                     OnReceive onReceivedStored = msg =>
                     {
                         if (msg.MessageType != MessageType.Stored ||
-                              msg.ChunkNo != chunkNo ||
-                              !msg.FileId.SequenceEqual(fileId))
+                              msg.ChunkNo != chunkNo || msg.FileId != fileId)
                             return false;
 
                         receivedMessagesFrom.Add(msg.RemoteEndPoint.Address.ToString());
@@ -318,7 +316,7 @@ namespace Peer
                 }
             }
 
-            PersistentStore.UpdateDegrees(FileIdGenerator.FileIdToString(fileId) + "_" + chunkNo, count, repDegree);
+            PersistentStore.UpdateDegrees(fileId + "_" + chunkNo, count, repDegree);
         }
 
 

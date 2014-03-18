@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace DBSTests
 {
     [TestClass]
-    public class FileIdGeneratorTests
+    public class FileIdTests
     {
         /* This is the file identifier for the backup service.
          * As stated above, it is supposed to be obtained by using
@@ -32,42 +32,42 @@ namespace DBSTests
         public void TestBuildEqualHash()
         {
             // File1a and File1b have same attributes
-            var hash1 = FileIdGenerator.Build(File1A).ToArray();
-            var hash2 = FileIdGenerator.Build(File1B).ToArray();
+            var fileId1 = FileId.FromFile(File1A);
+            var fileId2 = FileId.FromFile(File1B);
 
-            CollectionAssert.AreEqual(hash1, hash2);
+            Assert.AreEqual(fileId1, fileId2);
         }
 
         [TestMethod]
         public void TestBuildDifferentHash()
         {
-            var hash1 = FileIdGenerator.Build(File1A).ToArray();
-            var hash2 = FileIdGenerator.Build(File1C).ToArray();
-            var hash3 = FileIdGenerator.Build(File1D).ToArray();
-            var hash4 = FileIdGenerator.Build(File1E).ToArray();
-            var hash5 = FileIdGenerator.Build(File1F).ToArray();
+            var fileId1 = FileId.FromFile(File1A);
+            var fileId2 = FileId.FromFile(File1C);
+            var fileId3 = FileId.FromFile(File1D);
+            var fileId4 = FileId.FromFile(File1E);
+            var fileId5 = FileId.FromFile(File1F);
 
-            CollectionAssert.AreNotEqual(hash1, hash2); // diff data
-            CollectionAssert.AreNotEqual(hash1, hash3); // diff creation time
-            CollectionAssert.AreNotEqual(hash1, hash4); // diff modify time
-            CollectionAssert.AreNotEqual(hash1, hash5); // diff file name
-            CollectionAssert.AreNotEqual(hash2, hash3);
-            CollectionAssert.AreNotEqual(hash2, hash4);
-            CollectionAssert.AreNotEqual(hash2, hash5);
-            CollectionAssert.AreNotEqual(hash3, hash4);
-            CollectionAssert.AreNotEqual(hash3, hash5);
-            CollectionAssert.AreNotEqual(hash4, hash5);
+            Assert.AreNotEqual(fileId1, fileId2); // diff data
+            Assert.AreNotEqual(fileId1, fileId3); // diff creation time
+            Assert.AreNotEqual(fileId1, fileId4); // diff modify time
+            Assert.AreNotEqual(fileId1, fileId5); // diff file name
+            Assert.AreNotEqual(fileId2, fileId3);
+            Assert.AreNotEqual(fileId2, fileId4);
+            Assert.AreNotEqual(fileId2, fileId5);
+            Assert.AreNotEqual(fileId3, fileId4);
+            Assert.AreNotEqual(fileId3, fileId5);
+            Assert.AreNotEqual(fileId4, fileId5);
         }
 
         [TestMethod]
         public void TestFileIdToStringEquality()
         {
-            var hash1 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1A));
-            var hash2 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1B));
-            var hash3 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1C));
-            var hash4 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1D));
-            var hash5 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1E));
-            var hash6 = FileIdGenerator.FileIdToString(FileIdGenerator.Build(File1F));
+            var hash1 = FileId.FromFile(File1A).ToString();
+            var hash2 = FileId.FromFile(File1B).ToString();
+            var hash3 = FileId.FromFile(File1C).ToString();
+            var hash4 = FileId.FromFile(File1D).ToString();
+            var hash5 = FileId.FromFile(File1E).ToString();
+            var hash6 = FileId.FromFile(File1F).ToString();
 
             Assert.AreEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
@@ -79,8 +79,9 @@ namespace DBSTests
         [TestMethod]
         public void TestFileIdToStringFormat()
         {
-            var hashArr = FileIdGenerator.Build(File1A).ToArray();
-            var hashStr = FileIdGenerator.FileIdToString(hashArr);
+            var fileId = FileId.FromFile(File1A);
+            var hashArr = fileId.GetBytes();
+            var hashStr = fileId.ToString();
 
             // sizes
             Assert.AreEqual(32, hashArr.Length);

@@ -44,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Channel.cs" />
     <Compile Include="FileEntry.cs" />
-    <Compile Include="FileIdGenerator.cs" />
+    <Compile Include="FileId.cs" />
     <Compile Include="Multicast\IMulticastBroadcaster.cs" />
     <Compile Include="Multicast\IMulticastListener.cs" />
     <Compile Include="MemoryStreamExtensions.cs" />

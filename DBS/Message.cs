@@ -71,7 +71,7 @@ namespace DBS
             }
         }
 
-        internal void SetVersion(string version)
+        internal void SetVersion(string version) // expected format: "M.N"
         {
             if (version.Length != 3)
                 throw new ArgumentException("Invalid version string", "version");
@@ -80,29 +80,12 @@ namespace DBS
             VersionN = int.Parse(version[2].ToString(CultureInfo.InvariantCulture));
         }
 
-        private byte[] _fileId;
-        public byte[] FileId
-        {
-            get { return _fileId; }
-            set
-            {
-                if (value != null && value.Length != 32)
-                    throw new ArgumentException("File identifier must be a 32 byte array", "value");
-                _fileId = value;
-            }
-        }
-
         internal void SetFileId(string fileId)
         {
-            if (fileId.Length != 64)
-                throw new ArgumentException("Invalid fileId string", "fileId");
-
-            FileId = new byte[32];
-            for (int i = 0, index = 31; i < fileId.Length; i += 2, index--)
-            {
-                FileId[index] = Convert.ToByte(string.Format("{0}{1}", fileId[i], fileId[i + 1]), 16);
-            }
+            FileId = new FileId(fileId);
         }
+
+        public FileId FileId { get; set; }
 
         private int? _chunkNo;
         public int? ChunkNo
@@ -225,7 +208,7 @@ namespace DBS
 
                 if (FileId != null)
                 {
-                    stream.WriteASCII(FileIdGenerator.FileIdToString(FileId));
+                    stream.WriteASCII(FileId.ToString());
                     if (!IsLastField("FileId"))
                         stream.WriteASCII(' ');
                 }
@@ -276,7 +259,7 @@ namespace DBS
         {
             var ret = MessageType + " ";
             if (FileId != null)
-                ret += FileIdGenerator.FileIdToString(FileId).Substring(0, 6) + "... ";
+                ret += FileId.ToString().Substring(0, 6) + "... ";
             if (ChunkNo.HasValue)
                 ret += "#" + ChunkNo.Value + " ";
             if (ReplicationDeg.HasValue)
@@ -286,27 +269,27 @@ namespace DBS
             return ret;
         }
 
-        public static Message BuildPutChunkMessage(byte[] fileId, int chunkNo, int replicationDeg, byte[] body)
+        public static Message BuildPutChunkMessage(FileId fileId, int chunkNo, int replicationDeg, byte[] body)
         {
             return BuildPutChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, replicationDeg, body);
         }
 
-        public static Message BuildStoredMessage(byte[] fileId, int chunkNo)
+        public static Message BuildStoredMessage(FileId fileId, int chunkNo)
         {
             return BuildStoredMessage(VERSION_M, VERSION_N, fileId, chunkNo);
         }
 
-        public static Message BuildGetChunkMessage(byte[] fileId, int chunkNo)
+        public static Message BuildGetChunkMessage(FileId fileId, int chunkNo)
         {
             return BuildGetChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo);
         }
 
-        public static Message BuildChunkMessage(byte[] fileId, int chunkNo, byte[] body)
+        public static Message BuildChunkMessage(FileId fileId, int chunkNo, byte[] body)
         {
             return BuildChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, body);
         }
 
-        public static Message BuildRemovedMessage(byte[] fileId, int chunkNo)
+        public static Message BuildRemovedMessage(FileId fileId, int chunkNo)
         {
             return BuildRemovedMessage(VERSION_M, VERSION_N, fileId, chunkNo);
         }
@@ -316,7 +299,7 @@ namespace DBS
             return BuildRemovedMessage(VERSION_M, VERSION_N, fileIdStr, chunkNo);
         }
 
-        public static Message BuildPutChunkMessage(int versionM, int versionN, byte[] fileId, int chunkNo,
+        public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
             int replicationDeg, byte[] body)
         {
             return new Message
@@ -331,7 +314,7 @@ namespace DBS
             };
         }
 
-        public static Message BuildStoredMessage(int versionM, int versionN, byte[] fileId, int chunkNo)
+        public static Message BuildStoredMessage(int versionM, int versionN, FileId fileId, int chunkNo)
         {
             return new Message
             {
@@ -343,7 +326,7 @@ namespace DBS
             };
         }
 
-        public static Message BuildGetChunkMessage(int versionM, int versionN, byte[] fileId, int chunkNo)
+        public static Message BuildGetChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo)
         {
             return new Message
             {
@@ -355,7 +338,7 @@ namespace DBS
             };
         }
 
-        public static Message BuildChunkMessage(int versionM, int versionN, byte[] fileId, int chunkNo,
+        public static Message BuildChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
             byte[] body)
         {
             return new Message
@@ -369,7 +352,7 @@ namespace DBS
             };
         }
 
-        public static Message BuildDeleteMessage(byte[] fileId)
+        public static Message BuildDeleteMessage(FileId fileId)
         {
             return new Message
             {
@@ -378,7 +361,7 @@ namespace DBS
             };
         }
 
-        public static Message BuildRemovedMessage(int versionM, int versionN, byte[] fileId, int chunkNo)
+        public static Message BuildRemovedMessage(int versionM, int versionN, FileId fileId, int chunkNo)
         {
             return new Message
             {

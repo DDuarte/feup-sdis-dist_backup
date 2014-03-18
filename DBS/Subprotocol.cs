@@ -23,7 +23,7 @@ namespace DBS
             if (!Directory.Exists(_directory))
                 return;
 
-            var fileIdStr = FileIdGenerator.FileIdToString(msg.FileId);
+            var fileIdStr = msg.FileId.ToString();
 
             var files = Directory.GetFiles(_directory, fileIdStr + "_*"); // ABCDEF01324_12 -- FileId_ChunkNo
 

@@ -2,7 +2,7 @@
 {
     public class FileEntry
     {
-        public byte[] FileId { get; set; }
+        public FileId FileId { get; set; }
 
         public int ReplicationDegree { get; set; }
     }

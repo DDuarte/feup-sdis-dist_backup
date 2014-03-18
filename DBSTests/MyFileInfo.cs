@@ -86,7 +86,7 @@ namespace DBSTests
 
         public IFileStreamWrap Open(FileMode mode)
         {
-            throw new NotImplementedException();
+            return new MyFileStream(_data);
         }
 
         public IFileStreamWrap Open(FileMode mode, FileAccess access)
@@ -96,12 +96,12 @@ namespace DBSTests
 
         public IFileStreamWrap Open(FileMode mode, FileAccess access, FileShare share)
         {
-            throw new NotImplementedException();
+            return new MyFileStream(_data);
         }
 
         public IFileStreamWrap OpenRead()
         {
-            throw new NotImplementedException();
+            return new MyFileStream(_data);
         }
 
         public IStreamReaderWrap OpenText()

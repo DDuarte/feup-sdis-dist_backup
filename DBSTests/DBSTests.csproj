@@ -54,7 +54,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="FileIdGeneratorTests.cs" />
+    <Compile Include="FileIdTests.cs" />
     <Compile Include="MessageTests.cs" />
     <Compile Include="MyFileInfo.cs" />
     <Compile Include="MyFileStream.cs" />
