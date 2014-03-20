@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Community.CsharpSqlite.SQLiteClient;
 
-namespace Peer
+namespace DBS
 {
     public class DBFields<T> : IEqualityComparer<T>
     {

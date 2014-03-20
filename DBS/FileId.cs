@@ -117,6 +117,7 @@ namespace DBS
             var fileName = Encoding.ASCII.GetBytes(file.Name);
             var fileNameChecksum = sha.ComputeHash(fileName);
 
+            // TODO: Verifiy if including file data (expensive operation) is necessary
             byte[] fileChecksum;
             using (var fileStream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
             {

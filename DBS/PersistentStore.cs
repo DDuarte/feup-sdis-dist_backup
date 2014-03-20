@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using JsonConfig;
 
-namespace Peer
+namespace DBS
 {
     public class ReplicationDegrees
     {

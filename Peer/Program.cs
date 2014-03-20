@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 using DBS;
 using JsonConfig;
-using System.Linq;
 
 /* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
 
@@ -15,26 +11,6 @@ namespace Peer
 {
     static class Program
     {
-        static void SendFileInChunks(string fileName, FileEntry fileEntry)
-        {
-            const int chunkSize = 64000; // read the file in chunks of 64KB
-            using (var file = File.OpenRead(fileName))
-            {
-                int bytesRead, chunkNo = 0;
-                var fileSize = file.Length;
-                var buffer = new byte[chunkSize];
-                while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    BackupChunk(fileEntry.FileId, chunkNo, data, fileEntry.ReplicationDegree);
-                    ++chunkNo;
-                }
-
-                if ((fileSize%chunkSize) == 0) // last chunk with an empty body
-                    BackupChunk(fileEntry.FileId, chunkNo, new byte[] {}, fileEntry.ReplicationDegree);
-            }
-        }
-
         static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -98,27 +74,37 @@ namespace Peer
                 return;
             }
 
-            // Create channels
-            
-            _mcChannel = new Channel(mcIP, mcPort) { Name = "MC" };
-            _mdbChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
-            _mdrChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
+            // Get IPAddress
+            Core.Instance.LocalIP = IPAddress.Parse(Config.Global.LocalIP);
+
+            // Max site used to backup (locally)
+            Core.Instance.MaxBackupSize = Config.Global.DiskSpace;
 
             // Create dictionary of files to mantain
-
-            var files = new Dictionary<string, FileEntry>();
             foreach (var f in Config.Global.Files)
-                files.Add(f.Name, new FileEntry { FileId = new FileId(f.Name), ReplicationDegree = f.ReplicationDegree});
+                Core.Instance.BackupFiles.Add(f.Name, new FileEntry
+                {
+                    FileId = FileId.FromFile(f.Name),
+                    ReplicationDegree = f.ReplicationDegree
+                });
 
             // Setup directories
-            string backupDir = Config.Global.BackupDir;
-            string storeDir = Config.Global.StoreDir;
+            Core.Instance.BackupDirectory = Config.Global.BackupDir;
+            Core.Instance.StoreDirectory = Config.Global.StoreDir;
 
-            if (!Directory.Exists(backupDir))
-                Directory.CreateDirectory(backupDir);
-            if (!Directory.Exists(storeDir))
-                Directory.CreateDirectory(storeDir);
+            if (!Directory.Exists(Core.Instance.BackupDirectory))
+                Directory.CreateDirectory(Core.Instance.BackupDirectory);
+            if (!Directory.Exists(Core.Instance.StoreDirectory))
+                Directory.CreateDirectory(Core.Instance.StoreDirectory);
 
+            // Create channels
+            Core.Instance.MCChannel = new Channel(mcIP, mcPort) { Name = "MC" };
+            Core.Instance.MDBChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
+            Core.Instance.MDRChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
+
+            Core.Instance.Start();
+
+            /*
             // Start Tasks
 
             Task.Factory.StartNew(() => StoreFiles(backupDir));
@@ -129,14 +115,33 @@ namespace Peer
 
             var spaceRecl = new SpaceReclaimingWatcher(_mcChannel);
             spaceRecl.Run(backupDir);
-
-            Console.WriteLine("Press ENTER to quit.");
-            Console.ReadKey();
+             * */
         }
 
+        /*
         private static Channel _mcChannel;
         private static Channel _mdbChannel;
         private static Channel _mdrChannel;
+         * 
+         *static void SendFileInChunks(string fileName, FileEntry fileEntry)
+        {
+            const int chunkSize = 64000; // read the file in chunks of 64KB
+            using (var file = File.OpenRead(fileName))
+            {
+                int bytesRead, chunkNo = 0;
+                var fileSize = file.Length;
+                var buffer = new byte[chunkSize];
+                while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
+                    BackupChunk(fileEntry.FileId, chunkNo, data, fileEntry.ReplicationDegree);
+                    ++chunkNo;
+                }
+
+                if ((fileSize%chunkSize) == 0) // last chunk with an empty body
+                    BackupChunk(fileEntry.FileId, chunkNo, new byte[] {}, fileEntry.ReplicationDegree);
+            }
+        }
 
         private static void ListenRemoved(string dir)
         {
@@ -162,7 +167,7 @@ namespace Peer
 
                 var fullPath = Path.Combine(dir, key);
 
-                Core.Instance.Store.DecrementActualDegree(key, 0 /* won't be used, dict contains key*/);
+                Core.Instance.Store.DecrementActualDegree(key, 0 /* won't be used, dict contains key);
                 ReplicationDegrees rd;
                 Core.Instance.Store.TryGetDegrees(key, out rd);
 
@@ -318,7 +323,7 @@ namespace Peer
             }
 
             Core.Instance.Store.UpdateDegrees(fileId + "_" + chunkNo, count, repDegree);
-        }
+        }*/
 
 
         private static void PrintUsage()
