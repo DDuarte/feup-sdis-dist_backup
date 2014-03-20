@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace DBS
 {
@@ -7,4 +7,8 @@ namespace DBS
         void Start();
         void Stop(); // maybe
     }
+
+    // TODO: SpaceReclaimingService (in Program.cs)
+    // TODO: ChunkRestoreService
+    // TODO: ChunkRestoreProtocol
 }

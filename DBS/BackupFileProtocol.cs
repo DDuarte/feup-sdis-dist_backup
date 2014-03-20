@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DBS
 {
@@ -21,30 +22,30 @@ namespace DBS
 
         public void Run()
         {
-            //Task.Factory.StartNew(() =>
-            //{
-            using (var file = File.OpenRead(_fileName))
+            Task.Factory.StartNew(() =>
             {
-                int bytesRead, chunkNo = 0;
-                var fileSize = file.Length;
-                var buffer = new byte[ChunkSize];
-                while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
+                using (var file = File.OpenRead(_fileName))
                 {
-                    var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
-                        data);
-                    bc.Run();
-                    ++chunkNo;
-                }
+                    int bytesRead, chunkNo = 0;
+                    var fileSize = file.Length;
+                    var buffer = new byte[ChunkSize];
+                    while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
+                        var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
+                            data);
+                        bc.Run();
+                        ++chunkNo;
+                    }
 
-                if ((fileSize%ChunkSize) == 0) // last chunk with an empty body
-                {
-                    var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
-                        new byte[] {});
-                    bc.Run();
+                    if ((fileSize%ChunkSize) == 0) // last chunk with an empty body
+                    {
+                        var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
+                            new byte[] {});
+                        bc.Run();
+                    }
                 }
-            }
-            //});
+            });
         }
     }
 }

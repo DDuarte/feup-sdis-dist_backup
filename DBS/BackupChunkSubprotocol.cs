@@ -65,8 +65,9 @@ namespace DBS
                 message.FileId == _fileId &&
                 message.ChunkNo == _chunkNo).Subscribe(StoreHandler);
 
+            //Task.Factory.StartNew(SendChunk).ContinueWith(task => subs.Dispose());
             SendChunk();
-            subs.Dispose();
+            subs.Dispose(); // unsubscribe
         }
     }
 }
