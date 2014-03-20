@@ -64,7 +64,7 @@ namespace Peer
             {
                 // launch space reclaiming subprotocol
 
-                foreach (var f in PersistentStore.Dict)
+                foreach (var f in Core.Instance.Store)
                 {
                     var actualDegree = f.Value.ActualDegree;
                     var wantedDegree = f.Value.WantedDegree;

@@ -130,6 +130,7 @@ namespace Peer
             var spaceRecl = new SpaceReclaimingWatcher(_mcChannel);
             spaceRecl.Run(backupDir);
 
+            Console.WriteLine("Press ENTER to quit.");
             Console.ReadKey();
         }
 
@@ -156,14 +157,14 @@ namespace Peer
                 var fileId = msg.FileId;
 
                 var key = fileId.ToString() + "_" + chunkNo;
-                if (!PersistentStore.Dict.ContainsKey(key))
+                if (!Core.Instance.Store.ContainsFile(key))
                     return true;
 
                 var fullPath = Path.Combine(dir, key);
 
-                PersistentStore.DecrementActualDegree(key, 0 /* won't be used, dict contains key*/);
+                Core.Instance.Store.DecrementActualDegree(key, 0 /* won't be used, dict contains key*/);
                 ReplicationDegrees rd;
-                PersistentStore.TryGetDegrees(key, out rd);
+                Core.Instance.Store.TryGetDegrees(key, out rd);
 
                 if (rd.ActualDegree < rd.WantedDegree)
                 {
@@ -235,7 +236,7 @@ namespace Peer
                         fs.Write(msg.Body, 0, msg.Body.Length);
                         fs.Close();
 
-                        PersistentStore.IncrementActualDegree(fileName, msg.ReplicationDeg.Value);
+                        Core.Instance.Store.IncrementActualDegree(fileName, msg.ReplicationDeg.Value);
                     }
                     catch (Exception ex)
                     {
@@ -316,7 +317,7 @@ namespace Peer
                 }
             }
 
-            PersistentStore.UpdateDegrees(fileId + "_" + chunkNo, count, repDegree);
+            Core.Instance.Store.UpdateDegrees(fileId + "_" + chunkNo, count, repDegree);
         }
 
 
