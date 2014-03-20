@@ -1,83 +1,99 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using JsonConfig;
-using Microsoft.Isam.Esent.Collections.Generic;
 
 namespace Peer
 {
-    [Serializable]
-    public struct ReplicationDegrees
+    public class ReplicationDegrees
     {
-        public ReplicationDegrees(int a, int w)
-        {
-            ActualDegree = a;
-            WantedDegree = w;
-        }
-
-        public readonly int ActualDegree;
-        public readonly int WantedDegree;
+        public int ActualDegree { get; set; }
+        public int WantedDegree { get; set; }
     }
 
-    public static class PersistentStore
+    public class PersistentStore : IEnumerable<KeyValuePair<string, ReplicationDegrees>>, IDisposable
     {
-        // TODO: Add enumerator and change to private
-        public static readonly PersistentDictionary<string, ReplicationDegrees> Dict = new PersistentDictionary<string, ReplicationDegrees>(Config.Global.StoreDir);
+        private readonly PersistentDictionary<string, ReplicationDegrees> _dict =
+            new PersistentDictionary<string, ReplicationDegrees>("store", "repdegrees");
 
-        public static void IncrementActualDegree(string fileName, int wantedDegree)
+        public bool ContainsFile(string fileName)
+        {
+            return _dict.ContainsKey(fileName);
+        }
+
+        public void IncrementActualDegree(string fileName, int wantedDegree)
         {
             IncrementActualDegree(fileName, 1, wantedDegree);
         }
 
-        public static void DecrementActualDegree(string fileName, int wantedDegree)
+        public void DecrementActualDegree(string fileName, int wantedDegree)
         {
             IncrementActualDegree(fileName, -1, wantedDegree);
         }
 
-        public static void UpdateDegrees(string fileName, int actualDegree, int wantedDegree)
+        public void UpdateDegrees(string fileName, int actualDegree, int wantedDegree)
         {
             ReplicationDegrees t;
-            if (Dict.TryGetValue(fileName, out t))
+            if (_dict.TryGetValue(fileName, out t))
             {
-                var t2 = new ReplicationDegrees(t.ActualDegree, t.WantedDegree);
-                Dict[fileName] = t2;
+                _dict[fileName].ActualDegree = t.ActualDegree;
+                _dict[fileName].WantedDegree = t.WantedDegree;
             }
             else
-            {
-                Dict[fileName] = new ReplicationDegrees(actualDegree, wantedDegree);
-            }
+                _dict[fileName] = new ReplicationDegrees {ActualDegree = actualDegree, WantedDegree = wantedDegree};
         }
 
-        public static bool TryGetDegrees(string fileName, out ReplicationDegrees rd)
+        public bool TryGetDegrees(string fileName, out ReplicationDegrees rd)
         {
             ReplicationDegrees t;
-            if (Dict.TryGetValue(fileName, out t))
+            if (_dict.TryGetValue(fileName, out t))
             {
                 rd = t;
                 return true;
             }
-            else
-            {
-                rd = new ReplicationDegrees(0, 0);
-                return false;
-            }
+            rd = null;
+            return false;
         }
 
-        public static bool RemoveDegrees(string fileName)
+        public bool RemoveDegrees(string fileName)
         {
-            return Dict.Remove(fileName);
+            return _dict.Remove(fileName);
         }
 
-        private static void IncrementActualDegree(string fileName, int actualDegree, int wantedDegree)
+        private void IncrementActualDegree(string fileName, int add, int wantedDegree)
         {
             ReplicationDegrees t;
-            if (Dict.TryGetValue(fileName, out t))
+            if (_dict.TryGetValue(fileName, out t))
             {
-                var t2 = new ReplicationDegrees(t.ActualDegree, t.WantedDegree + actualDegree);
-                Dict[fileName] = t2;
+                var t2 = new ReplicationDegrees {ActualDegree = t.ActualDegree + add, WantedDegree = t.WantedDegree};
+                _dict[fileName] = t2;
             }
             else
             {
-                Dict[fileName] = new ReplicationDegrees(1, wantedDegree);
+                _dict[fileName] = new ReplicationDegrees { ActualDegree = add < 0 ? 0 : 1, WantedDegree = wantedDegree };
             }
+        }
+
+        public IEnumerator<KeyValuePair<string, ReplicationDegrees>> GetEnumerator()
+        {
+            return _dict.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable) _dict).GetEnumerator();
+        }
+
+        protected virtual void Dispose(bool d)
+        {
+            if (d)
+                _dict.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }
