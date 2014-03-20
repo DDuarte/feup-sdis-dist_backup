@@ -8,11 +8,12 @@ using JsonConfig;
 
 namespace Peer
 {
+    /*
     public class SpaceReclaimingWatcher
     {
-        private IChannel _channel;
+        private Channel _channel;
 
-        public SpaceReclaimingWatcher(IChannel channel)
+        public SpaceReclaimingWatcher(Channel channel)
         {
             _channel = channel;
         }
@@ -88,5 +89,5 @@ namespace Peer
         {
             return Directory.GetFiles(p).Select(name => new FileInfo(name)).Select(info => info.Length).Sum();
         }
-    }
+    }*/
 }

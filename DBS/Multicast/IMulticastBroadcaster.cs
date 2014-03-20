@@ -1,6 +1,8 @@
-﻿namespace DBS.Multicast
+﻿using System;
+
+namespace DBS.Multicast
 {
-    public interface IMulticastBroadcaster
+    public interface IMulticastBroadcaster : IDisposable
     {
         MulticastSettings Settings { get; }
 

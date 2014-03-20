@@ -128,7 +128,7 @@ namespace DBS
         {
             var message = new Message();
             if (data == null)
-                return message;
+                return null;
 
             using (var stream = new MemoryStream(data))
             {

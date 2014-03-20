@@ -36,7 +36,7 @@ namespace DBSTests
             Assert.AreEqual(FileId1, msg.FileId);
             Assert.AreEqual(50, msg.ChunkNo);
             Assert.AreEqual(5, msg.ReplicationDeg);
-            Assert.AreEqual(Body1, msg.Body);
+            CollectionAssert.AreEqual(Body1, msg.Body);
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace DBSTests
             Assert.AreEqual(FileId2, msg.FileId);
             Assert.AreEqual(100, msg.ChunkNo);
             Assert.AreEqual(2, msg.ReplicationDeg);
-            Assert.AreEqual(null, msg.Body);
+            CollectionAssert.AreEqual(null, msg.Body);
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace DBSTests
             Assert.AreEqual(msg.FileId, msg2.FileId);
             Assert.AreEqual(msg.ChunkNo, msg2.ChunkNo);
             Assert.AreEqual(msg.ReplicationDeg, msg2.ReplicationDeg);
-            Assert.AreEqual(msg.Body, msg2.Body);
+            CollectionAssert.AreEqual(msg.Body, msg2.Body);
         }
 
         [TestMethod]
@@ -93,7 +93,7 @@ namespace DBSTests
             Assert.AreEqual(msg.FileId, msg2.FileId);
             Assert.AreEqual(msg.ChunkNo, msg2.ChunkNo);
             Assert.AreEqual(msg.ReplicationDeg, msg2.ReplicationDeg);
-            Assert.AreEqual(msg.Body, msg2.Body);
+            CollectionAssert.AreEqual(msg.Body, msg2.Body);
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@ namespace DBSTests
             Assert.AreEqual(getChunkMsg.FileId, getChunkMsg2.FileId);
             Assert.AreEqual(getChunkMsg.ChunkNo, getChunkMsg2.ChunkNo);
             Assert.AreEqual(getChunkMsg.ReplicationDeg, getChunkMsg2.ReplicationDeg);
-            Assert.AreEqual(getChunkMsg.Body, getChunkMsg2.Body);
+            CollectionAssert.AreEqual(getChunkMsg.Body, getChunkMsg2.Body);
 
             var chunkMsg = Message.BuildChunkMessage(9, 9, FileId1, 999999, body);
             bytes = chunkMsg.Serialize();
@@ -123,7 +123,7 @@ namespace DBSTests
             Assert.AreEqual(chunkMsg.FileId, chunkMsg2.FileId);
             Assert.AreEqual(chunkMsg.ChunkNo, chunkMsg2.ChunkNo);
             Assert.AreEqual(chunkMsg.ReplicationDeg, chunkMsg2.ReplicationDeg);
-            Assert.AreEqual(chunkMsg.Body, chunkMsg2.Body);
+            CollectionAssert.AreEqual(chunkMsg.Body, chunkMsg2.Body);
 
             var putChunkMsg = Message.BuildPutChunkMessage(9, 9, FileId1, 999999, 9, body);
             bytes = putChunkMsg.Serialize();
@@ -134,7 +134,7 @@ namespace DBSTests
             Assert.AreEqual(putChunkMsg.FileId, putChunkMsg2.FileId);
             Assert.AreEqual(putChunkMsg.ChunkNo, putChunkMsg2.ChunkNo);
             Assert.AreEqual(putChunkMsg.ReplicationDeg, putChunkMsg2.ReplicationDeg);
-            Assert.AreEqual(putChunkMsg.Body, putChunkMsg2.Body);
+            CollectionAssert.AreEqual(putChunkMsg.Body, putChunkMsg2.Body);
 
             var storedMsg = Message.BuildStoredMessage(9, 9, FileId1, 999999);
             bytes = storedMsg.Serialize();
@@ -145,7 +145,7 @@ namespace DBSTests
             Assert.AreEqual(storedMsg.FileId, storedMsg2.FileId);
             Assert.AreEqual(storedMsg.ChunkNo, storedMsg2.ChunkNo);
             Assert.AreEqual(storedMsg.ReplicationDeg, storedMsg2.ReplicationDeg);
-            Assert.AreEqual(storedMsg.Body, storedMsg2.Body);
+            CollectionAssert.AreEqual(storedMsg.Body, storedMsg2.Body);
 
             var deleteMsg = Message.BuildDeleteMessage(FileId1);
             bytes = deleteMsg.Serialize();
@@ -156,7 +156,7 @@ namespace DBSTests
             Assert.AreEqual(deleteMsg.FileId, deleteMsg2.FileId);
             Assert.AreEqual(deleteMsg.ChunkNo, deleteMsg2.ChunkNo);
             Assert.AreEqual(deleteMsg.ReplicationDeg, deleteMsg2.ReplicationDeg);
-            Assert.AreEqual(deleteMsg.Body, deleteMsg2.Body);
+            CollectionAssert.AreEqual(deleteMsg.Body, deleteMsg2.Body);
 
             var removedMsg = Message.BuildRemovedMessage(9, 9, FileId1, 999999);
             bytes = removedMsg.Serialize();
@@ -167,7 +167,7 @@ namespace DBSTests
             Assert.AreEqual(removedMsg.FileId, removedMsg2.FileId);
             Assert.AreEqual(removedMsg.ChunkNo, removedMsg2.ChunkNo);
             Assert.AreEqual(removedMsg.ReplicationDeg, removedMsg2.ReplicationDeg);
-            Assert.AreEqual(removedMsg.Body, removedMsg2.Body);
+            CollectionAssert.AreEqual(removedMsg.Body, removedMsg2.Body);
         }
 
         [TestMethod]
@@ -197,7 +197,7 @@ namespace DBSTests
             Assert.AreEqual(chunkMsg.FileId, chunkMsg2.FileId);
             Assert.AreEqual(chunkMsg.ChunkNo, chunkMsg2.ChunkNo);
             Assert.AreEqual(chunkMsg.ReplicationDeg, chunkMsg2.ReplicationDeg);
-            Assert.AreEqual(chunkMsg.Body, chunkMsg2.Body);
+            CollectionAssert.AreEqual(chunkMsg.Body, chunkMsg2.Body);
 
             var putChunkMsg = Message.BuildPutChunkMessage(0, 0, FileId1, 0, 0, body);
             bytes = putChunkMsg.Serialize();
@@ -208,7 +208,7 @@ namespace DBSTests
             Assert.AreEqual(putChunkMsg.FileId, putChunkMsg2.FileId);
             Assert.AreEqual(putChunkMsg.ChunkNo, putChunkMsg2.ChunkNo);
             Assert.AreEqual(putChunkMsg.ReplicationDeg, putChunkMsg2.ReplicationDeg);
-            Assert.AreEqual(putChunkMsg.Body, putChunkMsg2.Body);
+            CollectionAssert.AreEqual(putChunkMsg.Body, putChunkMsg2.Body);
 
             var storedMsg = Message.BuildStoredMessage(0, 0, FileId1, 0);
             bytes = storedMsg.Serialize();
@@ -219,7 +219,7 @@ namespace DBSTests
             Assert.AreEqual(storedMsg.FileId, storedMsg2.FileId);
             Assert.AreEqual(storedMsg.ChunkNo, storedMsg2.ChunkNo);
             Assert.AreEqual(storedMsg.ReplicationDeg, storedMsg2.ReplicationDeg);
-            Assert.AreEqual(storedMsg.Body, storedMsg2.Body);
+            CollectionAssert.AreEqual(storedMsg.Body, storedMsg2.Body);
 
             var deleteMsg = Message.BuildDeleteMessage(FileId1);
             bytes = deleteMsg.Serialize();
@@ -230,7 +230,7 @@ namespace DBSTests
             Assert.AreEqual(deleteMsg.FileId, deleteMsg2.FileId);
             Assert.AreEqual(deleteMsg.ChunkNo, deleteMsg2.ChunkNo);
             Assert.AreEqual(deleteMsg.ReplicationDeg, deleteMsg2.ReplicationDeg);
-            Assert.AreEqual(deleteMsg.Body, deleteMsg2.Body);
+            CollectionAssert.AreEqual(deleteMsg.Body, deleteMsg2.Body);
 
             var removedMsg = Message.BuildRemovedMessage(0, 0, FileId1, 0);
             bytes = removedMsg.Serialize();
@@ -241,7 +241,7 @@ namespace DBSTests
             Assert.AreEqual(removedMsg.FileId, removedMsg2.FileId);
             Assert.AreEqual(removedMsg.ChunkNo, removedMsg2.ChunkNo);
             Assert.AreEqual(removedMsg.ReplicationDeg, removedMsg2.ReplicationDeg);
-            Assert.AreEqual(removedMsg.Body, removedMsg2.Body);
+            CollectionAssert.AreEqual(removedMsg.Body, removedMsg2.Body);
         }
 
         [TestMethod]

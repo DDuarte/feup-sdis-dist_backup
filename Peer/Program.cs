@@ -90,12 +90,9 @@ namespace Peer
 
             // Setup directories
             Core.Instance.BackupDirectory = Config.Global.BackupDir;
-            Core.Instance.StoreDirectory = Config.Global.StoreDir;
 
             if (!Directory.Exists(Core.Instance.BackupDirectory))
                 Directory.CreateDirectory(Core.Instance.BackupDirectory);
-            if (!Directory.Exists(Core.Instance.StoreDirectory))
-                Directory.CreateDirectory(Core.Instance.StoreDirectory);
 
             // Create channels
             Core.Instance.MCChannel = new Channel(mcIP, mcPort) { Name = "MC" };
@@ -119,30 +116,6 @@ namespace Peer
         }
 
         /*
-        private static Channel _mcChannel;
-        private static Channel _mdbChannel;
-        private static Channel _mdrChannel;
-         * 
-         *static void SendFileInChunks(string fileName, FileEntry fileEntry)
-        {
-            const int chunkSize = 64000; // read the file in chunks of 64KB
-            using (var file = File.OpenRead(fileName))
-            {
-                int bytesRead, chunkNo = 0;
-                var fileSize = file.Length;
-                var buffer = new byte[chunkSize];
-                while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                    BackupChunk(fileEntry.FileId, chunkNo, data, fileEntry.ReplicationDegree);
-                    ++chunkNo;
-                }
-
-                if ((fileSize%chunkSize) == 0) // last chunk with an empty body
-                    BackupChunk(fileEntry.FileId, chunkNo, new byte[] {}, fileEntry.ReplicationDegree);
-            }
-        }
-
         private static void ListenRemoved(string dir)
         {
             var rnd = new Random();
@@ -203,128 +176,7 @@ namespace Peer
 
                 return true;
             };
-        }
-
-        private static void StoreFiles(string dir)
-        {
-            var rnd = new Random();
-
-            _mdbChannel.OnReceive += msg =>
-            {
-                if (msg.MessageType != MessageType.PutChunk)
-                    return false; // not what we want
-
-                try
-                {
-                    if (!Directory.Exists(dir))
-                        Directory.CreateDirectory(dir);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("StoreFiles: " + ex);
-                    return true;
-                }
-
-                if (!msg.ChunkNo.HasValue)
-                {
-                    Console.WriteLine("StoreFiles: bad msg, ChunkNo has no value.");
-                    return true;
-                }
-
-                var fileName = msg.FileId.ToString() + "_" + msg.ChunkNo;
-                var fullPath = Path.Combine(dir, fileName);
-                if (!File.Exists(fullPath))
-                {
-                    try
-                    {
-                        var fs = File.Create(fullPath);
-                        fs.Write(msg.Body, 0, msg.Body.Length);
-                        fs.Close();
-
-                        Core.Instance.Store.IncrementActualDegree(fileName, msg.ReplicationDeg.Value);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("StoreFiles: " + ex);
-                        return true;
-                    }
-                }
-
-                Thread.Sleep(rnd.Next(0, 401)); // random delay uniformly distributed between 0 and 400 ms
-
-                _mcChannel.Send(Message.BuildStoredMessage(msg.FileId, msg.ChunkNo.Value));
-                return true;
-            };
-        }
-
-        private static void BackupChunk(FileId fileId, int chunkNo, byte[] data, int repDegree)
-        {
-            var t = new Func<int, int>(timeout =>
-            {
-                var cts = new CancellationTokenSource(timeout);
-                var token = cts.Token;
-                var storeTask = new Task<int>(() =>
-                {
-                    var receivedMessagesFrom = new HashSet<string>();
-
-                    OnReceive onReceivedStored = msg =>
-                    {
-                        if (msg.MessageType != MessageType.Stored ||
-                              msg.ChunkNo != chunkNo || msg.FileId != fileId)
-                            return false;
-
-                        receivedMessagesFrom.Add(msg.RemoteEndPoint.Address.ToString());
-                        return true;
-                    };
-
-                    try
-                    {
-
-                        _mcChannel.OnReceive += onReceivedStored;
-                        while (true)
-                        {
-                            token.ThrowIfCancellationRequested();
-                            Thread.Sleep(10);
-                        }
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _mcChannel.OnReceive -= onReceivedStored;
-                        return receivedMessagesFrom.Count;
-                    }
-                });
-
-                storeTask.RunSynchronously();
-                return storeTask.Result;
-            });
-
-            const int initialTimeout = 500;
-            const int maxRetries = 5;
-
-            var timeoutValue = initialTimeout;
-
-            var count = 0;
-            for (var retryCount = 0; retryCount < maxRetries; retryCount++)
-            {
-                var msg = Message.BuildPutChunkMessage(fileId, chunkNo, repDegree, data);
-                _mdbChannel.Send(msg);
-
-                count = t(timeoutValue);
-                if (count < repDegree)
-                {
-                    timeoutValue *= 2;
-                    Console.WriteLine("Replication degree is {0} but wanted {1}. Timeout increased to {2}", count, repDegree, timeoutValue);
-                }
-                else
-                {
-                    Console.WriteLine("Stored or giving up: retries {0}, rep degree {1}", retryCount, count);
-                    break;
-                }
-            }
-
-            Core.Instance.Store.UpdateDegrees(fileId + "_" + chunkNo, count, repDegree);
         }*/
-
 
         private static void PrintUsage()
         {

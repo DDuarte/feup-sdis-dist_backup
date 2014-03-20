@@ -93,7 +93,13 @@ namespace DBS
 
         public static bool operator ==(FileId a, FileId b)
         {
-            return ReferenceEquals(a, b) || (a != null && a.Equals(b));
+            if (ReferenceEquals(a, b))
+                return true;
+
+            if ((object)a == null || (object)b == null)
+                return false;
+
+            return a.Equals(b);
         }
 
         public static bool operator !=(FileId a, FileId b)

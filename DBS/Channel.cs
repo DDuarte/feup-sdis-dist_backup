@@ -1,50 +1,44 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Net;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using DBS.Multicast;
 
 namespace DBS
 {
-    public delegate bool OnReceive(Message msg);
-
-    public interface IChannel
+    public class Channel : IDisposable
     {
-        event OnReceive OnReceive;
-
-        string Name { get; set; }
-        ConcurrentQueue<Message> Messages { get; set; }
-
-        void Send(Message msg);
-    }
-
-    public class Channel : IChannel
-    {
-        public event OnReceive OnReceive;
         public string Name { get; set; }
-        public ConcurrentQueue<Message> Messages { get; set; }
 
         private void StartReceiving()
         {
-            Task.Factory.StartNew(() =>
+            while (true)
             {
-                while (true)
+                Message msg;
+                try
                 {
-                    var msg = Receive();
-                    Console.WriteLine("R -  {0}: {1}", Name, msg);
-                    if (OnReceive != null)
-                    {
-                        if (!OnReceive(msg))
-                            Messages.Enqueue(msg);
-                    }
-                    else
-                        Messages.Enqueue(msg);
+                    msg = Receive();
                 }
-            });
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Failed to receive a message on channel {0}: {1}", Name, ex);
+                    continue;
+                }
+
+                Console.WriteLine("R -  {0}: {1}", Name, msg);
+                _subject.OnNext(msg);
+            }
         }
 
         private readonly IMulticastListener _listener;
         private readonly IMulticastBroadcaster _broadcaster;
+        private readonly Task _receiveTask;
+
+        private readonly Subject<Message> _subject;
+
+        public IObservable<Message> Received { get { return _subject.AsObservable(); } } 
 
         public Channel(IPAddress ip, int port)
         {
@@ -53,8 +47,10 @@ namespace DBS
             _listener = new MulticastListener(settings);
             _broadcaster = new MulticastBroadcaster(settings);
 
-            Messages = new ConcurrentQueue<Message>();
-            StartReceiving();
+            _subject = new Subject<Message>();
+
+            _receiveTask = new Task(StartReceiving, TaskCreationOptions.LongRunning);
+            _receiveTask.Start();
         }
 
         public void Send(Message msg)
@@ -69,6 +65,16 @@ namespace DBS
             var msg = Message.Deserialize(_listener.Receive(out ep));
             msg.RemoteEndPoint = ep;
             return msg;
+        }
+
+        public void Dispose()
+        {
+            _receiveTask.Dispose();
+            _broadcaster.Dispose();
+            _listener.Dispose();
+
+            _subject.OnCompleted();
+            _subject.Dispose();
         }
     }
 }

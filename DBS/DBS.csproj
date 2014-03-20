@@ -55,10 +55,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackupChunkSubprotocol.cs" />
+    <Compile Include="BackupFileProtocol.cs" />
+    <Compile Include="BackupFileService.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="FileDeletionService.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileId.cs" />
+    <Compile Include="IProtocol.cs" />
+    <Compile Include="IService.cs" />
     <Compile Include="Multicast\IMulticastBroadcaster.cs" />
     <Compile Include="Multicast\IMulticastListener.cs" />
     <Compile Include="MemoryStreamExtensions.cs" />
@@ -72,7 +78,6 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringValueAttribute.cs" />
-    <Compile Include="Subprotocol.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
