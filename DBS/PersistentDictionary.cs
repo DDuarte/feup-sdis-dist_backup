@@ -384,35 +384,42 @@ namespace DBS
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private bool ExecuteScalar(string stm, out string ret)
         {
-            try
+            lock (_conn)
             {
-                using (var cmd = new SqliteCommand(stm, _conn))
-                    ret = Convert.ToString(cmd.ExecuteScalar());
-                return true;
+                try
+                {
+                    using (var cmd = new SqliteCommand(stm, _conn))
+                        ret = Convert.ToString(cmd.ExecuteScalar());
+                    return true;
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex);
+                    ret = null;
+                    //throw;
+                    return false;
+                }
             }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex);
-                ret = null;
-                //throw;
-                return false;
-            }
+            
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private bool ExecuteNonQuery(string stm)
         {
-            try
+            lock (_conn)
             {
-                using (var cmd = new SqliteCommand(stm, _conn))
-                    cmd.ExecuteNonQuery();
-                return true;
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex);
-                //throw;
-                return false;
+                try
+                {
+                    using (var cmd = new SqliteCommand(stm, _conn))
+                        cmd.ExecuteNonQuery();
+                    return true;
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex);
+                    //throw;
+                    return false;
+                }
             }
         }
     }
