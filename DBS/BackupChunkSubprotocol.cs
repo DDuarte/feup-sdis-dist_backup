@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DBS
 {
@@ -51,10 +52,10 @@ namespace DBS
                 timeout *= 2;
                 if (retryCount != MaxRetries - 1) // not last iter
                     Console.WriteLine("[{3}#{4}: ChunkReplication degree is {0} but wanted {1}. Timeout increased to {2}",
-                        _count, _replicationDegree, timeout, _fileId.ToString().Substring(0, 5), _chunkNo);
+                        _count, _replicationDegree, timeout, _fileId.ToStringSmall(), _chunkNo);
             }
 
-            Console.WriteLine("{2}#{3}: Stored or giving up: retries {0}, rep degree {1}", retryCount, _count, _fileId.ToString().Substring(0, 5), _chunkNo);
+            Console.WriteLine("{2}#{3}: Stored or giving up: retries {0}, rep degree {1}", retryCount, _count, _fileId.ToStringSmall(), _chunkNo);
             Core.Instance.Store.UpdateDegrees(_fileId + "_" + _chunkNo, _count, _replicationDegree);
         }
 
@@ -62,8 +63,8 @@ namespace DBS
         {
             var subs = Core.Instance.MCChannel.Received.Where(message =>
                 message.MessageType == MessageType.Stored &&
-                message.FileId == _fileId &&
-                message.ChunkNo == _chunkNo).Subscribe(StoreHandler);
+                message.ChunkNo == _chunkNo &&
+                message.FileId == _fileId).Subscribe(StoreHandler);
 
             //Task.Factory.StartNew(SendChunk).ContinueWith(task => subs.Dispose());
             SendChunk();

@@ -49,6 +49,11 @@ namespace DBS
             return _fileIdStr;
         }
 
+        public string ToStringSmall()
+        {
+            return ToString().Substring(0, 4) + "..";
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -85,6 +90,7 @@ namespace DBS
             if (_bytes == null || _bytes.Length == 0)
                 return 0;
             var hashCode = 0;
+// ReSharper disable once LoopCanBeConvertedToQuery
             for (var i = 0; i < _bytes.Length; i++)
                 // Rotate by 3 bits and XOR the new value.
                 hashCode = (hashCode << 3) | (hashCode >> (29)) ^ _bytes[i];

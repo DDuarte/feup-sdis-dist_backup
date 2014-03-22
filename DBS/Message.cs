@@ -258,7 +258,7 @@ namespace DBS
         {
             var ret = MessageType + " ";
             if (FileId != null)
-                ret += FileId.ToString().Substring(0, 6) + "... ";
+                ret += FileId.ToStringSmall();
             if (ChunkNo.HasValue)
                 ret += "#" + ChunkNo.Value + " ";
             if (ReplicationDeg.HasValue)
