@@ -59,6 +59,7 @@
     <Compile Include="BackupFileProtocol.cs" />
     <Compile Include="BackupFileService.cs" />
     <Compile Include="Channel.cs" />
+    <Compile Include="ChunkRestoreService.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="FileDeletionService.cs" />
     <Compile Include="FileEntry.cs" />
