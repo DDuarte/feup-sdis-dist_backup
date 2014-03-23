@@ -3,159 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Community.CsharpSqlite.SQLiteClient;
+using DBS.Persistence;
 
 namespace DBS
 {
-    public class DBFields<T> : IEqualityComparer<T>
-    {
-// ReSharper disable StaticFieldInGenericType
-        private static readonly Lazy<string> _fields = new Lazy<string>(GetFields);
-        private static readonly Lazy<string> _fieldsWithType = new Lazy<string>(GetFieldsWithType);
-// ReSharper restore StaticFieldInGenericType
-
-        public static string Fields { get { return _fields.Value; } }
-        public static string FieldsWithType { get { return _fieldsWithType.Value; } }
-
-        public static string Values(T obj) {  return GetValues(obj); }
-        public static string FieldsAndValues(T obj) { return GetFieldsAndValues(obj); }
-
-        private static string GetFields()
-        {
-            var type = typeof(T);
-            if (type.IsPrimitive || type == typeof (string))
-            {
-                return type.Name;
-            }
-            else
-            {
-                var props = typeof (T).GetProperties();
-                var str = "";
-                for (var i = 0; i < props.Length; i++)
-                {
-                    str += props[i].Name;
-                    if (i != props.Length - 1)
-                        str += ',';
-                }
-                return str;
-            }
-        }
-
-        private static string GetFieldsWithType()
-        {
-            var type = typeof(T);
-            if (type.IsPrimitive || type == typeof (string))
-            {
-                return type.Name + ' ' + TypeToSQL(type);
-            }
-            else
-            {
-                var props = typeof (T).GetProperties();
-                var str = "";
-                for (var i = 0; i < props.Length; i++)
-                {
-                    str += props[i].Name + ' ' + TypeToSQL(props[i].PropertyType);
-                    if (i != props.Length - 1)
-                        str += ',';
-                }
-                return str;
-            }
-        }
-
-        private static string GetValues(T obj)
-        {
-            var type = typeof(T);
-            if (type.IsPrimitive || type == typeof(string))
-            {
-                return "'" + obj + "'";
-            }
-            else
-            {
-                var props = type.GetProperties();
-                var str = "";
-                for (var i = 0; i < props.Length; i++)
-                {
-                    str += "'" + props[i].GetValue(obj) + "'";
-                    if (i != props.Length - 1)
-                        str += ',';
-                }
-                return str;
-            }
-        }
-
-        private static string GetFieldsAndValues(T obj)
-        {
-            var type = typeof(T);
-            if (type.IsPrimitive || type == typeof (string))
-            {
-                return type.Name + " = '" + obj + "'";
-            }
-            else
-            {
-                var props = typeof (T).GetProperties();
-                var str = "";
-                for (var i = 0; i < props.Length; i++)
-                {
-                    var f = props[i].Name;
-                    var v = props[i].GetValue(obj);
-
-                    str += f + " = '" + v + "'";
-                    if (i != props.Length - 1)
-                        str += ',';
-                }
-                return str;
-            }
-        }
-
-        public static string TypeToSQL()
-        {
-            return TypeToSQL(typeof (T));
-        }
-
-        public static string TypeToSQL(Type t)
-        {
-            //var t = typeof (T);
-            if (t == typeof (void))
-                return "NULL";
-            if (t == typeof (bool) || t == typeof (byte) ||
-                t == typeof (char) || t == typeof (long) ||
-                t == typeof (sbyte) || t == typeof (short) ||
-                t == typeof (uint) || t == typeof (ulong) ||
-                t == typeof (ushort) || t == typeof (int))
-                return "INTEGER";
-            if (t == typeof (decimal) || t == typeof (double) ||
-                t == typeof (float))
-                return "REAL";
-            if (t == typeof (string))
-                return "TEXT";
-            return "BLOB"; // blob can be anything (sort of)
-        }
-
-        public bool Equals(T x, T y)
-        {
-            return Values(x).Equals(Values(y));
-        }
-
-        public int GetHashCode(T obj)
-        {
-            return Values(obj).GetHashCode();
-        }
-    }
-
-    public class StringKey
-    {
-        public string String { get; private set; }
-
-        public static implicit operator StringKey(string str)
-        {
-            return new StringKey { String = str };
-        }
-
-        public static implicit operator string(StringKey sf)
-        {
-            return sf.String;
-        }
-    }
-
     [DebuggerDisplay("Count = {Count}, DB = {_conn.Database}")]
     public class PersistentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
         /*where TKey : new()*/
@@ -417,7 +268,7 @@ namespace DBS
                 catch (SqliteException ex)
                 {
                     Console.WriteLine(ex);
-                    //throw;
+                    throw;
                     return false;
                 }
             }

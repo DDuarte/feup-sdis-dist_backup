@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Persistence\DBFields.cs" />
     <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
     <Compile Include="Protocols\BackupFileProtocol.cs" />
     <Compile Include="Protocols\BackupFileService.cs" />
@@ -75,8 +76,8 @@
     <Compile Include="Multicast\MulticastListener.cs" />
     <Compile Include="Multicast\MulticastSettings.cs" />
     <Compile Include="NetworkUtilities.cs" />
-    <Compile Include="PersistentDictionary.cs" />
-    <Compile Include="PersistentStore.cs" />
+    <Compile Include="Persistence\PersistentDictionary.cs" />
+    <Compile Include="Persistence\PersistentStore.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocols\RestoreChunkSubprotocol.cs" />
