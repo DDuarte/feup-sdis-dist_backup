@@ -3,7 +3,7 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Listens to PUTCHUNK messages on MDB

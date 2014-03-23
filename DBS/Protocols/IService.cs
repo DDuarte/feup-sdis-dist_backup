@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DBS
+namespace DBS.Protocols
 {
     interface IService : IObserver<Message>
     {
@@ -9,6 +9,4 @@ namespace DBS
     }
 
     // TODO: SpaceReclaimingService (in Program.cs)
-    // TODO: ChunkRestoreService
-    // TODO: ChunkRestoreProtocol
 }

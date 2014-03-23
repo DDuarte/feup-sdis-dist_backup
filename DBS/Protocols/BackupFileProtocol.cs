@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Launches the backup file protocol

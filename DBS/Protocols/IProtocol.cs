@@ -1,4 +1,4 @@
-namespace DBS
+namespace DBS.Protocols
 {
     interface IProtocol
     {

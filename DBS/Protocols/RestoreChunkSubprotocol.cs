@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Launches the initiator-peer Chunk Restore Protocol

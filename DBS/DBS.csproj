@@ -55,18 +55,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackupChunkSubprotocol.cs" />
-    <Compile Include="BackupFileProtocol.cs" />
-    <Compile Include="BackupFileService.cs" />
+    <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
+    <Compile Include="Protocols\BackupFileProtocol.cs" />
+    <Compile Include="Protocols\BackupFileService.cs" />
     <Compile Include="Channel.cs" />
-    <Compile Include="ChunkRestoreService.cs" />
+    <Compile Include="Protocols\RestoreChunkService.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="FileChunk.cs" />
-    <Compile Include="FileDeletionService.cs" />
+    <Compile Include="Protocols\DeletionFileService.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileId.cs" />
-    <Compile Include="IProtocol.cs" />
-    <Compile Include="IService.cs" />
+    <Compile Include="Protocols\IProtocol.cs" />
+    <Compile Include="Protocols\IService.cs" />
     <Compile Include="Multicast\IMulticastBroadcaster.cs" />
     <Compile Include="Multicast\IMulticastListener.cs" />
     <Compile Include="MemoryStreamExtensions.cs" />
@@ -79,8 +79,8 @@
     <Compile Include="PersistentStore.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestoreChunkSubprotocol.cs" />
-    <Compile Include="RestoreFileProtocol.cs" />
+    <Compile Include="Protocols\RestoreChunkSubprotocol.cs" />
+    <Compile Include="Protocols\RestoreFileProtocol.cs" />
     <Compile Include="StringValueAttribute.cs" />
   </ItemGroup>
   <ItemGroup>

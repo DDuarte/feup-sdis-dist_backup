@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using System.Reactive.Linq;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Listens to DELETE messages on MC
     /// </summary>
-    public class FileDeletionService : IService
+    public class DeletionFileService : IService
     {
         public void Start()
         {

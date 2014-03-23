@@ -2,12 +2,12 @@
 using System.Reactive.Linq;
 using System.Threading;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Listens to GETCHUNK messages on MC
     /// </summary>
-    class ChunkRestoreService : IService
+    class RestoreChunkService : IService
     {
         public void Start()
         {
@@ -18,14 +18,14 @@ namespace DBS
 
         public void Stop()
         {
-            Console.WriteLine("ChunkRestoreService:Stop");
+            Console.WriteLine("RestoreChunkService:Stop");
         }
 
         public void OnNext(Message msg)
         {
             if (!msg.ChunkNo.HasValue)
             {
-                Console.WriteLine("ChunkRestoreService: bad msg, ChunkNo has no value.");
+                Console.WriteLine("RestoreChunkService: bad msg, ChunkNo has no value.");
                 return;
             }
 
@@ -54,7 +54,7 @@ namespace DBS
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ChunkRestoreService: " + ex);
+                Console.WriteLine("RestoreChunkService: " + ex);
             }
         }
 

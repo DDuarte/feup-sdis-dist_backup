@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace DBS
+namespace DBS.Protocols
 {
     /// <summary>
     /// Launches the chunk backup subprotocol

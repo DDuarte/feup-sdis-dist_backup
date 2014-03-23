@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using DBS.Protocols;
 
 namespace DBS
 {
@@ -35,7 +36,7 @@ namespace DBS
         public void Start()
         {
             new BackupFileService().Start();
-            new FileDeletionService().Start();
+            new DeletionFileService().Start();
 
             foreach (var backupFile in BackupFiles)
             {
