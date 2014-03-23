@@ -80,7 +80,7 @@ namespace Peer
             IPAddress localIP;
             if (IPAddress.TryParse(Config.Global.LocalIP, out localIP))
             {
-                if (NetworkUtilities.GetLocalIPAddresses().Contains(localIP))
+                if (localIP.Equals(IPAddress.Any) || NetworkUtilities.GetLocalIPAddresses().Contains(localIP))
                     Core.Instance.LocalIP = localIP;
                 else
                 {
