@@ -1,23 +1,21 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using DBS.Annotations;
 
-namespace DBS
+namespace DBS.Utilities
 {
-    [UsedImplicitly]
-    public class NetworkUtilities
+    public static class NetworkUtilities
     {
         /// <summary>
         /// Returns all IPv4 local IP addresses
         /// </summary>
         /// <returns>Array of addresses</returns>
-        [UsedImplicitly]
-        public static IPAddress[] GetLocalIPAddresses()
+        public static IEnumerable<IPAddress> GetLocalIPAddresses()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
-            return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork).ToArray();
+            return host.AddressList.Where(ip => ip.AddressFamily == AddressFamily.InterNetwork);
         }
 
         /// <summary>
@@ -37,7 +35,6 @@ namespace DBS
         /// <returns></returns>
         public static bool IsMulticastAddress(IPAddress address)
         {
-
             return address.IsIPv6Multicast  || (address.GetAddressBytes()[0] & 0xF0) == 224;
         }
     }

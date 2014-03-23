@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace DBS
+namespace DBS.Utilities
 {
     public static class MemoryStreamExtensions
     {

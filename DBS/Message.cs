@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
+using DBS.Utilities;
 
 namespace DBS
 {
@@ -87,7 +88,7 @@ namespace DBS
             FileId = new FileId(fileId);
         }
 
-        public FileId FileId { get; set; }
+        public FileId FileId { get; private set; }
 
         private int? _chunkNo;
         public int? ChunkNo

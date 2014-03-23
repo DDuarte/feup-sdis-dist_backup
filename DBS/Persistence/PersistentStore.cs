@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace DBS
+namespace DBS.Persistence
 {
     public class ReplicationDegrees
     {
@@ -20,14 +20,14 @@ namespace DBS
             return _dict.ContainsKey(fileName);
         }
 
-        public void IncrementActualDegree(string fileName, int wantedDegree)
+        public int IncrementActualDegree(string fileName, int wantedDegree)
         {
-            IncrementActualDegree(fileName, 1, wantedDegree);
+            return IncrementActualDegree(fileName, 1, wantedDegree);
         }
 
-        public void DecrementActualDegree(string fileName, int wantedDegree)
+        public int DecrementActualDegree(string fileName)
         {
-            IncrementActualDegree(fileName, -1, wantedDegree);
+            return IncrementActualDegree(fileName, -1, 1);
         }
 
         public void UpdateDegrees(string fileName, int actualDegree, int wantedDegree)
@@ -35,8 +35,8 @@ namespace DBS
             ReplicationDegrees t;
             if (_dict.TryGetValue(fileName, out t))
             {
-                _dict[fileName].ActualDegree = t.ActualDegree;
-                _dict[fileName].WantedDegree = t.WantedDegree;
+                t.ActualDegree = actualDegree;
+                t.WantedDegree = wantedDegree;
             }
             else
                 _dict[fileName] = new ReplicationDegrees {ActualDegree = actualDegree, WantedDegree = wantedDegree};
@@ -44,14 +44,7 @@ namespace DBS
 
         public bool TryGetDegrees(string fileName, out ReplicationDegrees rd)
         {
-            ReplicationDegrees t;
-            if (_dict.TryGetValue(fileName, out t))
-            {
-                rd = t;
-                return true;
-            }
-            rd = null;
-            return false;
+            return _dict.TryGetValue(fileName, out rd);
         }
 
         public bool RemoveDegrees(string fileName)
@@ -59,18 +52,20 @@ namespace DBS
             return _dict.Remove(fileName);
         }
 
-        private void IncrementActualDegree(string fileName, int add, int wantedDegree)
+        private int IncrementActualDegree(string fileName, int add, int wantedDegree)
         {
             ReplicationDegrees t;
             if (_dict.TryGetValue(fileName, out t))
             {
-                var t2 = new ReplicationDegrees {ActualDegree = t.ActualDegree + add, WantedDegree = t.WantedDegree};
-                _dict[fileName] = t2;
+                t.ActualDegree += add;
+                if (t.ActualDegree < 0)
+                    t.ActualDegree = 0;
+                return t.ActualDegree;
             }
-            else
-            {
-                _dict[fileName] = new ReplicationDegrees { ActualDegree = add < 0 ? 0 : 1, WantedDegree = wantedDegree };
-            }
+
+            var actualDegree = Math.Max(add, 0);
+            _dict[fileName] = new ReplicationDegrees { ActualDegree = actualDegree, WantedDegree = wantedDegree };
+            return actualDegree;
         }
 
         public IEnumerator<KeyValuePair<string, ReplicationDegrees>> GetEnumerator()

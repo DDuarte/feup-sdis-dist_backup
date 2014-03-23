@@ -12,7 +12,7 @@ namespace DBS
         public FileId FileId { get; private set; }
         public int ChunkNo { get; private set; }
 
-        public string FileName { get { return FileId.ToString() + "_" + ChunkNo; } }
+        public string FileName { get { return FileId + "_" + ChunkNo; } }
         public string FullFileName { get { return Path.Combine(Core.Instance.BackupDirectory, FileName); } }
 
         public FileChunk(FileId fileId, int chunkNo)
@@ -24,6 +24,23 @@ namespace DBS
         public bool Exists()
         {
             return File.Exists(FullFileName);
+        }
+
+        public bool Delete()
+        {
+            if (!Exists())
+                return false;
+
+            try
+            {
+                File.Delete(FullFileName);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private byte[] _data;
@@ -44,15 +61,38 @@ namespace DBS
                     // try to read the maximum chunk size from the file
                     var bytesRead = fileData.Read(buffer, 0, buffer.Length);
                     _data = buffer.Take(bytesRead).ToArray(); // slice it
+                    return _data;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // TODO: log message or something similar
-                return null; 
+                Console.WriteLine(ex);
+                return null;
             }
+        }
 
-            return _data;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>true = file created, false = file exists, null = error</returns>
+        public bool? SetData(byte[] data)
+        {
+            _data = data;
+
+            if (Exists())
+                return false;
+
+            try
+            {
+                File.WriteAllBytes(FullFileName, _data);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
         }
 
         public override string ToString()

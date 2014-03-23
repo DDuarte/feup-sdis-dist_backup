@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Community.CsharpSqlite.SQLiteClient;
-using DBS.Persistence;
 
-namespace DBS
+namespace DBS.Persistence
 {
     [DebuggerDisplay("Count = {Count}, DB = {_conn.Database}")]
     public class PersistentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
@@ -268,7 +267,7 @@ namespace DBS
                 catch (SqliteException ex)
                 {
                     Console.WriteLine(ex);
-                    throw;
+                    //throw;
                     return false;
                 }
             }

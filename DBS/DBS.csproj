@@ -58,35 +58,37 @@
     <Compile Include="Persistence\DBFields.cs" />
     <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
     <Compile Include="Protocols\BackupFileProtocol.cs" />
-    <Compile Include="Protocols\BackupFileService.cs" />
+    <Compile Include="Protocols\BackupChunkService.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Protocols\RestoreChunkService.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="FileChunk.cs" />
-    <Compile Include="Protocols\DeletionFileService.cs" />
+    <Compile Include="Protocols\DeleteFileService.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileId.cs" />
     <Compile Include="Protocols\IProtocol.cs" />
     <Compile Include="Protocols\IService.cs" />
     <Compile Include="Multicast\IMulticastBroadcaster.cs" />
     <Compile Include="Multicast\IMulticastListener.cs" />
-    <Compile Include="MemoryStreamExtensions.cs" />
+    <Compile Include="Protocols\SpaceReclaimingService.cs" />
+    <Compile Include="Utilities\MemoryStreamExtensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Multicast\MulticastBroadcaster.cs" />
     <Compile Include="Multicast\MulticastListener.cs" />
     <Compile Include="Multicast\MulticastSettings.cs" />
-    <Compile Include="NetworkUtilities.cs" />
+    <Compile Include="Utilities\NetworkUtilities.cs" />
     <Compile Include="Persistence\PersistentDictionary.cs" />
     <Compile Include="Persistence\PersistentStore.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocols\RestoreChunkSubprotocol.cs" />
     <Compile Include="Protocols\RestoreFileProtocol.cs" />
-    <Compile Include="StringValueAttribute.cs" />
+    <Compile Include="Protocols\SpaceReclaimingProtocol.cs" />
+    <Compile Include="Utilities\StringValueAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

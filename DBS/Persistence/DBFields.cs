@@ -91,12 +91,7 @@ namespace DBS.Persistence
             return str;
         }
 
-        public static string TypeToSQL()
-        {
-            return TypeToSQL(typeof (T));
-        }
-
-        public static string TypeToSQL(Type t)
+        private static string TypeToSQL(Type t)
         {
             //var t = typeof (T);
             if (t == typeof (void))

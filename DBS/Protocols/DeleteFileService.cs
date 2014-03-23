@@ -7,7 +7,7 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to DELETE messages on MC
     /// </summary>
-    public class DeletionFileService : IService
+    public class DeleteFileService : IService
     {
         public void Start()
         {

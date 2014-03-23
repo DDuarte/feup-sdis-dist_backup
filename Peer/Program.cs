@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using DBS;
+using DBS.Utilities;
 using JsonConfig;
 
 /* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
@@ -75,6 +77,23 @@ namespace Peer
             }
 
             // Get IPAddress
+            IPAddress localIP;
+            if (IPAddress.TryParse(Config.Global.LocalIP, out localIP))
+            {
+                if (NetworkUtilities.GetLocalIPAddresses().Contains(localIP))
+                    Core.Instance.LocalIP = localIP;
+                else
+                {
+                    Console.WriteLine("Config LocalIP '{0}' is not a local IP address",  localIP);
+                    return;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Config LocalIP '{0}' is not a valid IP address.", Config.Global.LocalIP);
+                return;
+            }
+            
             Core.Instance.LocalIP = IPAddress.Parse(Config.Global.LocalIP);
 
             // Max site used to backup (locally)
@@ -103,83 +122,7 @@ namespace Peer
             Core.Instance.MDRChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
 
             Core.Instance.Start();
-
-            /*
-            // Start Tasks
-
-            Task.Factory.StartNew(() => StoreFiles(backupDir));
-            Task.Factory.StartNew(() => ListenRemoved(backupDir));
-
-            foreach (var f in files)
-                Task.Factory.StartNew(() => SendFileInChunks(f.Key, f.Value));
-
-            var spaceRecl = new SpaceReclaimingWatcher(_mcChannel);
-            spaceRecl.Run(backupDir);
-             * */
         }
-
-        /*
-        private static void ListenRemoved(string dir)
-        {
-            var rnd = new Random();
-
-            _mcChannel.OnReceive += msg =>
-            {
-                if (msg.MessageType != MessageType.Removed)
-                    return false; // not what we want
-
-                if (!msg.ChunkNo.HasValue)
-                {
-                    Console.WriteLine("ListenRemoved: bad msg, ChunkNo has no value.");
-                    return true;
-                }
-
-                var chunkNo = msg.ChunkNo.Value;
-                var fileId = msg.FileId;
-
-                var key = fileId.ToString() + "_" + chunkNo;
-                if (!Core.Instance.Store.ContainsFile(key))
-                    return true;
-
-                var fullPath = Path.Combine(dir, key);
-
-                Core.Instance.Store.DecrementActualDegree(key, 0 /* won't be used, dict contains key);
-                ReplicationDegrees rd;
-                Core.Instance.Store.TryGetDegrees(key, out rd);
-
-                if (rd.ActualDegree < rd.WantedDegree)
-                {
-                    var cts = new CancellationTokenSource();
-                    var token = cts.Token;
-
-                    Task.Factory.StartNew(async () =>
-                    {
-                        await Task.Delay(rnd.Next(0, 401), token);
-                        if (token.IsCancellationRequested)
-                            return;
-
-                        var fs = File.OpenRead(fullPath);
-                        var buffer = new byte[Core.Instance.ChunkSize];
-                        var bytesRead = fs.Read(buffer, 0, buffer.Length);
-                        var data = buffer.Take(bytesRead).ToArray();
-
-                        BackupChunk(fileId, chunkNo, data, rd.WantedDegree);
-                    }, token);
-
-                    _mcChannel.OnReceive += msg2 =>
-                    {
-                        if (msg2.MessageType != MessageType.PutChunk ||
-                              msg2.ChunkNo != chunkNo || msg2.FileId != fileId)
-                            return false;
-
-                        cts.Cancel();
-                        return true;
-                    };
-                }
-
-                return true;
-            };
-        }*/
 
         private static void PrintUsage()
         {

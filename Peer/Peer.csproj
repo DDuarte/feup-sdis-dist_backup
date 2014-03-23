@@ -52,14 +52,9 @@
     <StartupObject>Peer.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Community.CsharpSqlite.SQLiteClient">
-      <HintPath>..\References\Community.CsharpSqlite.SQLiteClient.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="SystemWrapper, Version=0.5.4307.24424, Culture=neutral, PublicKeyToken=9861416082383a00, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\SystemWrapper.dll</HintPath>

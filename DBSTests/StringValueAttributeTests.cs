@@ -1,5 +1,4 @@
-﻿using System;
-using DBS;
+﻿using DBS.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DBSTests

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DBS
+namespace DBS.Utilities
 {
     /// <summary>
     /// Annotate enum with strings
