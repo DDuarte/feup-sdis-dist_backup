@@ -29,7 +29,11 @@ namespace DBS
 
         // Space reclaiming subprotocol
         [StringValue("REMOVED")] // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
-        Removed
+        Removed,
+
+        // File lookup subprotocol enhancement
+        [StringValue("LOOKUP")] // <Version> <FileId> <CRLF> <CRLF>
+        LookUp
     }
 
     // 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 = 90 # max header size
@@ -297,6 +301,11 @@ namespace DBS
             return BuildRemovedMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
         }
 
+        public static Message BuildLookUpMessage(FileId fileId)
+        {
+            return BuildLookUpMessage(VERSION_M, VERSION_N, fileId);
+        }
+
         public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
             int replicationDeg, byte[] body)
         {
@@ -368,6 +377,17 @@ namespace DBS
                 VersionN = versionN,
                 FileId = fileId,
                 ChunkNo = chunkNo
+            };
+        }
+
+        public static Message BuildLookUpMessage(int versionM, int versionN, FileId fileId)
+        {
+            return new Message
+            {
+                MessageType = MessageType.LookUp,
+                VersionM = versionM,
+                VersionN = versionN,
+                FileId = fileId
             };
         }
     }
