@@ -23,6 +23,7 @@ namespace DBS
         public IPAddress LocalIP { get; set; }
 
         public int MaxBackupSize { get; set; }
+        public int ChunkSize { get; set; }
 
         public Channel MCChannel { get; set; } // you can't touch this
         public Channel MDBChannel { get; set; }

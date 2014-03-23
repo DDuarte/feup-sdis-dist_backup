@@ -32,7 +32,7 @@ namespace DBS
 
                         file.Write(chunk.Body, 0, chunk.Body.Length);
                         ++chunkNo;
-                    } while (chunk.Body.Length == 64000);
+                    } while (chunk.Body.Length == Core.Instance.ChunkSize);
                 }
             });
         }

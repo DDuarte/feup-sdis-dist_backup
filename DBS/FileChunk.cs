@@ -40,7 +40,7 @@ namespace DBS
             {
                 using (var fileData = File.OpenRead(FullFileName))
                 {
-                    var buffer = new byte[64000];
+                    var buffer = new byte[Core.Instance.ChunkSize];
                     // try to read the maximum chunk size from the file
                     var bytesRead = fileData.Read(buffer, 0, buffer.Length);
                     _data = buffer.Take(bytesRead).ToArray(); // slice it

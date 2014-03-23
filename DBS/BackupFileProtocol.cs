@@ -12,8 +12,6 @@ namespace DBS
         private readonly string _fileName;
         private readonly FileEntry _fileEntry;
 
-        private const int ChunkSize = 64000; // read the file in chunks of 64KB
-
         public BackupFileProtocol(string fileName, FileEntry fileEntry)
         {
             _fileName = fileName;
@@ -28,7 +26,7 @@ namespace DBS
                 {
                     int bytesRead, chunkNo = 0;
                     var fileSize = file.Length;
-                    var buffer = new byte[ChunkSize];
+                    var buffer = new byte[Core.Instance.ChunkSize];
                     while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
@@ -38,7 +36,7 @@ namespace DBS
                         ++chunkNo;
                     }
 
-                    if ((fileSize%ChunkSize) == 0) // last chunk with an empty body
+                    if ((fileSize % Core.Instance.ChunkSize) == 0) // last chunk with an empty body
                     {
                         var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
                             new byte[] {});

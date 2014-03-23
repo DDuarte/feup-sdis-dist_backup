@@ -80,6 +80,9 @@ namespace Peer
             // Max site used to backup (locally)
             Core.Instance.MaxBackupSize = Config.Global.DiskSpace;
 
+            // Size of each chunk stored locally and sent over the network
+            Core.Instance.ChunkSize = Config.Global.ChunkSize;
+
             // Create dictionary of files to mantain
             foreach (var f in Config.Global.Files)
                 Core.Instance.BackupFiles.Add(f.Name, new FileEntry
@@ -156,7 +159,7 @@ namespace Peer
                             return;
 
                         var fs = File.OpenRead(fullPath);
-                        var buffer = new byte[64000];
+                        var buffer = new byte[Core.Instance.ChunkSize];
                         var bytesRead = fs.Read(buffer, 0, buffer.Length);
                         var data = buffer.Take(bytesRead).ToArray();
 

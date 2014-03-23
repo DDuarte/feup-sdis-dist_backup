@@ -11,7 +11,7 @@ namespace DBS
         [StringValue("NONE")]
         None,
         // Chunk backup subprotocol
-        [StringValue("PUTCHUNK")] // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body> 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 + 64000
+        [StringValue("PUTCHUNK")] // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body>
         PutChunk,
         [StringValue("STORED")] // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
         Stored,
@@ -30,6 +30,9 @@ namespace DBS
         [StringValue("REMOVED")] // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
         Removed
     }
+
+    // 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 = 90 # max header size
+    // 0x10000 (MaxUDPSize) - 90 = 65446 # max body size
 
     public class Message
     {
