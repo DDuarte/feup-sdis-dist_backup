@@ -42,7 +42,7 @@ namespace DBS.Protocols
                     message.ChunkNo == msg.ChunkNo &&
                     message.FileId == msg.FileId).Subscribe(_ => chunkReceived = true);
 
-                Thread.Sleep(Core.Instance.Rnd.Next(0, 401)); // random delay uniformly distributed between 0 and 400 ms
+                Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
 
                 if (!chunkReceived)
                 {

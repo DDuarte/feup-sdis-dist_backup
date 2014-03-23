@@ -80,7 +80,7 @@ namespace DBS.Protocols
             }
             // otherwise file is already created: send Stored but do not increment degrees
 
-            Thread.Sleep(Core.Instance.Rnd.Next(0, 401)); // random delay uniformly distributed between 0 and 400 ms
+            Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
             Core.Instance.MCChannel.Send(Message.BuildStoredMessage(fileChunk));
         }
 

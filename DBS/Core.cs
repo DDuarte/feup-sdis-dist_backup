@@ -20,19 +20,30 @@ namespace DBS
         }
 
         public PersistentStore Store { get; private set; }
-        public Random Rnd { get; private set; }
+        private Random Rnd { get; set; }
 
         public IPAddress LocalIP { get; set; }
 
         public int MaxBackupSize { get; set; }
         public int ChunkSize { get; set; }
 
-        public Channel MCChannel { get; set; } // you can't touch this
+        public int BackupChunkTimeout { get; set; }
+        public double BackupChunkTimeoutMultiplier { get; set; }
+        public int BackupChunkRetries { get; set; }
+
+        public int VersionM { get; set; }
+        public int VersionN { get; set; }
+
+        public Channel MCChannel { get; set; }
         public Channel MDBChannel { get; set; }
         public Channel MDRChannel { get; set; }
 
         public Dictionary<string, FileEntry> BackupFiles { get; private set; }
         public string BackupDirectory { get; set; }
+
+        public int RandomDelayMin { get; set; }
+        public int RandomDelayMax { get; set; }
+        public int RandomDelay { get { return Rnd.Next(RandomDelayMin, RandomDelayMax + 1); } }
 
         public void Start()
         {

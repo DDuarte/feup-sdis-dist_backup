@@ -14,9 +14,6 @@ namespace DBS.Protocols
         private readonly int _replicationDegree;
         private readonly byte[] _data;
 
-        private const int InitialTimeout = 500;
-        private const int MaxRetries = 5;
-
         public BackupChunkSubprotocol(FileChunk fileChunk, int replicationDegree, byte[] data)
         {
             _fileChunk = fileChunk;
@@ -36,10 +33,12 @@ namespace DBS.Protocols
 
         private void SendChunk()
         {
-            var timeout = InitialTimeout;
+            var timeout = Core.Instance.BackupChunkTimeout;
+            var maxRetries = Core.Instance.BackupChunkRetries;
+            var multi = Core.Instance.BackupChunkTimeoutMultiplier;
 
             int retryCount;
-            for (retryCount = 0; retryCount < MaxRetries; retryCount++)
+            for (retryCount = 0; retryCount < maxRetries; retryCount++)
             {
                 var msg = Message.BuildPutChunkMessage(_fileChunk, _replicationDegree, _data);
                 Core.Instance.MDBChannel.Send(msg);
@@ -49,8 +48,8 @@ namespace DBS.Protocols
                 if (_count >= _replicationDegree)
                     break;
 
-                timeout *= 2;
-                if (retryCount != MaxRetries - 1) // not last iter
+                timeout = (int) (timeout * multi);
+                if (retryCount != maxRetries - 1) // not last iter
                     Console.WriteLine("[{0}: ChunkReplication degree is {1} but wanted {2}. Timeout increased to {3}",
                         _fileChunk, _count, _replicationDegree, timeout);
             }

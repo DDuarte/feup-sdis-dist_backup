@@ -102,6 +102,19 @@ namespace Peer
             // Size of each chunk stored locally and sent over the network
             Core.Instance.ChunkSize = Config.Global.ChunkSize;
 
+            // Backup chunk protocol configurations
+            Core.Instance.BackupChunkTimeout = Config.Global.BackupChunkTimeout;
+            Core.Instance.BackupChunkTimeoutMultiplier = Config.Global.BackupChunkTimeoutMultiplier;
+            Core.Instance.BackupChunkRetries = Config.Global.BackupChunkRetries;
+
+            // Protocol version
+            Core.Instance.VersionM = Config.Global.Version.M;
+            Core.Instance.VersionN = Config.Global.Version.N;
+
+            // Random delay used in multiple protocols
+            Core.Instance.RandomDelayMin = Config.Global.RandomDelay.Min;
+            Core.Instance.RandomDelayMax = Config.Global.RandomDelay.Max;
+
             // Create dictionary of files to mantain
             foreach (var f in Config.Global.Files)
                 Core.Instance.BackupFiles.Add(f.Name, new FileEntry

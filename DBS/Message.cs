@@ -37,8 +37,8 @@ namespace DBS
 
     public class Message
     {
-        public const int VERSION_M = 1;
-        public const int VERSION_N = 0;
+        private static readonly int VERSION_M = Core.Instance.VersionM;
+        private static readonly int VERSION_N = Core.Instance.VersionN;
 
         public MessageType MessageType { get; private set; }
 
@@ -369,19 +369,6 @@ namespace DBS
                 FileId = fileId,
                 ChunkNo = chunkNo
             };
-        }
-
-        public static Message BuildRemovedMessage(int versionM, int versionN, string fileIdStr, int chunkNo)
-        {
-            var msg = new Message
-            {
-                MessageType = MessageType.Removed,
-                VersionM = versionM,
-                VersionN = versionN,
-                ChunkNo = chunkNo
-            };
-            msg.SetFileId(fileIdStr);
-            return msg;
         }
     }
 }
