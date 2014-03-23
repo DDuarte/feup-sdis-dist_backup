@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 
@@ -42,6 +43,33 @@ namespace DBS.Protocols
             }
 
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
+
+            var dirSize = SpaceReclaimingWatcher.GetDirectorySize(Core.Instance.BackupDirectory);
+
+            if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
+            {
+                Console.WriteLine(
+                    "BackupChunkService:OnNext: Got no space to store {0}, trying to evict some other chunks", fileChunk);
+                foreach (var fileChunkf in Core.Instance.Store.Where(f => f.Value.ActualDegree > f.Value.WantedDegree)
+                        .Select(f => f.Key.Split('_'))
+                        .Select(keyParts => new {keyParts, fileIdStr = keyParts[0]})
+                        .Select(@t => new {@t, chunkNo = int.Parse(@t.keyParts[1])})
+                        .Select(@t => new FileChunk(new FileId(@t.@t.fileIdStr), @t.chunkNo))) // lol.
+                {
+                    Console.WriteLine("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}",
+                        fileChunkf);
+                    new SpaceReclaimingProtocol(fileChunk).Run();
+                }
+            }
+
+            if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
+            {
+                Console.WriteLine(
+                    "BackupChunkService:OnNext: Really have no space to store any file. Giving up on storing {0}",
+                    fileChunk);
+                return;
+            }
+
             var stored = fileChunk.SetData(msg.Body);
             if (stored.HasValue && stored.Value)
                 Core.Instance.Store.IncrementActualDegree(fileChunk.FileName, msg.ReplicationDeg.Value);

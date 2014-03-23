@@ -49,7 +49,7 @@ namespace DBS.Protocols
             }
         }
 
-        private static long GetDirectorySize(string p)
+        public static long GetDirectorySize(string p)
         {
             try
             {
