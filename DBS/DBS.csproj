@@ -71,6 +71,7 @@
     <Compile Include="Multicast\IMulticastBroadcaster.cs" />
     <Compile Include="Multicast\IMulticastListener.cs" />
     <Compile Include="Protocols\SpaceReclaimingService.cs" />
+    <Compile Include="Protocols\SpaceReclaimingWatcher.cs" />
     <Compile Include="Utilities\MemoryStreamExtensions.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Multicast\MulticastBroadcaster.cs" />

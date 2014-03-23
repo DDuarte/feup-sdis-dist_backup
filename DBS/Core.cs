@@ -36,8 +36,11 @@ namespace DBS
 
         public void Start()
         {
-            new BackupChunkService().Start();
-            new DeleteFileService().Start();
+            new BackupChunkService().Start(); // 3.2 Chunk backup subprotocol
+            new RestoreChunkService().Start(); // 3.3 Chunk restore protocol
+            new DeleteFileService().Start(); // 3.4 File deletion subprotocol
+            new SpaceReclaimingService().Start(); // 3.5 Space reclaiming subprotocol
+            new SpaceReclaimingWatcher().Start();
 
             foreach (var backupFile in BackupFiles)
             {

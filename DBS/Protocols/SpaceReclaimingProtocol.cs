@@ -22,6 +22,8 @@ namespace DBS.Protocols
                 return;
             }
 
+            // Not updating actualDegree here. Will be done when we receive our own REMOVED.
+
             var msg = Message.BuildRemovedMessage(_fileChunk);
             Core.Instance.MCChannel.Send(msg);
         }
