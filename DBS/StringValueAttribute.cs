@@ -3,9 +3,27 @@ using System.Linq;
 
 namespace DBS
 {
+    /// <summary>
+    /// Annotate enum with strings
+    ///</summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class StringValueAttribute : Attribute
     {
+        // example usage:
+        //   enum ShapeType
+        //   {
+        //      [StringValue("NONE")]
+        //      None,
+        //      [StringValue("SQUARESHAPE")]
+        //      Square
+        //   }
+        //   ...
+        //   var e = ShapeType.Square;
+        //   var str = StringValueAttribute.Get(e); // str = "SQUARESHAPE"
+        //   ...
+        //   var str = "NONE";
+        //   var e = StringValueAttribute.Get<ShapeType>(str); // e = ShapeType.None
+
         private readonly string _value;
 
         public StringValueAttribute(string value)

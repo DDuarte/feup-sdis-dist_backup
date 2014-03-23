@@ -60,6 +60,7 @@
     <Compile Include="MyFileInfo.cs" />
     <Compile Include="MyFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringValueAttributeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DBS\DBS.csproj">
