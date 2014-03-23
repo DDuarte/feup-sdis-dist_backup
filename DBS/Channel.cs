@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -30,6 +29,7 @@ namespace DBS
                 Console.WriteLine("R -  {0}: {1}", Name, msg);
                 _subject.OnNext(msg);
             }
+// ReSharper disable once FunctionNeverReturns
         }
 
         private readonly IMulticastListener _listener;

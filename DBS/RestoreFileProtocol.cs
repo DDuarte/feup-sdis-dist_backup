@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace DBS
@@ -10,12 +6,12 @@ namespace DBS
     class RestoreFileProtocol : IProtocol
     {
         private readonly string _fileName;
-        private readonly FileEntry _fileInfo;
+        private readonly FileEntry _fileEntry;
 
-        public RestoreFileProtocol(string fileName, FileEntry fileInfo)
+        public RestoreFileProtocol(string fileName, FileEntry fileEntry)
         {
             _fileName = fileName;
-            _fileInfo = fileInfo;
+            _fileEntry = fileEntry;
         }
 
         public void Run()
@@ -24,13 +20,16 @@ namespace DBS
             {
                 using (var file = File.OpenWrite(_fileName))
                 {
-                    int chunkNo = 0;
+                    var chunkNo = 0;
                     Message chunk;
                     do
                     {
-                        var restoreChunkProtocol = new RestoreChunkSubprotocol(_fileInfo.FileId, chunkNo);
+                        var restoreChunkProtocol = new RestoreChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo));
                         restoreChunkProtocol.Run();
-                        chunk = restoreChunkProtocol.Chunk;
+                        chunk = restoreChunkProtocol.ChunkMessage;
+                        if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
+                            break;
+
                         file.Write(chunk.Body, 0, chunk.Body.Length);
                         ++chunkNo;
                     } while (chunk.Body.Length == 64000);
@@ -39,4 +38,3 @@ namespace DBS
         }
     }
 }
-

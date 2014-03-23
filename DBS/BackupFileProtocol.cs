@@ -32,7 +32,7 @@ namespace DBS
                     while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                        var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
+                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
                             data);
                         bc.Run();
                         ++chunkNo;
@@ -40,7 +40,7 @@ namespace DBS
 
                     if ((fileSize%ChunkSize) == 0) // last chunk with an empty body
                     {
-                        var bc = new BackupChunkSubprotocol(_fileEntry.FileId, chunkNo, _fileEntry.ReplicationDegree,
+                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
                             new byte[] {});
                         bc.Run();
                     }

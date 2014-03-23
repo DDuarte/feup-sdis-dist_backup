@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DBS
 {
@@ -12,27 +9,32 @@ namespace DBS
     /// </summary>
     class RestoreChunkSubprotocol : IProtocol
     {
-        private readonly FileId _fileId;
-        private readonly int _chunkNo;
-        public Message Chunk { get; private set; }
+        private readonly FileChunk _fileChunk;
+        public Message ChunkMessage { get; private set; }
 
-        public RestoreChunkSubprotocol(FileId fileId, int chunkNo)
+        public RestoreChunkSubprotocol(FileChunk fileChunk)
         {
-            _fileId = fileId;
-            _chunkNo = chunkNo;
+            _fileChunk = fileChunk;
         }
 
         private void SendGetChunk()
         {
-            Core.Instance.MCChannel.Send(Message.BuildGetChunkMessage(_fileId, _chunkNo));
+            Core.Instance.MCChannel.Send(Message.BuildGetChunkMessage(_fileChunk));
 
-            // wait for response
-            Chunk = Core.Instance.MDRChannel.Received.Where(message =>
-                message.MessageType == MessageType.Chunk &&
-                message.ChunkNo == _chunkNo &&
-                message.FileId == _fileId)
-                .Timeout(System.TimeSpan.FromMilliseconds(5000))
-                .Next().First();
+            try
+            {
+                // wait for response
+                ChunkMessage = Core.Instance.MDRChannel.Received.Where(message =>
+                    message.MessageType == MessageType.Chunk &&
+                    message.ChunkNo == _fileChunk.ChunkNo &&
+                    message.FileId == _fileChunk.FileId)
+                    .Timeout(TimeSpan.FromMilliseconds(5000))
+                    .Next().First();
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
+            }
         }
 
         public void Run()

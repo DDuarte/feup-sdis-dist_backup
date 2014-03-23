@@ -11,18 +11,16 @@ namespace DBS
     /// </summary>
     public class BackupChunkSubprotocol : IProtocol
     {
-        private readonly FileId _fileId;
-        private readonly int _chunkNo;
+        private readonly FileChunk _fileChunk;
         private readonly int _replicationDegree;
         private readonly byte[] _data;
 
         private const int InitialTimeout = 500;
         private const int MaxRetries = 5;
 
-        public BackupChunkSubprotocol(FileId fileId, int chunkNo, int replicationDegree, byte[] data)
+        public BackupChunkSubprotocol(FileChunk fileChunk, int replicationDegree, byte[] data)
         {
-            _fileId = fileId;
-            _chunkNo = chunkNo;
+            _fileChunk = fileChunk;
             _replicationDegree = replicationDegree;
             _data = data;
         }
@@ -31,6 +29,9 @@ namespace DBS
         private readonly HashSet<string> _storedsFrom = new HashSet<string>();
         private void StoreHandler(Message msg)
         {
+            // HashSet.Add only adds unique objects
+            // the idea here is to count multiple Stored messages from
+            // the same peer only once
             _storedsFrom.Add(msg.RemoteEndPoint.ToString());
         }
 
@@ -41,7 +42,7 @@ namespace DBS
             int retryCount;
             for (retryCount = 0; retryCount < MaxRetries; retryCount++)
             {
-                var msg = Message.BuildPutChunkMessage(_fileId, _chunkNo, _replicationDegree, _data);
+                var msg = Message.BuildPutChunkMessage(_fileChunk, _replicationDegree, _data);
                 Core.Instance.MDBChannel.Send(msg);
 
                 Thread.Sleep(timeout);
@@ -51,20 +52,20 @@ namespace DBS
 
                 timeout *= 2;
                 if (retryCount != MaxRetries - 1) // not last iter
-                    Console.WriteLine("[{3}#{4}: ChunkReplication degree is {0} but wanted {1}. Timeout increased to {2}",
-                        _count, _replicationDegree, timeout, _fileId.ToStringSmall(), _chunkNo);
+                    Console.WriteLine("[{0}: ChunkReplication degree is {1} but wanted {2}. Timeout increased to {3}",
+                        _fileChunk, _count, _replicationDegree, timeout);
             }
 
-            Console.WriteLine("{2}#{3}: Stored or giving up: retries {0}, rep degree {1}", retryCount, _count, _fileId.ToStringSmall(), _chunkNo);
-            Core.Instance.Store.UpdateDegrees(_fileId + "_" + _chunkNo, _count, _replicationDegree);
+            Console.WriteLine("{0}: Stored or giving up: retries {1}, rep degree {2}", _fileChunk, retryCount, _count);
+            Core.Instance.Store.UpdateDegrees(_fileChunk.FileName, _count, _replicationDegree);
         }
 
         public void Run()
         {
             var subs = Core.Instance.MCChannel.Received.Where(message =>
                 message.MessageType == MessageType.Stored &&
-                message.ChunkNo == _chunkNo &&
-                message.FileId == _fileId).Subscribe(StoreHandler);
+                message.ChunkNo == _fileChunk.ChunkNo &&
+                message.FileId == _fileChunk.FileId).Subscribe(StoreHandler);
 
             //Task.Factory.StartNew(SendChunk).ContinueWith(task => subs.Dispose());
             SendChunk();

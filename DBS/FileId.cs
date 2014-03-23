@@ -91,6 +91,7 @@ namespace DBS
                 return 0;
             var hashCode = 0;
 // ReSharper disable once LoopCanBeConvertedToQuery
+// ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < _bytes.Length; i++)
                 // Rotate by 3 bits and XOR the new value.
                 hashCode = (hashCode << 3) | (hashCode >> (29)) ^ _bytes[i];

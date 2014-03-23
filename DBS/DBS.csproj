@@ -61,6 +61,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChunkRestoreService.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="FileChunk.cs" />
     <Compile Include="FileDeletionService.cs" />
     <Compile Include="FileEntry.cs" />
     <Compile Include="FileId.cs" />

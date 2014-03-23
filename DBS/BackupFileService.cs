@@ -36,14 +36,13 @@ namespace DBS
                 return;
             }
 
-            var fileName = msg.FileId + "_" + msg.ChunkNo;
-            var fullPath = Path.Combine(Core.Instance.BackupDirectory, fileName);
-            if (!File.Exists(fullPath))
+            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
+            if (fileChunk.Exists())
             {
                 try
                 {
-                    File.WriteAllBytes(fullPath, msg.Body);
-                    Core.Instance.Store.IncrementActualDegree(fileName, msg.ReplicationDeg.Value);
+                    File.WriteAllBytes(fileChunk.FullFileName, msg.Body);
+                    Core.Instance.Store.IncrementActualDegree(fileChunk.FileName, msg.ReplicationDeg.Value);
                 }
                 catch (Exception ex)
                 {
@@ -53,17 +52,17 @@ namespace DBS
             }
 
             Thread.Sleep(Core.Instance.Rnd.Next(0, 401)); // random delay uniformly distributed between 0 and 400 ms
-            Core.Instance.MCChannel.Send(Message.BuildStoredMessage(msg.FileId, msg.ChunkNo.Value));
+            Core.Instance.MCChannel.Send(Message.BuildStoredMessage(fileChunk));
         }
 
         public void OnError(Exception error)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("BackupFileService:OnError: {0}", error);
         }
 
         public void OnCompleted()
         {
-            throw new NotImplementedException();
+            Console.WriteLine("BackupFileService:OnCompleted");
         }
     }
 }

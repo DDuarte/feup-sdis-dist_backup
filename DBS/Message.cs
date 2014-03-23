@@ -36,7 +36,7 @@ namespace DBS
         public const int VERSION_M = 1;
         public const int VERSION_N = 0;
 
-        public MessageType MessageType { get; set; }
+        public MessageType MessageType { get; private set; }
 
         internal void SetMessageType(string type)
         {
@@ -50,7 +50,7 @@ namespace DBS
         public int? VersionN
         {
             get { return _versionN; }
-            set
+            private set
             {
                 if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
                     throw new ArgumentOutOfRangeException("value", value, "Version (N) must be between 0 and 9");
@@ -62,7 +62,7 @@ namespace DBS
         public int? VersionM
         {
             get { return _versionM; }
-            set
+            private set
             {
                 if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
                     throw new ArgumentOutOfRangeException("value", value, "Version (M) must be between 0 and 9");
@@ -90,7 +90,7 @@ namespace DBS
         public int? ChunkNo
         {
             get { return _chunkNo; }
-            set
+            private set
             {
                 if (value.HasValue && (value < 0 || value > 999999)) // 6 digits max
                     throw new ArgumentOutOfRangeException("value", value, "Chunk number must be between 0 and 999999");
@@ -107,7 +107,7 @@ namespace DBS
         public int? ReplicationDeg
         {
             get { return _replicationDeg; }
-            set
+            private set
             {
                 if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
                     throw new ArgumentOutOfRangeException("value", value, "Replication degree must be between 0 and 9");
@@ -120,7 +120,7 @@ namespace DBS
             ReplicationDeg = int.Parse(replicationDeg);
         }
 
-        public byte[] Body { get; set; }
+        public byte[] Body { get; private set; }
 
         public IPEndPoint RemoteEndPoint { get; set; }
 
@@ -268,34 +268,29 @@ namespace DBS
             return ret;
         }
 
-        public static Message BuildPutChunkMessage(FileId fileId, int chunkNo, int replicationDeg, byte[] body)
+        public static Message BuildPutChunkMessage(FileChunk fileChunk, int replicationDeg, byte[] body)
         {
-            return BuildPutChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, replicationDeg, body);
+            return BuildPutChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo, replicationDeg, body);
         }
 
-        public static Message BuildStoredMessage(FileId fileId, int chunkNo)
+        public static Message BuildStoredMessage(FileChunk fileChunk)
         {
-            return BuildStoredMessage(VERSION_M, VERSION_N, fileId, chunkNo);
+            return BuildStoredMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
         }
 
-        public static Message BuildGetChunkMessage(FileId fileId, int chunkNo)
+        public static Message BuildGetChunkMessage(FileChunk fileChunk)
         {
-            return BuildGetChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo);
+            return BuildGetChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
         }
 
-        public static Message BuildChunkMessage(FileId fileId, int chunkNo, byte[] body)
+        public static Message BuildChunkMessage(FileChunk fileChunk, byte[] body)
         {
-            return BuildChunkMessage(VERSION_M, VERSION_N, fileId, chunkNo, body);
+            return BuildChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo, body);
         }
 
-        public static Message BuildRemovedMessage(FileId fileId, int chunkNo)
+        public static Message BuildRemovedMessage(FileChunk fileChunk)
         {
-            return BuildRemovedMessage(VERSION_M, VERSION_N, fileId, chunkNo);
-        }
-
-        public static Message BuildRemovedMessage(string fileIdStr, int chunkNo)
-        {
-            return BuildRemovedMessage(VERSION_M, VERSION_N, fileIdStr, chunkNo);
+            return BuildRemovedMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
         }
 
         public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
