@@ -43,6 +43,7 @@ namespace DBS.Protocols
                     message.FileId == msg.FileId).Subscribe(_ => chunkReceived = true);
 
                 Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
+                disposable.Dispose();
 
                 if (!chunkReceived)
                 {
@@ -50,8 +51,6 @@ namespace DBS.Protocols
                     var chunkMsg = Message.BuildChunkMessage(fileChunk, data);
                     Core.Instance.MDRChannel.Send(chunkMsg);
                 }
-
-                disposable.Dispose();
             }
             catch (Exception ex)
             {
