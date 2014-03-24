@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-// ConcurrentHashSet<T> impl that uses a HashSet<T> and a ReaderWriterLockSlim under the good
+// ConcurrentHashSet<T> impl that uses a HashSet<T> and a ReaderWriterLockSlim under the hood
 // Original code by Ben Mosher (http://stackoverflow.com/questions/4306936/how-to-implement-concurrenthashset-in-net)
 // Modified to fully implement ISet<T>
 

@@ -85,6 +85,7 @@
     <Compile Include="Protocols\RestoreFileProtocol.cs" />
     <Compile Include="Protocols\SpaceReclaimingProtocol.cs" />
     <Compile Include="Utilities\StringValueAttribute.cs" />
+    <Compile Include="Utilities\Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

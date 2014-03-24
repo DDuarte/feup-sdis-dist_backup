@@ -9,23 +9,20 @@ namespace DBS.Protocols
     /// </summary>
     public class BackupFileProtocol : IProtocol
     {
-        private readonly string _fileName;
         private readonly FileEntry _fileEntry;
 
-        public BackupFileProtocol(string fileName, FileEntry fileEntry)
+        public BackupFileProtocol(FileEntry fileEntry)
         {
-            _fileName = fileName;
-            _fileEntry = fileEntry;
+           _fileEntry = fileEntry;
         }
 
         public Task Run()
         {
             return Task.Factory.StartNew(() =>
             {
-                using (var file = File.OpenRead(_fileName))
+                using (var file = File.OpenRead(_fileEntry.OriginalFileName))
                 {
                     int bytesRead, chunkNo = 0;
-                    var fileSize = file.Length;
                     var buffer = new byte[Core.Instance.ChunkSize];
                     while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                     {
@@ -36,7 +33,7 @@ namespace DBS.Protocols
                         ++chunkNo;
                     }
 
-                    if ((fileSize % Core.Instance.ChunkSize) == 0) // last chunk with an empty body
+                    if ((file.Length % Core.Instance.ChunkSize) == 0) // last chunk with an empty body
                     {
                         var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
                             new byte[] {});

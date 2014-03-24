@@ -29,7 +29,7 @@ namespace DBS.Protocols
             // HashSet.Add only adds unique objects
             // the idea here is to count multiple Stored messages from
             // the same peer only once
-            _storedsFrom.Add(msg.RemoteEndPoint.ToString());
+            _storedsFrom.Add(msg.VersionN.GetValueOrDefault(0) + "_" + msg.RemoteEndPoint);
         }
 
         private void SendChunk()

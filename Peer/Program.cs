@@ -117,17 +117,14 @@ namespace Peer
 
             // Create dictionary of files to mantain
             foreach (var f in Config.Global.Files)
-                Core.Instance.BackupFiles.Add(f.Name, new FileEntry
-                {
-                    FileId = FileId.FromFile(f.Name),
-                    ReplicationDegree = f.ReplicationDegree
-                });
+                Core.Instance.AddBackupFile(f.Name, f.ReplicationDegree);
 
             // Setup directories
             Core.Instance.BackupDirectory = Config.Global.BackupDir;
+            Utilities.CreateDirectoryIfNotExists(Core.Instance.BackupDirectory);
 
-            if (!Directory.Exists(Core.Instance.BackupDirectory))
-                Directory.CreateDirectory(Core.Instance.BackupDirectory);
+            Core.Instance.RestoreDirectory = Config.Global.RestoreDir;
+            Utilities.CreateDirectoryIfNotExists(Core.Instance.RestoreDirectory);
 
             // Create channels
             Core.Instance.MCChannel = new Channel(mcIP, mcPort) { Name = "MC" };
