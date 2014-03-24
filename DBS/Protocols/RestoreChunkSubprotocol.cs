@@ -11,6 +11,8 @@ namespace DBS.Protocols
     class RestoreChunkSubprotocol : IProtocol
     {
         private readonly FileChunk _fileChunk;
+        private const int Timeout = 5000;
+
         public Message ChunkMessage { get; private set; }
 
         public RestoreChunkSubprotocol(FileChunk fileChunk)
@@ -29,7 +31,7 @@ namespace DBS.Protocols
                     message.MessageType == MessageType.Chunk &&
                     message.ChunkNo == _fileChunk.ChunkNo &&
                     message.FileId == _fileChunk.FileId)
-                    .Timeout(TimeSpan.FromMilliseconds(5000))
+                    .Timeout(TimeSpan.FromMilliseconds(Timeout))
                     .Next().First();
             }
             catch (TimeoutException)
