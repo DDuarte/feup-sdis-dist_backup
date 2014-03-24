@@ -25,7 +25,7 @@ namespace DBS.Protocols.Enhancements
         {
             Core.Instance.MCChannel.Send(Message.BuildLookUpMessage(fileId));
             return Core.Instance.MCChannel.Received.Where(message =>
-                message.MessageType == MessageType.LookUp &&
+                message.MessageType == MessageType.Got &&
                 message.FileId == fileId).Subscribe(msg =>
                 {
                     byte val;
@@ -41,14 +41,13 @@ namespace DBS.Protocols.Enhancements
                 {
                     var fileName = Path.GetFileName(path);
                     return fileName != null ? fileName.Split('_')[0] : null;
-                })
-                .ToArray();
+                });
 
             // remove duplicates, transform the collection into a ConcurrentDictionary
-            _backedUpFiles = new ConcurrentDictionary<string, byte>(fileIdArray.Distinct().ToDictionary(item => item, _ => new byte()));
+            _backedUpFiles = new ConcurrentDictionary<string, byte>(fileIdArray.ToDictionary(item => item, _ => new byte()));
 
             // perform a lookup for each fileId
-            var subscriptions = _backedUpFiles.Keys.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr))).ToList();
+            var subscriptions = _backedUpFiles.Keys.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
 
             // wait
             Thread.Sleep(WaitPeriod);
@@ -66,4 +65,3 @@ namespace DBS.Protocols.Enhancements
         }
     }
 }
-

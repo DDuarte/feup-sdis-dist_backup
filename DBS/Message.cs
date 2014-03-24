@@ -33,7 +33,11 @@ namespace DBS
 
         // File lookup subprotocol enhancement
         [StringValue("LOOKUP")] // <Version> <FileId> <CRLF> <CRLF>
-        LookUp
+        LookUp,
+
+        // File lookup reply
+        [StringValue("GOT")] // <Version> <FileId> <CRLF> <CRLF>
+        Got,
     }
 
     // 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 = 90 # max header size
@@ -306,6 +310,11 @@ namespace DBS
             return BuildLookUpMessage(VERSION_M, VERSION_N, fileId);
         }
 
+        public static Message BuildGotMessage(FileId fileId)
+        {
+            return BuildGotMessage(VERSION_M, VERSION_N, fileId);
+        }
+
         public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
             int replicationDeg, byte[] body)
         {
@@ -385,6 +394,16 @@ namespace DBS
             return new Message
             {
                 MessageType = MessageType.LookUp,
+                VersionM = versionM,
+                VersionN = versionN,
+                FileId = fileId
+            };
+        }
+        public static Message BuildGotMessage(int versionM, int versionN, FileId fileId)
+        {
+            return new Message
+            {
+                MessageType = MessageType.Got,
                 VersionM = versionM,
                 VersionN = versionN,
                 FileId = fileId
