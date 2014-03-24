@@ -45,9 +45,6 @@ namespace DBS
 
     public class Message
     {
-        private static readonly int VERSION_M = Core.Instance.VersionM;
-        private static readonly int VERSION_N = Core.Instance.VersionN;
-
         public MessageType MessageType { get; private set; }
 
         internal void SetMessageType(string type)
@@ -282,37 +279,42 @@ namespace DBS
 
         public static Message BuildPutChunkMessage(FileChunk fileChunk, int replicationDeg, byte[] body)
         {
-            return BuildPutChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo, replicationDeg, body);
+            return BuildPutChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
+                fileChunk.ChunkNo, replicationDeg, body);
         }
 
         public static Message BuildStoredMessage(FileChunk fileChunk)
         {
-            return BuildStoredMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
+            return BuildStoredMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
+                fileChunk.ChunkNo);
         }
 
         public static Message BuildGetChunkMessage(FileChunk fileChunk)
         {
-            return BuildGetChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
+            return BuildGetChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
+                fileChunk.ChunkNo);
         }
 
         public static Message BuildChunkMessage(FileChunk fileChunk, byte[] body)
         {
-            return BuildChunkMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo, body);
+            return BuildChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId, fileChunk.ChunkNo,
+                body);
         }
 
         public static Message BuildRemovedMessage(FileChunk fileChunk)
         {
-            return BuildRemovedMessage(VERSION_M, VERSION_N, fileChunk.FileId, fileChunk.ChunkNo);
+            return BuildRemovedMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
+                fileChunk.ChunkNo);
         }
 
         public static Message BuildLookUpMessage(FileId fileId)
         {
-            return BuildLookUpMessage(VERSION_M, VERSION_N, fileId);
+            return BuildLookUpMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileId);
         }
 
         public static Message BuildGotMessage(FileId fileId)
         {
-            return BuildGotMessage(VERSION_M, VERSION_N, fileId);
+            return BuildGotMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileId);
         }
 
         public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,

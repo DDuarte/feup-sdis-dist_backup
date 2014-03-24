@@ -51,7 +51,7 @@ namespace DBS.Protocols
 
                 timeout = (int) (timeout * multi);
                 if (retryCount != maxRetries - 1) // not last iter
-                    Console.WriteLine("[{0}: ChunkReplication degree is {1} but wanted {2}. Timeout increased to {3}",
+                    Console.WriteLine("{0}: ChunkReplication degree is {1} but wanted {2}. Timeout increased to {3}",
                         _fileChunk, _count, _replicationDegree, timeout);
             }
 

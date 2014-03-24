@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DBS.Utilities;
 
 namespace DBS.Protocols.Enhancements
 {
     class LookUpProtocol : IProtocol
     {
         private readonly string _backupDir;
-        private ConcurrentDictionary<string, byte> _backedUpFiles;
+        private ConcurrentHashSet<string> _backedUpFiles;
         private const int WaitPeriod = 10000;
         public LookUpProtocol(string backupDir)
         {
             _backupDir = backupDir;
-            _backedUpFiles = new ConcurrentDictionary<string, byte>();
+            _backedUpFiles = new ConcurrentHashSet<string>();
         }
 
         private IDisposable LookUpFileId(FileId fileId)
@@ -26,11 +25,7 @@ namespace DBS.Protocols.Enhancements
             Core.Instance.MCChannel.Send(Message.BuildLookUpMessage(fileId));
             return Core.Instance.MCChannel.Received.Where(message =>
                 message.MessageType == MessageType.Got &&
-                message.FileId == fileId).Subscribe(msg =>
-                {
-                    byte val;
-                    _backedUpFiles.TryRemove(msg.FileId.ToString(), out val);
-                });
+                message.FileId == fileId).Subscribe(msg => _backedUpFiles.Remove(msg.FileId.ToString()));
         }
 
         public Task Run() // should this run in a separate thread? We're deleting files...
@@ -38,19 +33,18 @@ namespace DBS.Protocols.Enhancements
             return Task.Factory.StartNew(() =>
             {
                 // get array with all the fileId's associated with the backed up chunks
-                var fileIdArray = Directory.GetFiles(_backupDir, "*_*")
+                var fileIds = Directory.GetFiles(_backupDir, "*_*")
                     .Select(path =>
                     {
                         var fileName = Path.GetFileName(path);
                         return fileName != null ? fileName.Split('_')[0] : null;
                     });
 
-                // remove duplicates, transform the collection into a ConcurrentDictionary
-                _backedUpFiles =
-                    new ConcurrentDictionary<string, byte>(fileIdArray.ToDictionary(item => item, _ => new byte()));
+                // remove duplicates, transform the collection into a ConcurrentHashSet
+                _backedUpFiles = new ConcurrentHashSet<string>(fileIds.Distinct());
 
                 // perform a lookup for each fileId
-                var subscriptions = _backedUpFiles.Keys.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
+                var subscriptions = _backedUpFiles.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
 
                 // wait
                 Thread.Sleep(WaitPeriod);
@@ -59,11 +53,11 @@ namespace DBS.Protocols.Enhancements
                     subscription.Dispose();
 
                 // delete all the unused chunks
-                foreach (var unusedFile in _backedUpFiles.Keys)
+                foreach (var unusedFile in _backedUpFiles)
                 {
-                    var fileList = Directory.GetFiles(_backupDir, unusedFile + '_' + '*');
+                    var fileList = Directory.GetFiles(_backupDir, unusedFile + "_*");
                     foreach (var backedUpChunk in fileList)
-                        System.IO.File.Delete(backedUpChunk);
+                        File.Delete(backedUpChunk);
                 }
             });
         }
