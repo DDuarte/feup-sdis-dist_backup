@@ -33,35 +33,39 @@ namespace DBS.Protocols.Enhancements
                 });
         }
 
-        public void Run() // should this run in a separate thread? We're deleting files...
+        public Task Run() // should this run in a separate thread? We're deleting files...
         {
-            // get array with all the fileId's associated with the backed up chunks
-            var fileIdArray = Directory.GetFiles(_backupDir, "*_*")
-                .Select(path =>
-                {
-                    var fileName = Path.GetFileName(path);
-                    return fileName != null ? fileName.Split('_')[0] : null;
-                });
-
-            // remove duplicates, transform the collection into a ConcurrentDictionary
-            _backedUpFiles = new ConcurrentDictionary<string, byte>(fileIdArray.ToDictionary(item => item, _ => new byte()));
-
-            // perform a lookup for each fileId
-            var subscriptions = _backedUpFiles.Keys.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
-
-            // wait
-            Thread.Sleep(WaitPeriod);
-
-            foreach (var subscription in subscriptions)
-                subscription.Dispose();
-
-            // delete all the unused chunks
-            foreach (var unusedFile in _backedUpFiles.Keys)
+            return Task.Factory.StartNew(() =>
             {
-                var fileList = Directory.GetFiles(_backupDir, unusedFile + '_' + '*');
-                foreach (var backedUpChunk in fileList)
-                    System.IO.File.Delete(backedUpChunk);
-            }
+                // get array with all the fileId's associated with the backed up chunks
+                var fileIdArray = Directory.GetFiles(_backupDir, "*_*")
+                    .Select(path =>
+                    {
+                        var fileName = Path.GetFileName(path);
+                        return fileName != null ? fileName.Split('_')[0] : null;
+                    });
+
+                // remove duplicates, transform the collection into a ConcurrentDictionary
+                _backedUpFiles =
+                    new ConcurrentDictionary<string, byte>(fileIdArray.ToDictionary(item => item, _ => new byte()));
+
+                // perform a lookup for each fileId
+                var subscriptions = _backedUpFiles.Keys.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
+
+                // wait
+                Thread.Sleep(WaitPeriod);
+
+                foreach (var subscription in subscriptions)
+                    subscription.Dispose();
+
+                // delete all the unused chunks
+                foreach (var unusedFile in _backedUpFiles.Keys)
+                {
+                    var fileList = Directory.GetFiles(_backupDir, unusedFile + '_' + '*');
+                    foreach (var backedUpChunk in fileList)
+                        System.IO.File.Delete(backedUpChunk);
+                }
+            });
         }
     }
 }

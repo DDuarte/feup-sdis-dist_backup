@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DBS.Protocols
 {
@@ -58,16 +59,19 @@ namespace DBS.Protocols
             Core.Instance.Store.UpdateDegrees(_fileChunk.FileName, _count, _replicationDegree);
         }
 
-        public void Run()
+        public Task Run()
         {
-            var subs = Core.Instance.MCChannel.Received.Where(message =>
-                message.MessageType == MessageType.Stored &&
-                message.ChunkNo == _fileChunk.ChunkNo &&
-                message.FileId == _fileChunk.FileId).Subscribe(StoreHandler);
+            return Task.Factory.StartNew(() =>
+            {
+                var subs = Core.Instance.MCChannel.Received.Where(message =>
+                    message.MessageType == MessageType.Stored &&
+                    message.ChunkNo == _fileChunk.ChunkNo &&
+                    message.FileId == _fileChunk.FileId).Subscribe(StoreHandler);
 
-            //Task.Factory.StartNew(SendChunk).ContinueWith(task => subs.Dispose());
-            SendChunk();
-            subs.Dispose(); // unsubscribe
+                //Task.Factory.StartNew(SendChunk).ContinueWith(task => subs.Dispose());
+                SendChunk();
+                subs.Dispose(); // unsubscribe
+            });
         }
     }
 }

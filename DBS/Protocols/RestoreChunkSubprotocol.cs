@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace DBS.Protocols
 {
@@ -37,9 +38,9 @@ namespace DBS.Protocols
             }
         }
 
-        public void Run()
+        public Task Run()
         {
-            SendGetChunk();
+            return Task.Factory.StartNew(SendGetChunk);
         }
     }
 }

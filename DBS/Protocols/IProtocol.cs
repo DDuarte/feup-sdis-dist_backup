@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace DBS.Protocols
 {
     /// <summary>
@@ -5,6 +7,6 @@ namespace DBS.Protocols
     /// </summary>
     interface IProtocol
     {
-        void Run();
+        Task Run();
     }
 }

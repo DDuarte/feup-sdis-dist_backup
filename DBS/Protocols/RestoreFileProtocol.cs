@@ -14,9 +14,9 @@ namespace DBS.Protocols
             _fileEntry = fileEntry;
         }
 
-        public void Run()
+        public Task Run()
         {
-            Task.Factory.StartNew(() =>
+            return Task.Factory.StartNew(() =>
             {
                 using (var file = File.OpenWrite(_fileName))
                 {
