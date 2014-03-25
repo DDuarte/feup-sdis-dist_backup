@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs" />
     <Compile Include="Persistence\DBFields.cs" />
     <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
     <Compile Include="Protocols\BackupFileProtocol.cs" />

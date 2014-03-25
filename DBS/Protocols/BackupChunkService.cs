@@ -1,7 +1,7 @@
 using System;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols
 {
@@ -44,14 +44,14 @@ namespace DBS.Protocols
 
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
 
-            var dirSize = SpaceReclaimingWatcher.GetDirectorySize(Core.Instance.BackupDirectory);
+            var dirSize = Util.GetDirectorySize(Core.Instance.BackupDirectory);
             if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
             {
                 Console.WriteLine(
                     "BackupChunkService:OnNext: Got no space to store {0}, trying to evict some other chunks", fileChunk);
                 new SpaceReclaimingProtocol().Run();
 
-                dirSize = SpaceReclaimingWatcher.GetDirectorySize(Core.Instance.BackupDirectory);
+                dirSize = Util.GetDirectorySize(Core.Instance.BackupDirectory);
                 if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
                 {
                     Console.WriteLine(

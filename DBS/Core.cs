@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using DBS.Persistence;
 using DBS.Protocols;
 using DBS.Utilities;
@@ -42,28 +43,27 @@ namespace DBS
         public Channel MDBChannel { get; set; }
         public Channel MDRChannel { get; set; }
 
-        public void AddBackupFile(string fileName, int replicationDegree)
+        public FileEntry AddBackupFile(string fileName /* C:/Windows/write.exe */, int replicationDegree)
         {
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ArgumentNullException("fileName");
 
             if (!File.Exists(fileName))
-                throw new ArgumentException("File '{0}' does not exist.".FormatWith(fileName), "fileName");
+                return null;
 
             // get a unique filename from the original file path
             // if the new filename already exists, append a number to it
-            var newFileName = Path.GetFileName(fileName) + "_";
+            var fileNameWithoutPath = Path.GetFileName(fileName); /* write.exe */
+            var newFileName = fileNameWithoutPath;
             var count = 1;
             while (BackupFiles.Any(entry => entry.FileName == newFileName))
             {
-                var countStr = count.ToString(CultureInfo.InvariantCulture);
-                newFileName = newFileName.Remove(newFileName.Length - countStr.Length);
-                newFileName += countStr;
+                var ext = Path.GetExtension(newFileName);
+                var name = Path.GetFileNameWithoutExtension(newFileName);
+
+                newFileName = name + '_' + count + ext;
                 count++;
             }
-
-            if (count == 1) // no changes
-                newFileName = newFileName.Remove(newFileName.Length - 1); // the underscore
 
             var fileEntry = new FileEntry
             {
@@ -74,6 +74,7 @@ namespace DBS
             };
 
             BackupFiles.Add(fileEntry);
+            return fileEntry;
         }
 
         public HashSet<FileEntry> BackupFiles { get; private set; }
@@ -97,12 +98,127 @@ namespace DBS
                 new BackupFileProtocol(backupFile).Run();
             }
 
+            var swt = new CommandSwitch();
+
             Console.WriteLine("Write 'quit' to exit application.");
-            string str;
-            do
+            while (true)
             {
-                str = Console.ReadLine();
-            } while (str != null && str != "quit");
+                var str = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(str))
+                    continue;
+
+                var parts = str.Split(' ');
+                var cmd = parts[0].Trim();
+                cmd = cmd.ToLower();
+                if (cmd == "quit")
+                    return;
+                else if (cmd == "backup")
+                {
+                    if (parts.Length != 3)
+                    {
+                        Console.WriteLine("Wrong number of arguments.");
+                        continue;
+                    }
+
+                    var fileName = parts[1];
+                    var repDegree = int.Parse(parts[2]);
+
+                    var fileEntry = AddBackupFile(fileName, repDegree);
+                    if (fileEntry == null)
+                    {
+                        Console.WriteLine("Tried to backup unknown file.");
+                        continue;
+                    }
+
+                    Console.WriteLine("Will backup file '{0}'", fileEntry.FileName);
+                    swt.Execute(new BackupFileCommand(fileEntry));
+                }
+                else if (cmd == "restore")
+                {
+                    if (parts.Length != 2)
+                    {
+                        Console.WriteLine("Wrong number of arguments.");
+                        continue;
+                    }
+
+                    var fileName = parts[1];
+                    var fileEntry = ConsoleGetFileEntry(fileName);
+                    if (fileEntry == null)
+                    {
+                        Console.WriteLine("Wrong file name provided.");
+                        continue;
+                    }
+
+                    Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
+                    swt.Execute(new RestoreFileCommand(fileEntry));
+                }
+                else if (cmd == "delete")
+                {
+                    if (parts.Length != 2)
+                    {
+                        Console.WriteLine("Wrong number of arguments.");
+                        continue;
+                    }
+
+                    var fileName = parts[1];
+                    var fileEntry = ConsoleGetFileEntry(fileName);
+                    if (fileEntry == null)
+                    {
+                        Console.WriteLine("Wrong file name provided.");
+                        continue;
+                    }
+
+                    Console.WriteLine("Will delete file '{0}'", fileEntry.FileName);
+                    swt.Execute(new DeleteFileCommand(fileEntry));
+                }
+                else if (cmd == "reclaim")
+                {
+                    Console.WriteLine("Launching space reclaming algorithm.");
+                    swt.Execute(new SpaceReclaimingCommand());
+                }
+                else
+                {
+                    Console.WriteLine("Unknown command.");
+                }
+            }
+        }
+
+        private FileEntry ConsoleGetFileEntry(string fileName)
+        {
+            var possibleFiles = BackupFiles.Where(entry =>
+            {
+                var name = Path.GetFileNameWithoutExtension(fileName);
+                var ext = Path.GetExtension(fileName);
+
+                var pattern = name + @"(_[0-9]+)?";
+                if (!string.IsNullOrEmpty(ext))
+                    pattern += '\\'+ ext; // must escape .
+                return Regex.IsMatch(entry.FileName, pattern);
+            }).ToList();
+            if (possibleFiles.Count == 0)
+            {
+                Console.WriteLine("File not found.");
+                return null;
+            }
+
+            while (possibleFiles.Count > 1)
+            {
+                Console.WriteLine("Which file do you want?");
+                foreach (var possibleFile in possibleFiles)
+                {
+                    Console.WriteLine("- {0}", possibleFile.FileName);
+                }
+
+                var chosenFile = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(chosenFile))
+                    return null;
+
+                possibleFiles.RemoveAll(entry => entry.FileName != chosenFile);
+                if (possibleFiles.Count == 1)
+                    break;
+            }
+
+            return possibleFiles[0];
         }
     }
 }
