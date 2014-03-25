@@ -59,7 +59,10 @@
     <Compile Include="Protocols\BackupChunkService.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Protocols\DeleteFileProtocol.cs" />
+    <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkProtocol.cs" />
+    <Compile Include="Protocols\Enhancements\EnhancedRestoreFileProtocol.cs" />
     <Compile Include="Protocols\Enhancements\LookUpProtocol.cs" />
+    <Compile Include="Protocols\Enhancements\LookUpService.cs" />
     <Compile Include="Protocols\RestoreChunkService.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="FileChunk.cs" />
@@ -74,7 +77,7 @@
     <Compile Include="Protocols\SpaceReclaimingWatcher.cs" />
     <Compile Include="Utilities\ConcurrentHashSet.cs" />
     <Compile Include="Utilities\MemoryStreamExtensions.cs" />
-    <Compile Include="Message.cs" />
+    <Compile Include="Messages\Message.cs" />
     <Compile Include="Multicast\MulticastBroadcaster.cs" />
     <Compile Include="Multicast\MulticastListener.cs" />
     <Compile Include="Multicast\MulticastSettings.cs" />
