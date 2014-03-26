@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using DBS.Messages;
 using DBS.Persistence;
 
 namespace DBS.Protocols
@@ -8,35 +9,24 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to REMOVED messages on MC
     /// </summary>
-    public class SpaceReclaimingService : IService
+    public class SpaceReclaimingService : IService<RemovedMessage>
     {
         public void Start()
         {
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.Removed)
+                .Cast<RemovedMessage>()
                 .Subscribe(this);
         }
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            Core.Instance.Log.Info("SpaceReclaimingService:Stop");
         }
 
-        public void OnNext(Message msg)
+        public void OnNext(RemovedMessage msg)
         {
-            if (msg.FileId == null)
-            {
-                Console.WriteLine("SpaceReclaimingService: bad msg, ChunkNo has no value.");
-                return;
-            }
-
-            if (!msg.ChunkNo.HasValue)
-            {
-                Console.WriteLine("BackupChunkService: bad msg, ChunkNo has no value.");
-                return;
-            }
-
-            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
+            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
 
             Core.Instance.Store.DecrementActualDegree(fileChunk.FileName);
             ReplicationDegrees rd;
@@ -46,10 +36,12 @@ namespace DBS.Protocols
                 try
                 {
                     var putChunkReceived = false;
-                    var disposable = Core.Instance.MDBChannel.Received.Where(message =>
-                        message.MessageType == MessageType.PutChunk &&
-                        message.ChunkNo == fileChunk.ChunkNo &&
-                        message.FileId == fileChunk.FileId).Subscribe(_ => putChunkReceived = true);
+                    var disposable = Core.Instance.MDBChannel.Received
+                        .Where(message => message.MessageType == MessageType.PutChunk)
+                        .Cast<PutChunkMessage>()
+                        .Where(message => message.ChunkNo == fileChunk.ChunkNo &&
+                            message.FileId == fileChunk.FileId)
+                        .Subscribe(_ => putChunkReceived = true);
 
                     Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
 
@@ -60,19 +52,19 @@ namespace DBS.Protocols
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("RestoreChunkService: " + ex);
+                    Core.Instance.Log.Error("SpaceReclaimingService", ex);
                 }
             }
         }
 
         public void OnError(Exception error)
         {
-            throw new NotImplementedException();
+            Core.Instance.Log.Error("SpaceReclaimingService:OnError", error);
         }
 
         public void OnCompleted()
         {
-            throw new NotImplementedException();
+            Core.Instance.Log.Info("SpaceReclaimingService:OnCompleted");
         }
     }
 }

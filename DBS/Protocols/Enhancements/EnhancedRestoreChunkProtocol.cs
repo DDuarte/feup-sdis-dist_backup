@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DBS.Messages;
+using DBS.Messages.Enhancements;
 
 namespace DBS.Protocols.Enhancements
 {
@@ -21,17 +23,26 @@ namespace DBS.Protocols.Enhancements
         {
             return Task.Factory.StartNew(() =>
             {
-                Core.Instance.MCChannel.Send(Message.BuildGetChunkMessage(_fileChunk));
+                Core.Instance.MCChannel.Send(new GetChunkMessage(_fileChunk));
 
                 try
                 {
+                    var src1 = Core.Instance.MDRChannel.Received
+                        .Where(message => message.MessageType == MessageType.Chunk)
+                        .Cast<ChunkMessage>()
+                        .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
+                                          message.FileId == _fileChunk.FileId)
+                        .Cast<Message>();
+
+                    var src2 = Core.Instance.MDRChannel.Received
+                        .Where(message => message.MessageType == MessageType.ACK)
+                        .Cast<ACKMessage>()
+                        .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
+                                          message.FileId == _fileChunk.FileId)
+                        .Cast<Message>();
+
                     // wait for response
-                    Message msg = Core.Instance.MDRChannel.Received.Where(message =>
-                        (message.MessageType == MessageType.Chunk &&
-                        message.ChunkNo == _fileChunk.ChunkNo &&
-                        message.FileId == _fileChunk.FileId) ||
-                        message.MessageType == MessageType.Ack)
-                        .Timeout(TimeSpan.FromMilliseconds(Timeout))
+                    var msg = src1.Merge(src2).Timeout(TimeSpan.FromMilliseconds(Timeout))
                         .Next().First();
 
                     if (msg.MessageType == MessageType.Chunk) // same behaviour as the regular protocol
@@ -40,7 +51,7 @@ namespace DBS.Protocols.Enhancements
                         return;
                     }
 
-                    
+                    // TODO
                 }
                 catch (TimeoutException)
                 {

@@ -7,7 +7,8 @@ namespace DBS.Utilities
     {
         public static void Write(this MemoryStream stream, byte[] bytes)
         {
-            stream.Write(bytes, 0, bytes.Length);
+            if (bytes.Length != 0)
+                stream.Write(bytes, 0, bytes.Length);
         }
 
         public static void WriteASCII(this MemoryStream stream, char c)

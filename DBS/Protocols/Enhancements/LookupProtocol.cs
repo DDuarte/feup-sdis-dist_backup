@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DBS.Messages.Enhancements;
 using DBS.Utilities;
 
 namespace DBS.Protocols.Enhancements
@@ -21,10 +22,12 @@ namespace DBS.Protocols.Enhancements
 
         private IDisposable LookUpFileId(FileId fileId)
         {
-            Core.Instance.MCChannel.Send(Message.BuildLookUpMessage(fileId));
-            return Core.Instance.MCChannel.Received.Where(message =>
-                message.MessageType == MessageType.Got &&
-                message.FileId == fileId).Subscribe(msg => _backedUpFiles.Remove(msg.FileId.ToString()));
+            Core.Instance.MCChannel.Send(new LookupMessage(fileId));
+            return Core.Instance.MCChannel.Received
+                .Where(message => message.MessageType == MessageType.Got)
+                .Cast<GotMessage>()
+                .Where(message => message.FileId == fileId)
+                .Subscribe(msg => _backedUpFiles.Remove(msg.FileId.ToString()));
         }
 
         public Task Run() // should this run in a separate thread? We're deleting files...

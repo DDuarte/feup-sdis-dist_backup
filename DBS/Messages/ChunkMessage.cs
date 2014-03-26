@@ -5,29 +5,26 @@ using DBS.Utilities;
 
 namespace DBS.Messages
 {
-    public class PutChunkMessage : Message // <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <CRLF> <Body>
+    class ChunkMessage : Message // <Version> <FileId> <ChunkNo> <CRLF> <CRLF> <Body>
     {
-        public PutChunkMessage(FileChunk fileChunk, int replicationDeg, byte[] body)
+        public ChunkMessage(FileChunk fileChunk, byte[] body)
             : this(Core.Instance.Config.VersionM, Core.Instance.Config.VersionN,
-            fileChunk.FileId, fileChunk.ChunkNo, replicationDeg, body)
+            fileChunk.FileId, fileChunk.ChunkNo, body)
         { }
 
-        public PutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
-            int replicationDeg, byte[] body)
-            : base(MessageType.PutChunk)
+        public ChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo, byte[] body)
+            : base(MessageType.Chunk)
         {
             ValidateVersionPart(versionM);
             ValidateVersionPart(versionN);
             ValidateFileId(fileId);
             ValidateChunkNo(chunkNo);
-            ValidateReplicationDeg(replicationDeg);
             ValidateBody(body);
 
             VersionM = versionM;
             VersionN = versionN;
             FileId = fileId;
             ChunkNo = chunkNo;
-            ReplicationDeg = replicationDeg;
             Body = body;
         }
 
@@ -35,13 +32,12 @@ namespace DBS.Messages
         public int VersionN { get; private set; }
         public FileId FileId { get; private set; }
         public int ChunkNo { get; private set; }
-        public int ReplicationDeg { get; private set; }
         public byte[] Body { get; private set; }
 
         public override string ToString()
         {
-            return string.Format("{0} {1}#{2} {3} |{4}|", MessageType,
-                FileId.ToStringSmall(), ChunkNo, ReplicationDeg, Body.Length);
+            return string.Format("{0} {1}#{2} |{3}|", MessageType,
+            FileId.ToStringSmall(), ChunkNo, Body.Length);
         }
 
         public override byte[] Serialize()
@@ -57,8 +53,6 @@ namespace DBS.Messages
                 stream.WriteASCII(FileId.ToString());
                 stream.WriteASCII(' ');
                 stream.WriteASCII(ChunkNo.ToString("D"));
-                stream.WriteASCII(' ');
-                stream.WriteASCII(ReplicationDeg.ToString("D"));
                 stream.WriteASCII("\r\n\r\n");
                 stream.Write(Body);
                 return stream.ToArray();
@@ -73,16 +67,15 @@ namespace DBS.Messages
                 var header = reader.ReadLine(); // until crlf
                 if (header == null) return null;
                 var fields = header.Split(' '); // fields[0] is type
-                if (fields.Length != 5)
+                if (fields.Length != 4)
                     return null;
 
-                int versionM, versionN, chunkNo, replicationDeg;
+                int versionM, versionN, chunkNo;
                 FileId fileId;
 
                 if (!ParseVersion(fields[1], out versionM, out versionN)) return null;
                 if (!ParseFileId(fields[2], out fileId)) return null;
                 if (!ParseInt(fields[3], out chunkNo)) return null;
-                if (!ParseInt(fields[4], out replicationDeg)) return null;
 
                 stream.Position = header.Length + 4; // 2x CRLF;
                 var bodySize = stream.Length - stream.Position;
@@ -92,11 +85,11 @@ namespace DBS.Messages
 
                 try
                 {
-                    return new PutChunkMessage(versionM, versionN, fileId, chunkNo, replicationDeg, body);
+                    return new ChunkMessage(versionM, versionN, fileId, chunkNo, body);
                 }
                 catch (Exception ex)
                 {
-                    Core.Instance.Log.Error("Could not create PutChunkMessage", ex);
+                    Core.Instance.Log.Error("Could not create ChunkMessage", ex);
                     return null;
                 }
             }

@@ -1,46 +1,43 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {
     /// <summary>
     /// Listens to GETCHUNK messages on MC
     /// </summary>
-    class RestoreChunkService : IService
+    class RestoreChunkService : IService<GetChunkMessage>
     {
         public void Start()
         {
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.GetChunk)
+                .Cast<GetChunkMessage>()
                 .Subscribe(this);
         }
 
         public void Stop()
         {
-            Console.WriteLine("RestoreChunkService:Stop");
+            Core.Instance.Log.Info("RestoreChunkService:Stop");
         }
 
-        public void OnNext(Message msg)
+        public void OnNext(GetChunkMessage msg)
         {
-            if (!msg.ChunkNo.HasValue)
-            {
-                Console.WriteLine("RestoreChunkService: bad msg, ChunkNo has no value.");
-                return;
-            }
-
-            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
-
+            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
             if (!fileChunk.Exists()) // we don't have this chunk, do nothing
                 return;
 
             try
             {
                 var chunkReceived = false;
-                var disposable = Core.Instance.MDRChannel.Received.Where(message =>
-                    message.MessageType == MessageType.Chunk &&
-                    message.ChunkNo == msg.ChunkNo &&
-                    message.FileId == msg.FileId).Subscribe(_ => chunkReceived = true);
+                var disposable = Core.Instance.MDRChannel.Received
+                    .Where(message => message.MessageType == MessageType.Chunk)
+                    .Cast<ChunkMessage>()
+                    .Where(message => message.ChunkNo == msg.ChunkNo &&
+                        message.FileId == msg.FileId)
+                    .Subscribe(_ => chunkReceived = true);
 
                 Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
                 disposable.Dispose();
@@ -48,24 +45,24 @@ namespace DBS.Protocols
                 if (!chunkReceived)
                 {
                     var data = fileChunk.GetData();
-                    var chunkMsg = Message.BuildChunkMessage(fileChunk, data);
+                    var chunkMsg = new ChunkMessage(fileChunk, data);
                     Core.Instance.MDRChannel.Send(chunkMsg);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("RestoreChunkService: " + ex);
+                Core.Instance.Log.Error("RestoreChunkService", ex);
             }
         }
 
         public void OnError(Exception error)
         {
-            
+            Core.Instance.Log.Error("RestoreChunkService:OnError", error);
         }
 
         public void OnCompleted()
         {
-            
+            Core.Instance.Log.Info("RestoreChunkService:OnCompleted");
         }
     }
 }

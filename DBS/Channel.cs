@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using DBS.Multicast;
+using DBS.Utilities;
 
 namespace DBS
 {
@@ -22,11 +23,11 @@ namespace DBS
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to receive a message on channel {0}: {1}", Name, ex);
+                    Core.Instance.Log.Error("Failed to receive a message on channel {0}".FormatWith(Name), ex);
                     continue;
                 }
 
-                Console.WriteLine("R -  {0}: {1}", Name, msg);
+                Core.Instance.Log.InfoFormat("R -  {0}: {1}", Name, msg);
                 _subject.OnNext(msg);
             }
 // ReSharper disable once FunctionNeverReturns
@@ -56,7 +57,7 @@ namespace DBS
         public void Send(Message msg)
         {
             _broadcaster.Broadcast(msg.Serialize());
-            Console.WriteLine("S -  {0}: {1}", Name, msg);
+            Core.Instance.Log.InfoFormat("S -  {0}: {1}", Name, msg);
         }
 
         private Message Receive()

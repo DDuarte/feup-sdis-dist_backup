@@ -13,7 +13,7 @@ namespace DBS
         public int ChunkNo { get; private set; }
 
         public string FileName { get { return FileId + "_" + ChunkNo; } }
-        public string FullFileName { get { return Path.Combine(Core.Instance.BackupDirectory, FileName); } }
+        public string FullFileName { get { return Path.Combine(Core.Instance.Config.BackupDirectory, FileName); } }
 
         public FileChunk(FileId fileId, int chunkNo)
         {
@@ -57,7 +57,7 @@ namespace DBS
             {
                 using (var fileData = File.OpenRead(FullFileName))
                 {
-                    var buffer = new byte[Core.Instance.ChunkSize];
+                    var buffer = new byte[Core.Instance.Config.ChunkSize];
                     // try to read the maximum chunk size from the file
                     var bytesRead = fileData.Read(buffer, 0, buffer.Length);
                     _data = buffer.Take(bytesRead).ToArray(); // slice it
@@ -66,7 +66,7 @@ namespace DBS
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Core.Instance.Log.Error("GetData()", ex);
                 return null;
             }
         }
@@ -90,7 +90,7 @@ namespace DBS
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Core.Instance.Log.Error("SetData()", ex);
                 return null;
             }
         }

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Text;
+using DBS.Messages;
+using DBS.Messages.Enhancements;
 using DBS.Utilities;
 
 namespace DBS
@@ -34,407 +37,157 @@ namespace DBS
 
         // File lookup subprotocol enhancement
         [StringValue("LOOKUP")] // <Version> <FileId> <CRLF> <CRLF>
-        LookUp,
+        Lookup,
 
         // File lookup reply
         [StringValue("GOT")] // <Version> <FileId> <CRLF> <CRLF>
         Got,
 
-        // Get message reply
-        [StringValue("ACK")] // <Version> <FileId> <ChunkNo> <ChunkOwnerIp> <ChunkOwnerPort> <CRLF> <CRLF>
-        Ack
+        // Get chunk message reply
+        [StringValue("ACK")] // <Version> <FileId> <ChunkNo> <ChunkOwnerIP> <ChunkOwnerPort> <CRLF> <CRLF>
+        ACK
     }
 
     // 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 = 90 # max header size
     // 0x10000 (MaxUDPSize) - 90 = 65446 # max body size
     public abstract class Message
     {
-        protected Message(int versionM, int versionN, MessageType messageType)
+        protected Message(MessageType messageType)
         {
-            VersionM = versionM;
-            VersionN = versionN;
             MessageType = messageType;
         }
 
         public MessageType MessageType { get; private set; }
 
-        internal void SetMessageType(string type)
-        {
-            var mt = StringValueAttribute.Get<MessageType>(type);
-            if (mt == MessageType.None)
-                throw new ArgumentException("Invalid MessageType", "type");
-            MessageType = mt;
-        }
-
-        protected int? _versionN;
-
-        public int? VersionN
-        {
-            get { return _versionN; }
-            private set
-            {
-                if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
-                    throw new ArgumentOutOfRangeException("value", value, "Version (N) must be between 0 and 9");
-                _versionN = value;
-            }
-        }
-
-        protected int? _versionM;
-
-        public int? VersionM
-        {
-            get { return _versionM; }
-            private set
-            {
-                if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
-                    throw new ArgumentOutOfRangeException("value", value, "Version (M) must be between 0 and 9");
-                _versionM = value;
-            }
-        }
-
-        internal void SetVersion(string version) // expected format: "M.N"
-        {
-            if (version.Length != 3)
-                throw new ArgumentException("Invalid version string", "version");
-
-            VersionM = int.Parse(version[0].ToString(CultureInfo.InvariantCulture));
-            VersionN = int.Parse(version[2].ToString(CultureInfo.InvariantCulture));
-        }
+        public IPEndPoint RemoteEndPoint { get; set; }
 
         public abstract byte[] Serialize();
-        public abstract Message Deserialize();
 
-        /*public static Message Unpack(byte[] data)
-        {
-
-        } */
-    }
-}
-
-/* public class Message
-    {
-        internal void SetFileId(string fileId)
-        {
-            FileId = new FileId(fileId);
-        }
-
-        public FileId FileId { get; private set; }
-
-        private int? _chunkNo;
-        public int? ChunkNo
-        {
-            get { return _chunkNo; }
-            private set
+        private static readonly Dictionary<MessageType, Func<byte[], Message>> _deserializeDict =
+            new Dictionary<MessageType, Func<byte[], Message>>
             {
-                if (value.HasValue && (value < 0 || value > 999999)) // 6 digits max
-                    throw new ArgumentOutOfRangeException("value", value, "Chunk number must be between 0 and 999999");
-                _chunkNo = value;
-            }
-        }
-
-        internal void SetChunkNo(string chunkNo)
-        {
-            _chunkNo = int.Parse(chunkNo);
-        }
-
-        private int? _replicationDeg;
-        public int? ReplicationDeg
-        {
-            get { return _replicationDeg; }
-            private set
-            {
-                if (value.HasValue && (value < 0 || value > 9)) // 1 digit max
-                    throw new ArgumentOutOfRangeException("value", value, "Replication degree must be between 0 and 9");
-                _replicationDeg = value;
-            }
-        }
-
-        internal void SetReplicationDeg(string replicationDeg)
-        {
-            ReplicationDeg = int.Parse(replicationDeg);
-        }
-
-        public byte[] Body { get; private set; }
-
-        public IPEndPoint RemoteEndPoint { get; set; }
+                {MessageType.PutChunk, PutChunkMessage.Deserialize},
+                {MessageType.Stored, StoredMessage.Deserialize},
+                {MessageType.GetChunk, GetChunkMessage.Deserialize},
+                {MessageType.Chunk, ChunkMessage.Deserialize},
+                {MessageType.Delete, DeleteMessage.Deserialize},
+                {MessageType.Removed, RemovedMessage.Deserialize},
+                {MessageType.Lookup, LookupMessage.Deserialize},
+                {MessageType.Got, GotMessage.Deserialize},
+                {MessageType.ACK, ACKMessage.Deserialize}
+            };
 
         public static Message Deserialize(byte[] data)
         {
-            var message = new Message();
             if (data == null)
                 return null;
 
-            using (var stream = new MemoryStream(data))
+            var minLength = Math.Min(15, data.Length); // assuming max type length is 15
+            string typeStr = null;
+            for (var i = 0; i < minLength; ++i)
             {
-                //using (var reader = new StreamReader(stream, Encoding.ASCII))
-                var reader = new StreamReader(stream, Encoding.ASCII);
-                var pos = 0L;
+                if (data[i] == ' ')
                 {
-                    var header = reader.ReadLine(); // until crlf
-                    if (header != null)
-                    {
-                        pos += header.Length;
-                        var fields = header.Split(' ');
-                        var messageType = fields[0];
-                        message.SetMessageType(messageType);
-                        switch (message.MessageType)
-                        {
-                            case MessageType.PutChunk:
-                            {
-                                message.SetVersion(fields[1]);
-                                message.SetFileId(fields[2]);
-                                message.SetChunkNo(fields[3]);
-                                message.SetReplicationDeg(fields[4]);
-                                break;
-                            }
-                            case MessageType.Stored:
-                            case MessageType.GetChunk:
-                            case MessageType.Chunk:
-                            case MessageType.Removed:
-                            {
-                                message.SetVersion(fields[1]);
-                                message.SetFileId(fields[2]);
-                                message.SetChunkNo(fields[3]);
-                                break;
-                            }
-                            case MessageType.Delete:
-                            {
-                                message.SetFileId(fields[1]);
-                                break;
-                            }
-                        }
-                    }
-
-                    pos += 4; // 2x CRLF
-                }
-
-                if (message.MessageType == MessageType.PutChunk || message.MessageType == MessageType.Chunk)
-                {
-                    stream.Position = pos;
-                    var bodySize = stream.Length - stream.Position;
-                    message.Body = new byte[bodySize];
-                    if (bodySize != 0) // body can be 0 bytes if the size of the file to be sent is multiple of 64KB
-                        stream.Read(message.Body, 0, (int)bodySize);
+                    typeStr = Encoding.ASCII.GetString(data, 0, i);
+                    break;
                 }
             }
 
-            return message;
+            if (string.IsNullOrWhiteSpace(typeStr))
+                return null;
+
+            var type = StringValueAttribute.Get<MessageType>(typeStr);
+            if (type == MessageType.None)
+                return null;
+
+            Func<byte[], Message> deserializeMethod;
+            if (_deserializeDict.TryGetValue(type, out deserializeMethod))
+                return deserializeMethod(data);
+            return null;
         }
 
-        public byte[] Serialize()
+        protected static bool ParseVersion(string versionStr, out int m, out int n) // expected format: "M.N"
         {
-            // <MessageType> <Version> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> <Body>
-            using (var stream = new MemoryStream())
+            if (versionStr.Length != 3)
             {
-                stream.Write(Encoding.ASCII.GetBytes(StringValueAttribute.Get(MessageType)));
-                if (!IsLastField("MessageType"))
-                    stream.WriteASCII(' ');
+                m = 0;
+                n = 0;
+                return false;
+            }
 
-                if (VersionM.HasValue && VersionN.HasValue)
-                {
-                    stream.WriteASCII(VersionM.Value.ToString("D"));
-                    stream.WriteASCII('.');
-                    stream.WriteASCII(VersionN.Value.ToString("D"));
-                    if (!IsLastField("VersionM"))
-                        stream.WriteASCII(' ');
-                }
+            if (!int.TryParse(versionStr[0].ToString(CultureInfo.InvariantCulture), out m))
+            {
+                n = 0;
+                return false;
+            }
 
-                if (FileId != null)
-                {
-                    stream.WriteASCII(FileId.ToString());
-                    if (!IsLastField("FileId"))
-                        stream.WriteASCII(' ');
-                }
+            return int.TryParse(versionStr[2].ToString(CultureInfo.InvariantCulture), out n);
+        }
 
-                if (ChunkNo.HasValue)
-                {
-                    stream.WriteASCII(ChunkNo.Value.ToString("D"));
-                    if (!IsLastField("ChunkNo"))
-                        stream.WriteASCII(' ');
-                }
-
-                if (ReplicationDeg.HasValue)
-                {
-                    stream.WriteASCII(ReplicationDeg.Value.ToString("D"));
-                    if (!IsLastField("ReplicationDeg"))
-                        stream.WriteASCII(' ');
-                }
-
-                stream.WriteASCII("\r\n\r\n");
-
-                if (Body != null)
-                    stream.Write(Body);
-
-                return stream.ToArray();
+        protected static bool ParseFileId(string fileIdStr, out FileId fileId)
+        {
+            try
+            {
+                fileId = new FileId(fileIdStr);
+                return true;
+            }
+            catch (Exception)
+            {
+                fileId = null;
+                return false;
             }
         }
 
-        private bool IsLastField(string field)
+        protected static bool ParseInt(string valueStr, out int value)
         {
-            switch (field)
-            {
-                case "MessageType":
-                    return !(VersionM.HasValue || FileId != null || ChunkNo.HasValue || ReplicationDeg.HasValue);
-                case "VersionM":
-                    return !(FileId != null || ChunkNo.HasValue || ReplicationDeg.HasValue);
-                case "FileId":
-                    return !(ChunkNo.HasValue || ReplicationDeg.HasValue);
-                case "ChunkNo":
-                    return !ReplicationDeg.HasValue;
-                case "ReplicationDeg":
-                    return true;
-                default:
-                    throw new ArgumentException("field needs to be one of MessageType, VersionM, FileId, ChunkNo or ReplicationDeg", "field");
-            }
+            return int.TryParse(valueStr, out value);
         }
 
-        public override string ToString()
+        protected static bool ParseIP(string ipStr, out IPAddress ip)
         {
-            var ret = MessageType + " ";
-            if (FileId != null)
-                ret += FileId.ToStringSmall();
-            if (ChunkNo.HasValue)
-                ret += "#" + ChunkNo.Value + " ";
-            if (ReplicationDeg.HasValue)
-                ret += ReplicationDeg.Value + " ";
-            if (Body != null)
-                ret += "|" + Body.Length + "|";
-            return ret;
+            return IPAddress.TryParse(ipStr, out ip);
         }
 
-        public static Message BuildPutChunkMessage(FileChunk fileChunk, int replicationDeg, byte[] body)
+        protected static void ValidateVersionPart(int v)
         {
-            return BuildPutChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
-                fileChunk.ChunkNo, replicationDeg, body);
+            if (v < 0 || v > 9) // 1 digit max
+                throw new ArgumentOutOfRangeException("v", v, "Version part must be between 0 and 9");
         }
 
-        public static Message BuildStoredMessage(FileChunk fileChunk)
+        protected static void ValidateChunkNo(int v)
         {
-            return BuildStoredMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
-                fileChunk.ChunkNo);
+            if (v < 0 || v > 999999) // 6 digits max
+                throw new ArgumentOutOfRangeException("v", v, "Chunk number must be between 0 and 999999");
         }
 
-        public static Message BuildGetChunkMessage(FileChunk fileChunk)
+        protected static void ValidateReplicationDeg(int v)
         {
-            return BuildGetChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
-                fileChunk.ChunkNo);
+            if (v < 0 || v > 9) // 1 digit max
+                throw new ArgumentOutOfRangeException("v", v, "Replication degree must be between 0 and 9");
         }
 
-        public static Message BuildChunkMessage(FileChunk fileChunk, byte[] body)
+        protected static void ValidateFileId(FileId fileId)
         {
-            return BuildChunkMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId, fileChunk.ChunkNo,
-                body);
+            if (fileId == null)
+                throw new ArgumentNullException("fileId");
         }
 
-        public static Message BuildRemovedMessage(FileChunk fileChunk)
+        protected static void ValidateBody(IEnumerable<byte> body)
         {
-            return BuildRemovedMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileChunk.FileId,
-                fileChunk.ChunkNo);
+            if (body == null)
+                throw new ArgumentNullException("body");
         }
 
-        public static Message BuildLookUpMessage(FileId fileId)
+        protected static void ValidateIP(IPAddress ip)
         {
-            return BuildLookUpMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileId);
+            if (ip == null)
+                throw new ArgumentNullException("ip");
         }
 
-        public static Message BuildGotMessage(FileId fileId)
+        protected static void ValidatePort(int port)
         {
-            return BuildGotMessage(Core.Instance.VersionM, Core.Instance.VersionN, fileId);
-        }
-
-        public static Message BuildPutChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
-            int replicationDeg, byte[] body)
-        {
-            return new Message
-            {
-                MessageType = MessageType.PutChunk,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId,
-                ChunkNo = chunkNo,
-                ReplicationDeg = replicationDeg,
-                Body = body
-            };
-        }
-
-        public static Message BuildStoredMessage(int versionM, int versionN, FileId fileId, int chunkNo)
-        {
-            return new Message
-            {
-                MessageType = MessageType.Stored,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId,
-                ChunkNo = chunkNo
-            };
-        }
-
-        public static Message BuildGetChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo)
-        {
-            return new Message
-            {
-                MessageType = MessageType.GetChunk,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId,
-                ChunkNo = chunkNo
-            };
-        }
-
-        public static Message BuildChunkMessage(int versionM, int versionN, FileId fileId, int chunkNo,
-            byte[] body)
-        {
-            return new Message
-            {
-                MessageType = MessageType.Chunk,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId,
-                ChunkNo = chunkNo,
-                Body = body
-            };
-        }
-
-        public static Message BuildDeleteMessage(FileId fileId)
-        {
-            return new Message
-            {
-                MessageType = MessageType.Delete,
-                FileId = fileId
-            };
-        }
-
-        public static Message BuildRemovedMessage(int versionM, int versionN, FileId fileId, int chunkNo)
-        {
-            return new Message
-            {
-                MessageType = MessageType.Removed,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId,
-                ChunkNo = chunkNo
-            };
-        }
-
-        public static Message BuildLookUpMessage(int versionM, int versionN, FileId fileId)
-        {
-            return new Message
-            {
-                MessageType = MessageType.LookUp,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId
-            };
-        }
-        public static Message BuildGotMessage(int versionM, int versionN, FileId fileId)
-        {
-            return new Message
-            {
-                MessageType = MessageType.Got,
-                VersionM = versionM,
-                VersionN = versionN,
-                FileId = fileId
-            };
+            if (port < 0 || port > 65535) // 0x0 - 0xFFFF
+                throw new ArgumentOutOfRangeException("port", port, "Port number must be between 0 and 65535");
         }
     }
-} */
+}

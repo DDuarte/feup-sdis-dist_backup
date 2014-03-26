@@ -5,7 +5,7 @@ namespace DBS.Protocols
     /// <summary>
     /// Passive peers
     /// </summary>
-    interface IService : IObserver<Message>
+    interface IService<in T> : IObserver<T> where T : Message
     {
         void Start();
         void Stop(); // maybe

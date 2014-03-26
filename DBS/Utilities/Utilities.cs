@@ -29,7 +29,7 @@ namespace DBS.Utilities
             }
             catch (Exception ex)
             {
-                Console.WriteLine("GetDirectorySize: {0}", ex);
+                Core.Instance.Log.Error("GetDirectorySize", ex);
                 return 0L;
             }
         }

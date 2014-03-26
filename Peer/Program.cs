@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using DBS;
-using DBS.Utilities;
 using JsonConfig;
 
 /* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
@@ -60,77 +58,48 @@ namespace Peer
                 return;
             }
 
-            if (!NetworkUtilities.IsMulticastAddress(mcIP))
-            {
-                Console.WriteLine("MC:IP is not a multicast address");
-                return;
-            }
-            if (!NetworkUtilities.IsMulticastAddress(mdbIP))
-            {
-                Console.WriteLine("MDB:IP is not a multicast address");
-                return;
-            }
-            if (!NetworkUtilities.IsMulticastAddress(mdrIP))
-            {
-                Console.WriteLine("MDR:IP is not a multicast address");
-                return;
-            }
-
-            // Get IPAddress
             IPAddress localIP;
-            if (IPAddress.TryParse(Config.Global.LocalIP, out localIP))
-            {
-                if (localIP.Equals(IPAddress.Any) || NetworkUtilities.GetLocalIPAddresses().Contains(localIP))
-                    Core.Instance.LocalIP = localIP;
-                else
-                {
-                    Console.WriteLine("Config LocalIP '{0}' is not a local IP address",  localIP);
-                    return;
-                }
-            }
-            else
+            if (!IPAddress.TryParse(Config.Global.LocalIP, out localIP))
             {
                 Console.WriteLine("Config LocalIP '{0}' is not a valid IP address.", Config.Global.LocalIP);
                 return;
             }
-            
-            Core.Instance.LocalIP = IPAddress.Parse(Config.Global.LocalIP);
 
-            // Max site used to backup (locally)
-            Core.Instance.MaxBackupSize = Config.Global.DiskSpace;
-
-            // Size of each chunk stored locally and sent over the network
-            Core.Instance.ChunkSize = Config.Global.ChunkSize;
+            int maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
+            int chunkSize = Config.Global.ChunkSize; // Size of each chunk stored locally and sent over the network
 
             // Backup chunk protocol configurations
-            Core.Instance.BackupChunkTimeout = Config.Global.BackupChunkTimeout;
-            Core.Instance.BackupChunkTimeoutMultiplier = Config.Global.BackupChunkTimeoutMultiplier;
-            Core.Instance.BackupChunkRetries = Config.Global.BackupChunkRetries;
+            int backupChunkTimeout = Config.Global.BackupChunkTimeout;
+            double backupChunkTimeoutMultiplier = Config.Global.BackupChunkTimeoutMultiplier;
+            int backupChunkRetries = Config.Global.BackupChunkRetries;
 
             // Protocol version
-            Core.Instance.VersionM = Config.Global.Version.M;
-            Core.Instance.VersionN = Config.Global.Version.N;
+            int versionM = Config.Global.Version.M;
+            int versionN = Config.Global.Version.N;
 
             // Random delay used in multiple protocols
-            Core.Instance.RandomDelayMin = Config.Global.RandomDelay.Min;
-            Core.Instance.RandomDelayMax = Config.Global.RandomDelay.Max;
-
-            // Create dictionary of files to mantain
-            foreach (var f in Config.Global.Files)
-                Core.Instance.AddBackupFile(f.Name, f.ReplicationDegree);
+            int randomDelayMin = Config.Global.RandomDelay.Min;
+            int randomDelayMax = Config.Global.RandomDelay.Max;
 
             // Setup directories
-            Core.Instance.BackupDirectory = Config.Global.BackupDir;
-            Utilities.CreateDirectoryIfNotExists(Core.Instance.BackupDirectory);
+            string backupDirectory = Config.Global.BackupDir;
+            string restoreDirectory = Config.Global.RestoreDir;
 
-            Core.Instance.RestoreDirectory = Config.Global.RestoreDir;
-            Utilities.CreateDirectoryIfNotExists(Core.Instance.RestoreDirectory);
+            try
+            {
+                var config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
+                    backupChunkTimeoutMultiplier, backupChunkRetries, versionM, versionN,
+                    randomDelayMin, randomDelayMax, backupDirectory, restoreDirectory,
+                    mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort);
+                Core.Instance.Config = config;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return;
+            }
 
-            // Create channels
-            Core.Instance.MCChannel = new Channel(mcIP, mcPort) { Name = "MC" };
-            Core.Instance.MDBChannel = new Channel(mdbIP, mdbPort) { Name = "MDB" };
-            Core.Instance.MDRChannel = new Channel(mdrIP, mdrPort) { Name = "MDR" };
-
+            Core.Instance.Log.Subscribe(Console.WriteLine);
             Core.Instance.Start();
         }
 

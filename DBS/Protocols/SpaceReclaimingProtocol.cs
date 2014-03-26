@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {
@@ -17,13 +17,13 @@ namespace DBS.Protocols
         {
             if (!chunk.Delete())
             {
-                Console.WriteLine("SpaceReclaimingProtocol: Could not delete file {0}", chunk);
+                Core.Instance.Log.ErrorFormat("SpaceReclaimingProtocol: Could not delete file {0}", chunk);
                 return;
             }
 
             // Not updating actualDegree here. Will be done when we receive our own REMOVED.
 
-            var msg = Message.BuildRemovedMessage(chunk);
+            var msg = new RemovedMessage(chunk);
             Core.Instance.MCChannel.Send(msg);
         }
 
@@ -37,7 +37,7 @@ namespace DBS.Protocols
                         .Select(@t => new { @t, chunkNo = int.Parse(@t.keyParts[1]) })
                         .Select(@t => new FileChunk(new FileId(@t.@t.fileIdStr), @t.chunkNo))) // lol.
                 {
-                    Console.WriteLine("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}",
+                    Core.Instance.Log.InfoFormat("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}",
                         fileChunk);
                     DeleteChunk(fileChunk);
                 }

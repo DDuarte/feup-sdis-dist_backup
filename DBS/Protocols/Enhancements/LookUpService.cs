@@ -1,23 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using DBS.Messages.Enhancements;
 
 namespace DBS.Protocols.Enhancements
 {
-    class LookUpService : IService
+    class LookUpService : IService<LookupMessage>
     {
-        public void OnNext(Message msg)
+        public void OnNext(LookupMessage msg)
         {
-            var fileIds = Directory.GetFiles(Core.Instance.BackupDirectory, msg.FileId + "_*");
+            var fileIds = Directory.GetFiles(Core.Instance.Config.BackupDirectory, msg.FileId + "_*");
             if (fileIds.Length == 0)
                 return;
             
-            Core.Instance.MCChannel.Send(Message.BuildGotMessage(msg.FileId));
+            Core.Instance.MCChannel.Send(new GotMessage(msg.FileId));
         }
 
         public void OnError(Exception error)
@@ -33,7 +29,8 @@ namespace DBS.Protocols.Enhancements
         public void Start()
         {
             Core.Instance.MCChannel.Received.Where(message =>
-                message.MessageType == MessageType.LookUp).Subscribe(this);
+                message.MessageType == MessageType.Lookup)
+                .Cast<LookupMessage>().Subscribe(this);
         }
 
         public void Stop()

@@ -53,6 +53,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Messages\ChunkMessage.cs" />
+    <Compile Include="Messages\DeleteMessage.cs" />
+    <Compile Include="Messages\Enhancements\ACKMessage.cs" />
+    <Compile Include="Messages\Enhancements\GotMessage.cs" />
+    <Compile Include="Messages\Enhancements\LookupMessage.cs" />
+    <Compile Include="Messages\GetChunkMessage.cs" />
+    <Compile Include="Messages\PutChunkMessage.cs" />
+    <Compile Include="Messages\RemovedMessage.cs" />
+    <Compile Include="Messages\StoredMessage.cs" />
     <Compile Include="Persistence\DBFields.cs" />
     <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
     <Compile Include="Protocols\BackupFileProtocol.cs" />

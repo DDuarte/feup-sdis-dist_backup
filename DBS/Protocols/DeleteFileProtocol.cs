@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {
@@ -19,7 +20,7 @@ namespace DBS.Protocols
         {
             return Task.Factory.StartNew(() =>
             {
-                var msg = Message.BuildDeleteMessage(_fileEntry.FileId);
+                var msg = new DeleteMessage(_fileEntry.FileId);
                 Core.Instance.MCChannel.Send(msg);
             });
         }

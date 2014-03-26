@@ -1,24 +1,26 @@
 using System;
 using System.IO;
 using System.Reactive.Linq;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {
     /// <summary>
     /// Listens to DELETE messages on MC
     /// </summary>
-    public class DeleteFileService : IService
+    public class DeleteFileService : IService<DeleteMessage>
     {
         public void Start()
         {
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.Delete)
+                .Cast<DeleteMessage>()
                 .Subscribe(this);
         }
 
-        public void OnNext(Message msg)
+        public void OnNext(DeleteMessage msg)
         {
-            var dir = Core.Instance.BackupDirectory;
+            var dir = Core.Instance.Config.BackupDirectory;
             if (!Directory.Exists(dir))
                 return;
 
@@ -29,24 +31,24 @@ namespace DBS.Protocols
             foreach (var file in files)
             {
                 File.Delete(file);
-                Console.WriteLine("FileDeletionService: Deleting file {0}", file);
+                Core.Instance.Log.InfoFormat("DeleteFileService: Deleting file {0}", file);
                 Core.Instance.Store.RemoveDegrees(file);
             }
         }
 
         public void OnError(Exception error)
         {
-            Console.WriteLine("FileDeletionService:OnError: {0}", error);
+            Core.Instance.Log.Error("DeleteFileService:OnError", error);
         }
 
         public void OnCompleted()
         {
-            Console.WriteLine("FileDeletionService:OnCompleted");
+            Core.Instance.Log.Info("DeleteFileService:OnCompleted");
         }
 
         public void Stop()
         {
-            Console.WriteLine("FileDeletionService:Stop");
+            Core.Instance.Log.Info("DeleteFileService:Stop");
         }
     }
 }

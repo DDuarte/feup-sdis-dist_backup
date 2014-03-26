@@ -98,9 +98,9 @@ namespace DBS.Persistence
                     }
                 }
             }
-            catch (SqliteException e)
+            catch (SqliteException ex)
             {
-                Console.WriteLine(e);
+                Core.Instance.Log.Error("PersistentDictionary()", ex);
             }
         }
 
@@ -244,7 +244,7 @@ namespace DBS.Persistence
                 }
                 catch (SqliteException ex)
                 {
-                    Console.WriteLine(ex);
+                    Core.Instance.Log.Error("ExecuteScalar()", ex);
                     ret = null;
                     //throw;
                     return false;
@@ -266,7 +266,7 @@ namespace DBS.Persistence
                 }
                 catch (SqliteException ex)
                 {
-                    Console.WriteLine(ex);
+                    Core.Instance.Log.Error("ExecuteNonQuery()", ex);
                     //throw;
                     return false;
                 }

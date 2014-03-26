@@ -15,7 +15,7 @@ namespace DBS.Protocols
             // Create a new FileSystemWatcher and set its properties.
             var watcher = new FileSystemWatcher
             {
-                Path = Core.Instance.BackupDirectory,
+                Path = Core.Instance.Config.BackupDirectory,
                 Filter = "*_*",
                 IncludeSubdirectories = true,
                 EnableRaisingEvents = true
@@ -30,7 +30,7 @@ namespace DBS.Protocols
             var dirName = ((FileSystemWatcher) pattern.Sender).Path;
             var size = Util.GetDirectorySize(dirName);
 
-            if (size > Core.Instance.MaxBackupSize);
+            if (size > Core.Instance.Config.MaxBackupSize)
                 new SpaceReclaimingProtocol().Run();
         }
     }

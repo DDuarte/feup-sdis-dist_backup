@@ -37,7 +37,7 @@ namespace DBS.Multicast
 
         private void BindJoinConnect()
         {
-            LocalIPEndPoint = new IPEndPoint(Core.Instance.LocalIP, Settings.Port);
+            LocalIPEndPoint = new IPEndPoint(Core.Instance.Config.LocalIP, Settings.Port);
             RemoteIPEndPoint = new IPEndPoint(Settings.Address, Settings.Port);
 
             UdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);

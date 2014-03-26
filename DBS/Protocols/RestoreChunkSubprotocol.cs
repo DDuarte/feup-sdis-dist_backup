@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {
@@ -13,7 +14,7 @@ namespace DBS.Protocols
         private readonly FileChunk _fileChunk;
         private const int Timeout = 5000;
 
-        public Message ChunkMessage { get; private set; }
+        public ChunkMessage Message { get; private set; }
 
         public RestoreChunkSubprotocol(FileChunk fileChunk)
         {
@@ -22,21 +23,22 @@ namespace DBS.Protocols
 
         private void SendGetChunk()
         {
-            Core.Instance.MCChannel.Send(Message.BuildGetChunkMessage(_fileChunk));
+            Core.Instance.MCChannel.Send(new GetChunkMessage(_fileChunk));
 
             try
             {
                 // wait for response
-                ChunkMessage = Core.Instance.MDRChannel.Received.Where(message =>
-                    message.MessageType == MessageType.Chunk &&
-                    message.ChunkNo == _fileChunk.ChunkNo &&
-                    message.FileId == _fileChunk.FileId)
+                Message = Core.Instance.MDRChannel.Received
+                    .Where(message => message.MessageType == MessageType.Chunk)
+                    .Cast<ChunkMessage>()
+                    .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
+                        message.FileId == _fileChunk.FileId)
                     .Timeout(TimeSpan.FromMilliseconds(Timeout))
                     .Next().First();
             }
             catch (TimeoutException)
             {
-                Console.WriteLine("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
+                Core.Instance.Log.ErrorFormat("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
             }
         }
 

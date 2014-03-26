@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +12,80 @@ namespace DBS
 {
     public sealed class Core
     {
+        public class Settings
+        {
+            public Settings(IPAddress localIP, int maxBackupSize, int chunkSize,
+                int backupChunkTimeout, double backupChunkTimeoutMultiplier,
+                int backupChunkRetries, int versionM, int versionN, int randomDelayMin,
+                int randomDelayMax, string backupDirectory, string restoreDirectory,
+                IPAddress mcIP, int mcPort, IPAddress mdbIP, int mdbPort,
+                IPAddress mdrIP, int mdrPort)
+            {
+                Utilities.Utilities.CreateDirectoryIfNotExists(backupDirectory);
+                Utilities.Utilities.CreateDirectoryIfNotExists(restoreDirectory);
+
+                LocalIP = localIP;
+                MaxBackupSize = maxBackupSize;
+                ChunkSize = chunkSize;
+                BackupChunkTimeout = backupChunkTimeout;
+                BackupChunkTimeoutMultiplier = backupChunkTimeoutMultiplier;
+                BackupChunkRetries = backupChunkRetries;
+                VersionM = versionM;
+                VersionN = versionN;
+                RandomDelayMin = randomDelayMin;
+                RandomDelayMax = randomDelayMax;
+                BackupDirectory = backupDirectory;
+                RestoreDirectory = restoreDirectory;
+
+                if (!NetworkUtilities.IsMulticastAddress(mcIP))
+                    throw new ArgumentException("MC:IP is not a multicast address", "mcIP");
+                if (!NetworkUtilities.IsMulticastAddress(mdbIP))
+                    throw new ArgumentException("MDB:IP is not a multicast address", "mdbIP");
+                if (!NetworkUtilities.IsMulticastAddress(mdrIP))
+                    throw new ArgumentException("MDR:IP is not a multicast address", "mdrIP");
+
+                if (!localIP.Equals(IPAddress.Any) && !NetworkUtilities.GetLocalIPAddresses().Contains(localIP))
+                    throw new ArgumentException("LocalIP is not a local IP address", "localIP");
+
+                MCIP = mcIP;
+                MCPort = mcPort;
+                MDBIP = mdbIP;
+                MDBPort = mdbPort;
+                MDRIP = mdrIP;
+                MDRPort = mdrPort;
+            }
+
+            public Settings(IPAddress localIP, int maxBackupSize, int chunkSize,
+                int backupChunkTimeout, double backupChunkTimeoutMultiplier,
+                int backupChunkRetries, int versionM, int versionN, int randomDelayMin,
+                int randomDelayMax, string backupDirectory, string restoreDirectory) :
+                    this(localIP, maxBackupSize, chunkSize, backupChunkTimeout, backupChunkTimeoutMultiplier,
+                        backupChunkRetries, versionM, versionN, randomDelayMin, randomDelayMax,
+                        backupDirectory, restoreDirectory, IPAddress.Parse("225.0.0.10"), 31000,
+                        IPAddress.Parse("225.0.0.10"), 31001, IPAddress.Parse("225.0.0.10"), 31002)
+            {
+            }
+
+            public IPAddress LocalIP { get; private set; }
+            public int MaxBackupSize { get; private set; }
+            public int ChunkSize { get; private set; }
+            public int BackupChunkTimeout { get; private set; }
+            public double BackupChunkTimeoutMultiplier { get; private set; }
+            public int BackupChunkRetries { get; private set; }
+            public int VersionM { get; private set; }
+            public int VersionN { get; private set; }
+            public int RandomDelayMin { get; private set; }
+            public int RandomDelayMax { get; private set; }
+            public string BackupDirectory { get; private set; }
+            public string RestoreDirectory { get; private set; }
+            public IPAddress MCIP { get; private set; }
+            public int MCPort { get; private set; }
+            public IPAddress MDBIP { get; private set; }
+            public int MDBPort { get; private set; }
+            public IPAddress MDRIP { get; private set; }
+            public int MDRPort { get; private set; }
+        }
+
         private static readonly Lazy<Core> Lazy = new Lazy<Core>(() => new Core());
 
         public static Core Instance { get { return Lazy.Value; } }
@@ -22,26 +95,39 @@ namespace DBS
             Store = new PersistentStore();
             Rnd = new Random();
             BackupFiles = new HashSet<FileEntry>(new FileEntry.Comparer());
+            Log = new Log();
         }
 
         public PersistentStore Store { get; private set; }
         private Random Rnd { get; set; }
+        public ILog Log { get; private set; }
 
-        public IPAddress LocalIP { get; set; }
+        public Channel MCChannel { get; private set; }
+        public Channel MDBChannel { get; private set; }
+        public Channel MDRChannel { get; private set; }
 
-        public int MaxBackupSize { get; set; }
-        public int ChunkSize { get; set; }
+        public HashSet<FileEntry> BackupFiles { get; private set; }
 
-        public int BackupChunkTimeout { get; set; }
-        public double BackupChunkTimeoutMultiplier { get; set; }
-        public int BackupChunkRetries { get; set; }
+        private Settings _config;
 
-        public int VersionM { get; set; }
-        public int VersionN { get; set; }
+        public Settings Config
+        {
+            get { return _config; }
+            set
+            {
+                _config = value;
+                SetupChannels();
+            }
+        }
 
-        public Channel MCChannel { get; set; }
-        public Channel MDBChannel { get; set; }
-        public Channel MDRChannel { get; set; }
+        public int RandomDelay { get { return Rnd.Next(Config.RandomDelayMin, Config.RandomDelayMax + 1); } }
+
+        private void SetupChannels()
+        {
+            MCChannel = new Channel(Config.MCIP, Config.MCPort) { Name = "MC" };
+            MDBChannel = new Channel(Config.MDBIP, Config.MDBPort) { Name = "MDB" };
+            MDRChannel = new Channel(Config.MDRIP, Config.MDRPort) { Name = "MDR" };
+        }
 
         public FileEntry AddBackupFile(string fileName /* C:/Windows/write.exe */, int replicationDegree)
         {
@@ -77,16 +163,11 @@ namespace DBS
             return fileEntry;
         }
 
-        public HashSet<FileEntry> BackupFiles { get; private set; }
-        public string BackupDirectory { get; set; }
-        public string RestoreDirectory { get; set; }
-
-        public int RandomDelayMin { get; set; }
-        public int RandomDelayMax { get; set; }
-        public int RandomDelay { get { return Rnd.Next(RandomDelayMin, RandomDelayMax + 1); } }
-
-        public void Start()
+        public void Start(bool console = true)
         {
+            if (_config == null)
+                throw new Exception("Called Start() without setting config.");
+
             new BackupChunkService().Start(); // 3.2 Chunk backup subprotocol
             new RestoreChunkService().Start(); // 3.3 Chunk restore protocol
             new DeleteFileService().Start(); // 3.4 File deletion subprotocol
@@ -97,6 +178,9 @@ namespace DBS
             {
                 new BackupFileProtocol(backupFile).Run();
             }
+
+            if (!console)
+                return;
 
             var swt = new CommandSwitch();
 

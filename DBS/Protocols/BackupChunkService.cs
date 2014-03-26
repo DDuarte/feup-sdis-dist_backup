@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Linq;
 using System.Threading;
+using DBS.Messages;
 using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols
@@ -8,53 +9,37 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to PUTCHUNK messages on MDB
     /// </summary>
-    public class BackupChunkService : IService
+    public class BackupChunkService : IService<PutChunkMessage>
     {
         public void Start()
         {
+            Core.Instance.Log.Info("Starting BackupChunkService");
             Core.Instance.MDBChannel.Received
                 .Where(message => message.MessageType == MessageType.PutChunk)
+                .Cast<PutChunkMessage>()
                 .Subscribe(this);
         }
 
         public void Stop()
         {
-            Console.WriteLine("BackupChunkService:Stop");
+            Core.Instance.Log.Info("BackupChunkService:Stop");
         }
 
-        public void OnNext(Message msg)
+        public void OnNext(PutChunkMessage msg)
         {
-            if (msg.FileId == null)
-            {
-                Console.WriteLine("BackupChunkService: bad msg, ChunkNo has no value.");
-                return;
-            }
+            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
 
-            if (!msg.ChunkNo.HasValue)
+            var dirSize = Util.GetDirectorySize(Core.Instance.Config.BackupDirectory);
+            if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)
             {
-                Console.WriteLine("BackupChunkService: bad msg, ChunkNo has no value.");
-                return;
-            }
-
-            if (!msg.ReplicationDeg.HasValue)
-            {
-                Console.WriteLine("BackupChunkService: bad msg, ReplicationDeg has no value.");
-                return;
-            }
-
-            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo.Value);
-
-            var dirSize = Util.GetDirectorySize(Core.Instance.BackupDirectory);
-            if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
-            {
-                Console.WriteLine(
+                Core.Instance.Log.InfoFormat(
                     "BackupChunkService:OnNext: Got no space to store {0}, trying to evict some other chunks", fileChunk);
                 new SpaceReclaimingProtocol().Run();
 
-                dirSize = Util.GetDirectorySize(Core.Instance.BackupDirectory);
-                if (dirSize + msg.Body.Length > Core.Instance.MaxBackupSize)
+                dirSize = Util.GetDirectorySize(Core.Instance.Config.BackupDirectory);
+                if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)
                 {
-                    Console.WriteLine(
+                    Core.Instance.Log.InfoFormat(
                         "BackupChunkService:OnNext: Really have no space to store any file. Giving up on storing {0}",
                         fileChunk);
                     return;
@@ -63,26 +48,26 @@ namespace DBS.Protocols
 
             var stored = fileChunk.SetData(msg.Body);
             if (stored.HasValue && stored.Value)
-                Core.Instance.Store.IncrementActualDegree(fileChunk.FileName, msg.ReplicationDeg.Value);
+                Core.Instance.Store.IncrementActualDegree(fileChunk.FileName, msg.ReplicationDeg);
             else if (!stored.HasValue)
             {
-                Console.WriteLine("BackupChunkService: Could not store file {0}", fileChunk);
+                Core.Instance.Log.ErrorFormat("BackupChunkService: Could not store file {0}", fileChunk);
                 return;
             }
             // otherwise file is already created: send Stored but do not increment degrees
 
             Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
-            Core.Instance.MCChannel.Send(Message.BuildStoredMessage(fileChunk));
+            Core.Instance.MCChannel.Send(new StoredMessage(fileChunk));
         }
 
         public void OnError(Exception error)
         {
-            Console.WriteLine("BackupChunkService:OnError: {0}", error);
+            Core.Instance.Log.Error("BackupChunkService:OnError", error);
         }
 
         public void OnCompleted()
         {
-            Console.WriteLine("BackupChunkService:OnCompleted");
+            Core.Instance.Log.Info("BackupChunkService:OnCompleted");
         }
     }
 }
