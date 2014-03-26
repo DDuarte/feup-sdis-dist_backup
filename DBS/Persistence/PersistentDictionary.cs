@@ -169,7 +169,7 @@ namespace DBS.Persistence
 
         public bool Remove(TKey key)
         {
-            var stm = string.Format("DELETE FROM {0} WHERE {1})", _tableName, DBFields<TKey>.FieldsAndValues(key));
+            var stm = string.Format("DELETE FROM {0} WHERE {1}", _tableName, DBFields<TKey>.FieldsAndValues(key));
             return ExecuteNonQuery(stm) && _dict.Remove(key);
         }
 
