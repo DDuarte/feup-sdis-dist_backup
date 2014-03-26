@@ -220,7 +220,7 @@ namespace PeerGUI
 
         private const string BACKED_UP = "backed up";
         private const string NOT_BACKED_UP = "not backed up";
-        private const string RESTORED = "restored backed up";
+        private const string RESTORED = "restored";
 
         private void reclaimButton_Click(object sender, EventArgs e)
         {
