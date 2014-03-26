@@ -165,14 +165,14 @@ namespace PeerGUI
             incDegreeButton.Enabled = false;
             decDegreeButton.Enabled = false;
 
-            var fileName = filesListView.Items[0].Text;
-            var replicationDegree = int.Parse(filesListView.Items[0].SubItems[1].Text);
+            var fileName = filesListView.SelectedItems[0].Text;
+            var replicationDegree = int.Parse(filesListView.SelectedItems[0].SubItems[1].Text);
             var fileEntry = Core.Instance.AddBackupFile(fileName, replicationDegree);
 
             if (fileEntry != null)
             {
                 _commandSwitch.Execute(new BackupFileCommand(fileEntry));
-                filesListView.Items[0].SubItems[2].Text = BACKED_UP;
+                filesListView.SelectedItems[0].SubItems[2].Text = BACKED_UP;
             }
         }
 
@@ -184,14 +184,14 @@ namespace PeerGUI
             if (Core.Instance.BackupFiles.Count == 0)
                 return;
 
-            var fileName = filesListView.Items[0].Text;
+            var fileName = filesListView.SelectedItems[0].Text;
             var files = Core.Instance.BackupFiles
                 .Where(backupFile => backupFile.OriginalFileName == fileName).ToList();
             if (files.Count != 1)
                 return;
 
             _commandSwitch.Execute(new RestoreFileCommand(files[0]));
-            filesListView.Items[0].SubItems[2].Text = RESTORED;
+            filesListView.SelectedItems[0].SubItems[2].Text = RESTORED;
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
@@ -202,14 +202,14 @@ namespace PeerGUI
             if (Core.Instance.BackupFiles.Count == 0)
                 return;
 
-            var fileName = filesListView.Items[0].Text;
+            var fileName = filesListView.SelectedItems[0].Text;
             var files = Core.Instance.BackupFiles
                 .Where(backupFile => backupFile.OriginalFileName == fileName).ToList();
             if (files.Count != 1)
                 return;
 
             _commandSwitch.Execute(new DeleteFileCommand(files[0]));
-            filesListView.Items[0].SubItems[2].Text = NOT_BACKED_UP;
+            filesListView.SelectedItems[0].SubItems[2].Text = NOT_BACKED_UP;
 
             backupButton.Enabled = true;
             restoreButton.Enabled = false;
