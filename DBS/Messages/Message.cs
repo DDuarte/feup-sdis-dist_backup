@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Text;
-using DBS.Messages;
 using DBS.Messages.Enhancements;
 using DBS.Utilities;
 
-namespace DBS
+namespace DBS.Messages
 {
     public enum MessageType
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using DBS.Messages;
 
 namespace DBS.Protocols
 {

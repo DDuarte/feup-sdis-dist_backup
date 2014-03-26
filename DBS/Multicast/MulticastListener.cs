@@ -6,7 +6,7 @@ namespace DBS.Multicast
 {
     class MulticastListener : IMulticastListener
     {
-        public MulticastSettings Settings { get; protected set; }
+        public MulticastSettings Settings { get; private set; }
 
         public bool IsBound
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reactive.Linq;
+using DBS.Messages;
 using DBS.Messages.Enhancements;
 
 namespace DBS.Protocols.Enhancements
