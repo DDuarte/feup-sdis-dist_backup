@@ -8,12 +8,12 @@ namespace DBS.Persistence
 {
     [DebuggerDisplay("Count = {Count}, DB = {_conn.Database}")]
     public class PersistentDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
-        /*where TKey : new()*/
         where TValue : new()
     {
         private readonly string _tableName;
         private readonly Dictionary<TKey, TValue> _dict;
         private readonly SqliteConnection _conn;
+        private static object _syncRoot = new object();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public PersistentDictionary(string db, string table)
@@ -234,7 +234,7 @@ namespace DBS.Persistence
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private bool ExecuteScalar(string stm, out string ret)
         {
-            lock (_conn)
+            lock (_syncRoot)
             {
                 try
                 {
@@ -256,7 +256,7 @@ namespace DBS.Persistence
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         private bool ExecuteNonQuery(string stm)
         {
-            lock (_conn)
+            lock (_syncRoot)
             {
                 try
                 {
