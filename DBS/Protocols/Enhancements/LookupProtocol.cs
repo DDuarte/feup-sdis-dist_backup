@@ -13,12 +13,11 @@ namespace DBS.Protocols.Enhancements
     class LookUpProtocol : IProtocol
     {
         private readonly string _backupDir;
-        private ConcurrentHashSet<string> _backedUpFiles;
+        private ConcurrentHashSet<FileId> _backedUpFiles;
         private const int WaitPeriod = 10000;
         public LookUpProtocol(string backupDir)
         {
             _backupDir = backupDir;
-            _backedUpFiles = new ConcurrentHashSet<string>();
         }
 
         private IDisposable LookUpFileId(FileId fileId)
@@ -28,7 +27,7 @@ namespace DBS.Protocols.Enhancements
                 .Where(message => message.MessageType == MessageType.Got)
                 .Cast<GotMessage>()
                 .Where(message => message.FileId == fileId)
-                .Subscribe(msg => _backedUpFiles.Remove(msg.FileId.ToString()));
+                .Subscribe(msg => _backedUpFiles.Remove(msg.FileId));
         }
 
         public Task Run() // should this run in a separate thread? We're deleting files...
@@ -40,14 +39,14 @@ namespace DBS.Protocols.Enhancements
                     .Select(path =>
                     {
                         var fileName = Path.GetFileName(path);
-                        return fileName != null ? fileName.Split('_')[0] : null;
+                        return new FileChunk(fileName).FileId;
                     });
 
                 // remove duplicates, transform the collection into a ConcurrentHashSet
-                _backedUpFiles = new ConcurrentHashSet<string>(fileIds.Distinct());
+                _backedUpFiles = new ConcurrentHashSet<FileId>(fileIds.Distinct());
 
                 // perform a lookup for each fileId
-                var subscriptions = _backedUpFiles.Select(fileIdStr => LookUpFileId(new FileId(fileIdStr)));
+                var subscriptions = _backedUpFiles.Select(LookUpFileId);
 
                 // wait
                 Thread.Sleep(WaitPeriod);

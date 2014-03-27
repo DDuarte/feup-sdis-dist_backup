@@ -23,7 +23,7 @@ namespace DBS
 
         public FileChunk(string filename)
         {
-            if (!string.IsNullOrWhiteSpace(filename))
+            if (string.IsNullOrWhiteSpace(filename))
                 throw new ArgumentNullException("filename");
 
             var tokens = filename.Split('_');

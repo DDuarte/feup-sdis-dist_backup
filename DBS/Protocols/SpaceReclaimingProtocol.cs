@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DBS.Messages;
+using DBS.Persistence;
 
 namespace DBS.Protocols
 {
@@ -31,15 +33,12 @@ namespace DBS.Protocols
         {
             return Task.Factory.StartNew(() =>
             {
-                foreach (var fileChunk in Core.Instance.Store.Where(f => f.Value.ActualDegree > f.Value.WantedDegree)
-                        .Select(f => f.Key.Split('_'))
-                        .Select(keyParts => new { keyParts, fileIdStr = keyParts[0] })
-                        .Select(@t => new { @t, chunkNo = int.Parse(@t.keyParts[1]) })
-                        .Select(@t => new FileChunk(new FileId(@t.@t.fileIdStr), @t.chunkNo))) // lol.
+                foreach (var fc in Core.Instance.Store
+                    .Where(f => f.Value.ActualDegree > f.Value.WantedDegree)
+                    .Select(d => new FileChunk(d.Key)))
                 {
-                    Core.Instance.Log.InfoFormat("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}",
-                        fileChunk);
-                    DeleteChunk(fileChunk);
+                    Core.Instance.Log.InfoFormat("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}", fc);
+                    DeleteChunk(fc);
                 }
             });
         }
