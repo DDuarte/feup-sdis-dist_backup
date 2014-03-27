@@ -50,7 +50,7 @@ namespace DBSTests
                 new RemovedMessage(5, 7, FileId1, 100),
                 new LookupMessage(5, 7, FileId1),
                 new GotMessage(5, 7, FileId1),
-                new ACKMessage(5, 7, FileId1, 100, IPAddress.Any, 15000) 
+                new ACKMessage(5, 7, FileId1, 100) 
             };
 
             foreach (var message in msgs)
@@ -145,7 +145,7 @@ namespace DBSTests
             Assert.AreEqual(gotMsg.VersionN, gotMsg2.VersionN);
             Assert.AreEqual(gotMsg.FileId, gotMsg2.FileId);
 
-            var ackMsg = new ACKMessage(9, 9, FileId1, 999999, IPAddress.Parse("255.255.255.255"), 65535);
+            var ackMsg = new ACKMessage(9, 9, FileId1, 999999);
             bytes = ackMsg.Serialize();
             var ackMsg2 = Message.Deserialize(bytes) as ACKMessage;
             Assert.IsNotNull(ackMsg2);
@@ -154,8 +154,6 @@ namespace DBSTests
             Assert.AreEqual(ackMsg.VersionN, ackMsg2.VersionN);
             Assert.AreEqual(ackMsg.FileId, ackMsg2.FileId);
             Assert.AreEqual(ackMsg.ChunkNo, ackMsg2.ChunkNo);
-            Assert.AreEqual(ackMsg.ChunkOwnerIP, ackMsg2.ChunkOwnerIP);
-            Assert.AreEqual(ackMsg.ChunkOwnerPort, ackMsg2.ChunkOwnerPort);
         }
 
         [TestMethod]
@@ -242,7 +240,7 @@ namespace DBSTests
             Assert.AreEqual(gotMsg.VersionN, gotMsg2.VersionN);
             Assert.AreEqual(gotMsg.FileId, gotMsg2.FileId);
 
-            var ackMsg = new ACKMessage(0, 0, FileId1, 0, IPAddress.Parse("0.0.0.0"), 0);
+            var ackMsg = new ACKMessage(0, 0, FileId1, 0);
             bytes = ackMsg.Serialize();
             var ackMsg2 = Message.Deserialize(bytes) as ACKMessage;
             Assert.IsNotNull(ackMsg2);
@@ -251,8 +249,16 @@ namespace DBSTests
             Assert.AreEqual(ackMsg.VersionN, ackMsg2.VersionN);
             Assert.AreEqual(ackMsg.FileId, ackMsg2.FileId);
             Assert.AreEqual(ackMsg.ChunkNo, ackMsg2.ChunkNo);
-            Assert.AreEqual(ackMsg.ChunkOwnerIP, ackMsg2.ChunkOwnerIP);
-            Assert.AreEqual(ackMsg.ChunkOwnerPort, ackMsg2.ChunkOwnerPort);
+
+            var connInfoMsg = new ConnInfoMessage(0, 0, FileId1, 0, 50, IPAddress.Parse("0.0.0.0"));
+            bytes = connInfoMsg.Serialize();
+            var connInfoMsg2 = Message.Deserialize(bytes) as ConnInfoMessage;
+            Assert.IsNotNull(connInfoMsg2);
+            Assert.AreEqual(connInfoMsg.MessageType, connInfoMsg2.MessageType);
+            Assert.AreEqual(connInfoMsg.VersionM, connInfoMsg2.VersionM);
+            Assert.AreEqual(connInfoMsg.VersionN, connInfoMsg2.VersionN);
+            Assert.AreEqual(connInfoMsg.FileId, connInfoMsg2.FileId);
+            Assert.AreEqual(connInfoMsg.ChunkNo, connInfoMsg2.ChunkNo);
         }
 
         [TestMethod]
