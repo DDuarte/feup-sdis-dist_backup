@@ -26,8 +26,17 @@ namespace DBS.Protocols
         public void OnNext(GetChunkMessage msg)
         {
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
-            if (!fileChunk.Exists()) // we don't have this chunk, do nothing
+            if (!fileChunk.Exists())
+            {
+                // we were supposed to have this chunk: send removed message and remove the entry in the local count
+                if (Core.Instance.Store.ContainsFile(fileChunk.FileName)) 
+                {
+                    Core.Instance.MCChannel.Send(new RemovedMessage(fileChunk));
+                    Core.Instance.Store.RemoveDegrees(fileChunk.FileName);
+                }
+
                 return;
+            }
 
             try
             {
@@ -66,4 +75,3 @@ namespace DBS.Protocols
         }
     }
 }
-
