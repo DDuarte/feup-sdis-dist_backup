@@ -42,6 +42,7 @@ namespace DBS.Protocols.Enhancements
 
         public void Stop()
         {
+            Core.Instance.Log.Info("EnhancedRestoreChunkConnInfoService:Stop");
         }
     }
 }
