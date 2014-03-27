@@ -69,14 +69,20 @@ namespace DBS
             return msg;
         }
 
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
+            if (!disposing) return;
             _receiveTask.Dispose();
             _broadcaster.Dispose();
             _listener.Dispose();
 
             _subject.OnCompleted();
             _subject.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

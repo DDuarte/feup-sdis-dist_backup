@@ -48,7 +48,7 @@ namespace DBS.Protocols.Enhancements
                 }
                 catch (TimeoutException)
                 {
-                    Console.WriteLine("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
+                    Core.Instance.Log.ErrorFormat("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
                     return;
                 }
 
@@ -59,6 +59,12 @@ namespace DBS.Protocols.Enhancements
                 }
 
                 var ackMessage = msg as ACKMessage;
+                if (ackMessage == null)
+                {
+                    Core.Instance.Log.ErrorFormat("EnhancedRestoreChunkProtocol: could not cast message {0} to ACK", msg);
+                    return;
+                }
+
                 var listener = new TcpListener(IPAddress.Any, 0);
                 listener.Start();
 
@@ -66,7 +72,7 @@ namespace DBS.Protocols.Enhancements
                     ackMessage.RemoteEndPoint.Address));
 
                 var clientTask = listener.AcceptTcpClientAsync();
-                if (Task.WaitAny(new[] {clientTask}, Timeout) < 0)
+                if (!clientTask.Wait(Timeout))
                 {
                     Core.Instance.Log.Error("EnhancedRestoreChunkProtocol: listener.AcceptTcpClientAsync timed out");
                     return;

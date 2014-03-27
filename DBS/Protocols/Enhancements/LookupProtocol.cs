@@ -13,21 +13,10 @@ namespace DBS.Protocols.Enhancements
     class LookUpProtocol : IProtocol
     {
         private readonly string _backupDir;
-        private ConcurrentHashSet<FileId> _backedUpFiles;
         private const int WaitPeriod = 10000;
         public LookUpProtocol(string backupDir)
         {
             _backupDir = backupDir;
-        }
-
-        private IDisposable LookUpFileId(FileId fileId)
-        {
-            Core.Instance.MCChannel.Send(new LookupMessage(fileId));
-            return Core.Instance.MCChannel.Received
-                .Where(message => message.MessageType == MessageType.Got)
-                .Cast<GotMessage>()
-                .Where(message => message.FileId == fileId)
-                .Subscribe(msg => _backedUpFiles.Remove(msg.FileId));
         }
 
         public Task Run() // should this run in a separate thread? We're deleting files...
@@ -43,10 +32,19 @@ namespace DBS.Protocols.Enhancements
                     });
 
                 // remove duplicates, transform the collection into a ConcurrentHashSet
-                _backedUpFiles = new ConcurrentHashSet<FileId>(fileIds.Distinct());
+                var backedUpFiles = new ConcurrentHashSet<FileId>(fileIds.Distinct());
 
                 // perform a lookup for each fileId
-                var subscriptions = _backedUpFiles.Select(LookUpFileId);
+                var subscriptions = backedUpFiles.Select(id =>
+                {
+                    Core.Instance.MCChannel.Send(new LookupMessage(id));
+                    return Core.Instance.MCChannel.Received
+                        .Where(message => message.MessageType == MessageType.Got)
+                        .Cast<GotMessage>()
+                        .Where(message => message.FileId == id)
+// ReSharper disable once AccessToDisposedClosure
+                        .Subscribe(msg => backedUpFiles.Remove(msg.FileId));
+                });
 
                 // wait
                 Thread.Sleep(WaitPeriod);
@@ -55,12 +53,14 @@ namespace DBS.Protocols.Enhancements
                     subscription.Dispose();
 
                 // delete all the unused chunks
-                foreach (var unusedFile in _backedUpFiles)
+                foreach (var unusedFile in backedUpFiles)
                 {
                     var fileList = Directory.GetFiles(_backupDir, unusedFile + "_*");
                     foreach (var backedUpChunk in fileList)
                         File.Delete(backedUpChunk);
                 }
+
+                backedUpFiles.Dispose();
             });
         }
     }

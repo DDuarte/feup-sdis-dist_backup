@@ -192,102 +192,103 @@ namespace DBS
                     continue;
 
                 var parts = str.Split(' ');
-                var cmd = parts[0].Trim();
-                cmd = cmd.ToLower();
-                if (cmd == "quit")
-                    return;
-                else if (cmd == "backup")
+                var cmd = parts[0].ToLower().Trim();
+                switch (cmd)
                 {
-                    if (parts.Length != 3)
+                    case "quit":
+                        return;
+                    case "backup":
                     {
-                        Console.WriteLine("Wrong number of arguments.");
-                        continue;
-                    }
-
-                    var fileName = parts[1];
-                    var repDegree = int.Parse(parts[2]);
-
-                    var fileEntry = AddBackupFile(fileName, repDegree);
-                    if (fileEntry == null)
-                    {
-                        Console.WriteLine("Tried to backup unknown file.");
-                        continue;
-                    }
-
-                    Console.WriteLine("Will backup file '{0}'", fileEntry.FileName);
-                    swt.Execute(new BackupFileCommand(fileEntry));
-                }
-                else if (cmd == "restore")
-                {
-                    switch (parts.Length)
-                    {
-                        case 2:
+                        if (parts.Length != 3)
                         {
-                            var fileName = parts[1];
-                            var fileEntry = ConsoleGetFileEntry(fileName);
-                            if (fileEntry == null)
-                            {
-                                Console.WriteLine("Wrong file name provided.");
-                                continue;
-                            }
-
-                            Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
-                            swt.Execute(new RestoreFileCommand(fileEntry));
-                        }
-                            break;
-                        case 3:
-                        {
-                            var fileName = parts[1];
-                            var flag = parts[2];
-                            var fileEntry = ConsoleGetFileEntry(fileName);
-                            if (fileEntry == null)
-                            {
-                                Console.WriteLine("Wrong file name provided.");
-                                continue;
-                            }
-
-                            if (flag.ToLower() != "-e")
-                            {
-                                Console.WriteLine("Invalid flag specified");
-                                continue;
-                            }
-
-                            Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
-                            swt.Execute(new RestoreFileCommand(fileEntry, true));
-                        }
-                            break;
-                        default:
                             Console.WriteLine("Wrong number of arguments.");
-                            break;
-                    }
-                }
-                else if (cmd == "delete")
-                {
-                    if (parts.Length != 2)
-                    {
-                        Console.WriteLine("Wrong number of arguments.");
-                        continue;
-                    }
+                            continue;
+                        }
 
-                    var fileName = parts[1];
-                    var fileEntry = ConsoleGetFileEntry(fileName);
-                    if (fileEntry == null)
-                    {
-                        Console.WriteLine("Wrong file name provided.");
-                        continue;
-                    }
+                        var fileName = parts[1];
+                        var repDegree = int.Parse(parts[2]);
 
-                    Console.WriteLine("Will delete file '{0}'", fileEntry.FileName);
-                    swt.Execute(new DeleteFileCommand(fileEntry));
-                }
-                else if (cmd == "reclaim")
-                {
-                    Console.WriteLine("Launching space reclaming algorithm.");
-                    swt.Execute(new SpaceReclaimingCommand());
-                }
-                else
-                {
-                    Console.WriteLine("Unknown command.");
+                        var fileEntry = AddBackupFile(fileName, repDegree);
+                        if (fileEntry == null)
+                        {
+                            Console.WriteLine("Tried to backup unknown file.");
+                            continue;
+                        }
+
+                        Console.WriteLine("Will backup file '{0}'", fileEntry.FileName);
+                        swt.Execute(new BackupFileCommand(fileEntry));
+                    }
+                        break;
+                    case "restore":
+                        switch (parts.Length)
+                        {
+                            case 2:
+                            {
+                                var fileName = parts[1];
+                                var fileEntry = ConsoleGetFileEntry(fileName);
+                                if (fileEntry == null)
+                                {
+                                    Console.WriteLine("Wrong file name provided.");
+                                    continue;
+                                }
+
+                                Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
+                                swt.Execute(new RestoreFileCommand(fileEntry));
+                            }
+                                break;
+                            case 3:
+                            {
+                                var fileName = parts[1];
+                                var flag = parts[2];
+                                var fileEntry = ConsoleGetFileEntry(fileName);
+                                if (fileEntry == null)
+                                {
+                                    Console.WriteLine("Wrong file name provided.");
+                                    continue;
+                                }
+
+                                if (flag.ToLower() != "-e")
+                                {
+                                    Console.WriteLine("Invalid flag specified");
+                                    continue;
+                                }
+
+                                Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
+                                swt.Execute(new RestoreFileCommand(fileEntry, true));
+                            }
+                                break;
+                            default:
+                                Console.WriteLine("Wrong number of arguments.");
+                                break;
+                        }
+                        break;
+                    case "delete":
+                    {
+                        if (parts.Length != 2)
+                        {
+                            Console.WriteLine("Wrong number of arguments.");
+                            continue;
+                        }
+
+                        var fileName = parts[1];
+                        var fileEntry = ConsoleGetFileEntry(fileName);
+                        if (fileEntry == null)
+                        {
+                            Console.WriteLine("Wrong file name provided.");
+                            continue;
+                        }
+
+                        Console.WriteLine("Will delete file '{0}'", fileEntry.FileName);
+                        swt.Execute(new DeleteFileCommand(fileEntry));
+                    }
+                        break;
+                    case "reclaim":
+                        Console.WriteLine("Launching space reclaming algorithm.");
+                        swt.Execute(new SpaceReclaimingCommand());
+                        break;
+                    default:
+                        Console.WriteLine("Unknown command.");
+                        break;
                 }
             }
         }

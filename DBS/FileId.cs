@@ -47,9 +47,8 @@ namespace DBS
         private string _fileIdStr; // cached string, it is assumed that _bytes is immutable
         public override string ToString()
         {
-            if (_fileIdStr == null)
-                _fileIdStr = _bytes.Reverse().Aggregate(string.Empty, (current, b) => current + b.ToString("X2"));
-            return _fileIdStr;
+            return _fileIdStr ??
+                   (_fileIdStr = _bytes.Reverse().Aggregate(string.Empty, (current, b) => current + b.ToString("X2")));
         }
 
         public string ToStringSmall()

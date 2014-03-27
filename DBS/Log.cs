@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -9,7 +8,7 @@ using DBS.Utilities;
 
 namespace DBS
 {
-    public interface ILog : IObservable<string>
+    public interface ILog : IObservable<string>, IDisposable
     {
         void Error(string msg, Exception ex);
         void ErrorFormat(string format, params object[] args);
@@ -143,6 +142,20 @@ namespace DBS
             }
 
             return observ.ObserveOn(context).Subscribe(observer);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            _infoSubj.Dispose();
+            _errorSubj.Dispose();
+            foreach (var s in _customSubj)
+                s.Value.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }
