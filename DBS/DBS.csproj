@@ -70,6 +70,7 @@
     <Compile Include="Protocols\BackupChunkService.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="Protocols\DeleteFileProtocol.cs" />
+    <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkConnInfoService.cs" />
     <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkProtocol.cs" />
     <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkAckService.cs" />
     <Compile Include="Protocols\Enhancements\EnhancedRestoreFileProtocol.cs" />

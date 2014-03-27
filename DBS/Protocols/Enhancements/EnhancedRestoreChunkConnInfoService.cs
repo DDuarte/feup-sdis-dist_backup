@@ -1,0 +1,47 @@
+﻿using System;
+using System.Linq;
+using System.Net.Sockets;
+using System.Reactive.Linq;
+using DBS.Messages.Enhancements;
+using DBS.Utilities;
+
+namespace DBS.Protocols.Enhancements
+{
+    class EnhancedRestoreChunkConnInfoService : IService<ConnInfoMessage>
+    {
+        public void OnNext(ConnInfoMessage msg)
+        {
+            var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
+            if (!fileChunk.Exists()) // we don't have this chunk, do nothing
+                return;
+
+            var client = new TcpClient();
+            client.Connect(msg.RemoteEndPoint.Address, msg.InitiatorPort);
+            var stream = client.GetStream();
+
+            var bytes = fileChunk.GetData();
+            stream.Write(bytes, 0, bytes.Length);
+            client.Close();
+        }
+
+        public void OnError(Exception error)
+        {
+        }
+
+        public void OnCompleted()
+        {
+        }
+
+        public void Start()
+        {
+            Core.Instance.MCChannel.Received
+                .Where(message => message.MessageType == Messages.MessageType.ConnInfo)
+                .Cast<ConnInfoMessage>().Where(message => NetworkUtilities.GetLocalIPAddresses().Contains(message.PassiveIP))
+                .Subscribe(this);
+        }
+
+        public void Stop()
+        {
+        }
+    }
+}
