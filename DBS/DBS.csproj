@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,6 +74,7 @@
     <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkProtocol.cs" />
     <Compile Include="Protocols\Enhancements\EnhancedRestoreChunkAckService.cs" />
     <Compile Include="Protocols\Enhancements\EnhancedRestoreFileProtocol.cs" />
+    <Compile Include="Protocols\Enhancements\EnhancedSpaceReclaimingWatcher.cs" />
     <Compile Include="Protocols\Enhancements\LookUpProtocol.cs" />
     <Compile Include="Protocols\Enhancements\LookUpService.cs" />
     <Compile Include="Protocols\RestoreChunkService.cs" />
