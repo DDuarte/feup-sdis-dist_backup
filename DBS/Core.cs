@@ -219,22 +219,47 @@ namespace DBS
                 }
                 else if (cmd == "restore")
                 {
-                    if (parts.Length != 2)
+                    switch (parts.Length)
                     {
-                        Console.WriteLine("Wrong number of arguments.");
-                        continue;
-                    }
+                        case 2:
+                        {
+                            var fileName = parts[1];
+                            var fileEntry = ConsoleGetFileEntry(fileName);
+                            if (fileEntry == null)
+                            {
+                                Console.WriteLine("Wrong file name provided.");
+                                continue;
+                            }
 
-                    var fileName = parts[1];
-                    var fileEntry = ConsoleGetFileEntry(fileName);
-                    if (fileEntry == null)
-                    {
-                        Console.WriteLine("Wrong file name provided.");
-                        continue;
-                    }
+                            Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
+                            swt.Execute(new RestoreFileCommand(fileEntry));
+                        }
+                            break;
+                        case 3:
+                        {
+                            var fileName = parts[1];
+                            var flag = parts[2];
+                            var fileEntry = ConsoleGetFileEntry(fileName);
+                            if (fileEntry == null)
+                            {
+                                Console.WriteLine("Wrong file name provided.");
+                                continue;
+                            }
 
-                    Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
-                    swt.Execute(new RestoreFileCommand(fileEntry));
+                            if (flag.ToLower() != "-e")
+                            {
+                                Console.WriteLine("Invalid flag specified");
+                                continue;
+                            }
+
+                            Console.WriteLine("Will restore file '{0}'", fileEntry.FileName);
+                            swt.Execute(new RestoreFileCommand(fileEntry, true));
+                        }
+                            break;
+                        default:
+                            Console.WriteLine("Wrong number of arguments.");
+                            break;
+                    }
                 }
                 else if (cmd == "delete")
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DBS.Protocols;
+using DBS.Protocols.Enhancements;
 
 namespace DBS
 {
@@ -41,18 +42,23 @@ namespace DBS
     public class RestoreFileCommand : ICommand
     {
         private readonly FileEntry _fileEntry;
+        private readonly bool _enhanced;
 
-        public RestoreFileCommand(FileEntry fileEntry)
+        public RestoreFileCommand(FileEntry fileEntry, bool enhanced = false)
         {
             if (fileEntry == null)
                 throw new ArgumentNullException("fileEntry");
 
             _fileEntry = fileEntry;
+            _enhanced = enhanced;
         }
 
         public void Execute()
         {
-            new RestoreFileProtocol(_fileEntry).Run();
+            if (_enhanced)
+                new EnhancedRestoreFileProtocol(_fileEntry).Run();
+            else
+                new RestoreFileProtocol(_fileEntry).Run();
         }
     }
 
