@@ -27,7 +27,7 @@ namespace DBS.Protocols.Enhancements
                 {
                     var restoreChunkProtocol = new EnhancedRestoreChunkProtocol(new FileChunk(_fileEntry.FileId, chunkNo));
                     restoreChunkProtocol.Run().Wait();
-                    chunk = restoreChunkProtocol.ChunkMessage;
+                    chunk = restoreChunkProtocol.Message;
                     if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
                         break;
 
