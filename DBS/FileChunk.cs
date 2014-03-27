@@ -21,6 +21,20 @@ namespace DBS
             ChunkNo = chunkNo;
         }
 
+        public FileChunk(string filename)
+        {
+            if (!string.IsNullOrWhiteSpace(filename))
+                throw new ArgumentNullException("filename");
+
+            var tokens = filename.Split('_');
+
+            if (tokens.Length != 2)
+                throw new ArgumentException("Invalid filename", "filename");
+
+            FileId = new FileId(tokens[0]);
+            ChunkNo = int.Parse(tokens[1]);
+        }
+
         public bool Exists()
         {
             return File.Exists(FullFileName);
