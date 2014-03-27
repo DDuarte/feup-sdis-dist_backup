@@ -52,7 +52,7 @@ namespace DBS
 
         public void Info(string msg)
         {
-            var date = DateTime.UtcNow.ToShortTimeString();
+            var date = DateTime.UtcNow.ToLongTimeString();
             var log = "I" + date + ": " + msg;
             _infoSubj.OnNext(log);
         }
