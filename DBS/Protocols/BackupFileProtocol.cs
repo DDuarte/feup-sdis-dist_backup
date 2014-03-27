@@ -29,7 +29,7 @@ namespace DBS.Protocols
                         var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
                         var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
                             data);
-                        bc.Run();
+                        bc.Run().Wait();
                         ++chunkNo;
                     }
 

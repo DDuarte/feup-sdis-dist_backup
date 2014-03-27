@@ -27,7 +27,7 @@ namespace DBS.Protocols
                 do
                 {
                     var restoreChunkProtocol = new RestoreChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo));
-                    Task.WaitAll(restoreChunkProtocol.Run());
+                    restoreChunkProtocol.Run().Wait();
                     chunk = restoreChunkProtocol.Message;
                     if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
                         break;
