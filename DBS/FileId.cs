@@ -26,6 +26,8 @@ namespace DBS
             if (fileIdStr.Length != 64)
                 throw new ArgumentException("Invalid fileId string", "fileIdStr");
 
+            fileIdStr = fileIdStr.ToUpperInvariant();
+
             _bytes = new byte[32];
             for (int i = 0, index = 31; i < fileIdStr.Length; i += 2, index--)
                 _bytes[index] = Convert.ToByte(string.Format("{0}{1}", fileIdStr[i], fileIdStr[i + 1]), 16);

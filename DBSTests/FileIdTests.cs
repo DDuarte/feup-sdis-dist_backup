@@ -99,5 +99,22 @@ namespace DBSTests
             var startArr = hashArr[0].ToString("X2");
             Assert.AreEqual(startArr, endStr);
         }
+
+        [TestMethod]
+        public void TestFileIdCaseInsensitive()
+        {
+            var fileId = FileId.FromFile(File1A);
+            var hashStr = fileId.ToString();
+
+            var hashStr1 = hashStr.ToUpperInvariant();
+            var hashStr2 = hashStr.ToLowerInvariant();
+
+            var fileId1 = new FileId(hashStr1);
+            var fileId2 = new FileId(hashStr2);
+
+            Assert.AreEqual(fileId1, fileId);
+            Assert.AreEqual(fileId2, fileId);
+            Assert.AreEqual(fileId2, fileId1);
+        }
     }
 }
