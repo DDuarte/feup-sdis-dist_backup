@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DBS.Messages;
@@ -11,7 +13,7 @@ namespace DBS.Protocols.Enhancements
     {
         private readonly FileChunk _fileChunk;
         private const int Timeout = 5000;
-        public Message ChunkMessage { get; private set; }
+        public ChunkMessage ChunkMessage { get; private set; }
         public EnhancedRestoreChunkProtocol(FileChunk fileChunk)
         {
             _fileChunk = fileChunk;
@@ -23,39 +25,66 @@ namespace DBS.Protocols.Enhancements
             {
                 Core.Instance.MCChannel.Send(new GetChunkMessage(_fileChunk));
 
+                var src1 = Core.Instance.MDRChannel.Received
+                    .Where(message => message.MessageType == MessageType.Chunk)
+                    .Cast<ChunkMessage>()
+                    .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
+                                      message.FileId == _fileChunk.FileId)
+                    .Cast<Message>();
+
+                var src2 = Core.Instance.MDRChannel.Received
+                    .Where(message => message.MessageType == MessageType.ACK)
+                    .Cast<ACKMessage>()
+                    .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
+                                      message.FileId == _fileChunk.FileId)
+                    .Cast<Message>();
+
+                Message msg;
                 try
                 {
-                    var src1 = Core.Instance.MDRChannel.Received
-                        .Where(message => message.MessageType == MessageType.Chunk)
-                        .Cast<ChunkMessage>()
-                        .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
-                                          message.FileId == _fileChunk.FileId)
-                        .Cast<Message>();
-
-                    var src2 = Core.Instance.MDRChannel.Received
-                        .Where(message => message.MessageType == MessageType.ACK)
-                        .Cast<ACKMessage>()
-                        .Where(message => message.ChunkNo == _fileChunk.ChunkNo &&
-                                          message.FileId == _fileChunk.FileId)
-                        .Cast<Message>();
-
                     // wait for response
-                    var msg = src1.Merge(src2).Timeout(TimeSpan.FromMilliseconds(Timeout))
+                    msg = src1.Merge(src2).Timeout(TimeSpan.FromMilliseconds(Timeout))
                         .Next().First();
-
-                    if (msg.MessageType == MessageType.Chunk) // same behaviour as the regular protocol
-                    {
-                        ChunkMessage = msg;
-                        return;
-                    }
-
-                    // TODO
                 }
                 catch (TimeoutException)
                 {
                     Console.WriteLine("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
+                    return;
+                }
+
+                if (msg.MessageType == MessageType.Chunk) // same behaviour as the regular protocol
+                {
+                    ChunkMessage = msg as ChunkMessage;
+                    return;
+                }
+
+                var ackMessage = msg as ACKMessage;
+                var listener = new TcpListener(IPAddress.Any, 0);
+                listener.Start();
+
+                Core.Instance.MCChannel.Send(new ConnInfoMessage(_fileChunk, ((IPEndPoint) listener.LocalEndpoint).Port,
+                    ackMessage.RemoteEndPoint.Address));
+
+                var clientTask = listener.AcceptTcpClientAsync();
+                if (Task.WaitAny(new[] {clientTask}, Timeout) < 0)
+                {
+                    Core.Instance.Log.Error("EnhancedRestoreChunkProtocol: listener.AcceptTcpClientAsync timed out");
+                    return;
+                }
+
+                try
+                {
+                    var stream = clientTask.Result.GetStream();
+                    var bytes = new byte[Core.Instance.Config.ChunkSize];
+                    stream.Read(bytes, 0, bytes.Length);
+                    ChunkMessage = new ChunkMessage(_fileChunk, bytes);
+                    clientTask.Result.Close();
+                }
+                catch (Exception)
+                {
+                    Core.Instance.Log.Error("EnhancedRestoreChunkProtocol: error receiving chunk");
                 }
             });
         }
     }
-}
+}  
