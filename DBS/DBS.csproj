@@ -57,6 +57,7 @@
     <Compile Include="Messages\ChunkMessage.cs" />
     <Compile Include="Messages\DeleteMessage.cs" />
     <Compile Include="Messages\Enhancements\ACKMessage.cs" />
+    <Compile Include="Messages\Enhancements\ConnInfoMessage.cs" />
     <Compile Include="Messages\Enhancements\GotMessage.cs" />
     <Compile Include="Messages\Enhancements\LookupMessage.cs" />
     <Compile Include="Messages\GetChunkMessage.cs" />

@@ -43,7 +43,11 @@ namespace DBS.Messages
 
         // Get chunk message reply
         [StringValue("ACK")] // <Version> <FileId> <ChunkNo> <ChunkOwnerIP> <ChunkOwnerPort> <CRLF> <CRLF>
-        ACK
+        ACK,
+
+        // Connection Information message
+        [StringValue("CONNINFO")] // <Version> <FileId> <ChunkNo> <InitiatorPeerIP> <InitiatorPeerPort> <SelectedPeerIP> <CRLF> <CRLF>
+        ConnInfo
     }
 
     // 8 + 1 + 3 + 1 + 64 + 1 + 6 + 1 + 1 + 2 + 2 = 90 # max header size
@@ -72,7 +76,8 @@ namespace DBS.Messages
                 {MessageType.Removed, RemovedMessage.Deserialize},
                 {MessageType.Lookup, LookupMessage.Deserialize},
                 {MessageType.Got, GotMessage.Deserialize},
-                {MessageType.ACK, ACKMessage.Deserialize}
+                {MessageType.ACK, ACKMessage.Deserialize},
+                {MessageType.ConnInfo, ConnInfoMessage.Deserialize}
             };
 
         public static Message Deserialize(byte[] data)
