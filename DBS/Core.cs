@@ -100,7 +100,7 @@ namespace DBS
 
         public PersistentStore Store { get; private set; }
         private Random Rnd { get; set; }
-        public ILog Log { get; private set; }
+        public Log Log { get; private set; }
 
         public Channel MCChannel { get; private set; }
         public Channel MDBChannel { get; private set; }

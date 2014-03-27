@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using DBS.Utilities;
 
 namespace DBS
@@ -13,15 +17,26 @@ namespace DBS
         void Info(string msg, Exception ex);
         void InfoFormat(string format, params object[] args);
         void Info(string msg);
+        void Custom(string t, string msg);
+        void CustomFormat(string t, string format, params object[] args);
     }
 
     public class Log : ILog
     {
         private readonly Subject<string> _infoSubj = new Subject<string>();
         private readonly Subject<string> _errorSubj = new Subject<string>();
-        private IObservable<string> _errorLog { get { return _errorSubj.AsObservable(); } }
-        private IObservable<string> _infoLog { get { return _infoSubj.AsObservable(); } }
-        private IObservable<string> _logs { get { return _infoLog.Merge(_errorLog); } } 
+        private readonly Dictionary<string, Subject<string>> _customSubj = new Dictionary<string, Subject<string>>();
+        private IObservable<string> ErrorLog { get { return _errorSubj; } }
+        private IObservable<string> InfoLog { get { return _infoSubj; } }
+
+        private Dictionary<string, IObservable<string>> CustomLog
+        {
+            get
+            {
+                return _customSubj.ToDictionary<KeyValuePair<string, Subject<string>>, string, IObservable<string>>(
+                    pair => pair.Key, pair => pair.Value);
+            }
+        }
 
         public void Error(string msg, Exception ex)
         {
@@ -57,19 +72,77 @@ namespace DBS
             _infoSubj.OnNext(log);
         }
 
+        public void Custom(string t, string msg)
+        {
+            var date = DateTime.UtcNow.ToLongTimeString();
+            var log = "C" + date + ": " + msg;
+            _customSubj.GetOrCreate(t).OnNext(log);
+        }
+
+        public void CustomFormat(string t, string format, params object[] args)
+        {
+            Custom(t, format.FormatWith(args));
+        }
+
         public IDisposable Subscribe(IObserver<string> observer)
         {
-            return _logs.Subscribe(observer);
+            var allLogs = ErrorLog.Merge(InfoLog);
+            foreach (var obs in CustomLog)
+                allLogs.Merge(obs.Value);
+            return allLogs.Subscribe(observer);
+        }
+
+        public IDisposable SubscribeOn(IObserver<string> observer, SynchronizationContext context)
+        {
+            var allLogs = ErrorLog.Merge(InfoLog);
+            allLogs = CustomLog.Aggregate(allLogs, (current, obs) => current.Merge(obs.Value));
+            return allLogs.ObserveOn(context).Subscribe(observer);
         }
 
         public IDisposable SubscribeError(IObserver<string> observer)
         {
-            return _errorLog.Subscribe(observer);
+            return ErrorLog.Subscribe(observer);
+        }
+
+        public IDisposable SubscribeErrorOn(IObserver<string> observer, SynchronizationContext context)
+        {
+            return ErrorLog.ObserveOn(context).Subscribe(observer);
         }
 
         public IDisposable SubscribeInfo(IObserver<string> observer)
         {
-            return _infoLog.Subscribe(observer);
+            return InfoLog.Subscribe(observer);
+        }
+
+        public IDisposable SubscribeInfoOn(IObserver<string> observer, SynchronizationContext context)
+        {
+            return InfoLog.ObserveOn(context).Subscribe(observer);
+        }
+
+        public IDisposable SubscribeCustom(string t, IObserver<string> observer)
+        {
+            IObservable<string> observ;
+            if (!CustomLog.TryGetValue(t, out observ))
+            {
+                var subj = new Subject<string>();
+                _customSubj.Add(t, subj);
+                observ = subj;
+            }
+
+            return observ.Subscribe(observer);
+        }
+
+        public IDisposable SubscribeCustomOn(string t, IObserver<string> observer, SynchronizationContext context)
+        {
+            IObservable<string> observ;
+            if (!CustomLog.TryGetValue(t, out observ))
+            {
+                var subj = new Subject<string>();
+                _customSubj.Add(t, subj);
+                observ = subj;
+            }
+
+            return observ.ObserveOn(context).Subscribe(observer);
         }
     }
 }

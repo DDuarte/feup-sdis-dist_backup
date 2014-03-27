@@ -48,7 +48,19 @@
             this.removeFileButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.logTextBox = new System.Windows.Forms.TextBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.allTabPage = new System.Windows.Forms.TabPage();
+            this.allLogTextBox = new System.Windows.Forms.TextBox();
+            this.receivedTabPage = new System.Windows.Forms.TabPage();
+            this.receivedLogTextBox = new System.Windows.Forms.TextBox();
+            this.sentTabPage = new System.Windows.Forms.TabPage();
+            this.sentLogTextBox = new System.Windows.Forms.TextBox();
+            this.errorsTabPage = new System.Windows.Forms.TabPage();
+            this.errorsLogTextBox = new System.Windows.Forms.TextBox();
+            this.infoTabPage = new System.Windows.Forms.TabPage();
+            this.infoLogTextBox = new System.Windows.Forms.TextBox();
+            this.transmittedTabPage = new System.Windows.Forms.TabPage();
+            this.transmittedTextBox = new System.Windows.Forms.TextBox();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -56,6 +68,13 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.allTabPage.SuspendLayout();
+            this.receivedTabPage.SuspendLayout();
+            this.sentTabPage.SuspendLayout();
+            this.errorsTabPage.SuspendLayout();
+            this.infoTabPage.SuspendLayout();
+            this.transmittedTabPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // backupButton
@@ -283,8 +302,8 @@
             this.tableLayoutPanel3.ColumnCount = 1;
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Controls.Add(this.logTextBox, 0, 1);
             this.tableLayoutPanel3.Controls.Add(this.actionsGroupBox, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.tabControl1, 0, 1);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(177, 3);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -294,16 +313,152 @@
             this.tableLayoutPanel3.Size = new System.Drawing.Size(516, 391);
             this.tableLayoutPanel3.TabIndex = 7;
             // 
-            // logTextBox
+            // tabControl1
             // 
-            this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.logTextBox.Location = new System.Drawing.Point(3, 198);
-            this.logTextBox.Multiline = true;
-            this.logTextBox.Name = "logTextBox";
-            this.logTextBox.ReadOnly = true;
-            this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.logTextBox.Size = new System.Drawing.Size(510, 190);
-            this.logTextBox.TabIndex = 4;
+            this.tabControl1.Controls.Add(this.allTabPage);
+            this.tabControl1.Controls.Add(this.transmittedTabPage);
+            this.tabControl1.Controls.Add(this.receivedTabPage);
+            this.tabControl1.Controls.Add(this.sentTabPage);
+            this.tabControl1.Controls.Add(this.errorsTabPage);
+            this.tabControl1.Controls.Add(this.infoTabPage);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(3, 198);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(510, 190);
+            this.tabControl1.TabIndex = 5;
+            // 
+            // allTabPage
+            // 
+            this.allTabPage.Controls.Add(this.allLogTextBox);
+            this.allTabPage.Location = new System.Drawing.Point(4, 22);
+            this.allTabPage.Name = "allTabPage";
+            this.allTabPage.Size = new System.Drawing.Size(502, 164);
+            this.allTabPage.TabIndex = 6;
+            this.allTabPage.Text = "All";
+            this.allTabPage.UseVisualStyleBackColor = true;
+            // 
+            // allLogTextBox
+            // 
+            this.allLogTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.allLogTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.allLogTextBox.Location = new System.Drawing.Point(0, 0);
+            this.allLogTextBox.Multiline = true;
+            this.allLogTextBox.Name = "allLogTextBox";
+            this.allLogTextBox.ReadOnly = true;
+            this.allLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.allLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.allLogTextBox.TabIndex = 4;
+            // 
+            // receivedTabPage
+            // 
+            this.receivedTabPage.Controls.Add(this.receivedLogTextBox);
+            this.receivedTabPage.Location = new System.Drawing.Point(4, 22);
+            this.receivedTabPage.Name = "receivedTabPage";
+            this.receivedTabPage.Size = new System.Drawing.Size(502, 164);
+            this.receivedTabPage.TabIndex = 5;
+            this.receivedTabPage.Text = "Received";
+            this.receivedTabPage.UseVisualStyleBackColor = true;
+            // 
+            // receivedLogTextBox
+            // 
+            this.receivedLogTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.receivedLogTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.receivedLogTextBox.Location = new System.Drawing.Point(0, 0);
+            this.receivedLogTextBox.Multiline = true;
+            this.receivedLogTextBox.Name = "receivedLogTextBox";
+            this.receivedLogTextBox.ReadOnly = true;
+            this.receivedLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.receivedLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.receivedLogTextBox.TabIndex = 5;
+            // 
+            // sentTabPage
+            // 
+            this.sentTabPage.Controls.Add(this.sentLogTextBox);
+            this.sentTabPage.Location = new System.Drawing.Point(4, 22);
+            this.sentTabPage.Name = "sentTabPage";
+            this.sentTabPage.Size = new System.Drawing.Size(502, 164);
+            this.sentTabPage.TabIndex = 2;
+            this.sentTabPage.Text = "Sent";
+            this.sentTabPage.UseVisualStyleBackColor = true;
+            // 
+            // sentLogTextBox
+            // 
+            this.sentLogTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sentLogTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sentLogTextBox.Location = new System.Drawing.Point(0, 0);
+            this.sentLogTextBox.Multiline = true;
+            this.sentLogTextBox.Name = "sentLogTextBox";
+            this.sentLogTextBox.ReadOnly = true;
+            this.sentLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.sentLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.sentLogTextBox.TabIndex = 5;
+            // 
+            // errorsTabPage
+            // 
+            this.errorsTabPage.Controls.Add(this.errorsLogTextBox);
+            this.errorsTabPage.Location = new System.Drawing.Point(4, 22);
+            this.errorsTabPage.Name = "errorsTabPage";
+            this.errorsTabPage.Size = new System.Drawing.Size(502, 164);
+            this.errorsTabPage.TabIndex = 3;
+            this.errorsTabPage.Text = "Errors";
+            this.errorsTabPage.UseVisualStyleBackColor = true;
+            // 
+            // errorsLogTextBox
+            // 
+            this.errorsLogTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.errorsLogTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorsLogTextBox.Location = new System.Drawing.Point(0, 0);
+            this.errorsLogTextBox.Multiline = true;
+            this.errorsLogTextBox.Name = "errorsLogTextBox";
+            this.errorsLogTextBox.ReadOnly = true;
+            this.errorsLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.errorsLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.errorsLogTextBox.TabIndex = 5;
+            // 
+            // infoTabPage
+            // 
+            this.infoTabPage.Controls.Add(this.infoLogTextBox);
+            this.infoTabPage.Location = new System.Drawing.Point(4, 22);
+            this.infoTabPage.Name = "infoTabPage";
+            this.infoTabPage.Size = new System.Drawing.Size(502, 164);
+            this.infoTabPage.TabIndex = 4;
+            this.infoTabPage.Text = "Info";
+            this.infoTabPage.UseVisualStyleBackColor = true;
+            // 
+            // infoLogTextBox
+            // 
+            this.infoLogTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.infoLogTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.infoLogTextBox.Location = new System.Drawing.Point(0, 0);
+            this.infoLogTextBox.Multiline = true;
+            this.infoLogTextBox.Name = "infoLogTextBox";
+            this.infoLogTextBox.ReadOnly = true;
+            this.infoLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.infoLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.infoLogTextBox.TabIndex = 5;
+            // 
+            // transmittedTabPage
+            // 
+            this.transmittedTabPage.Controls.Add(this.transmittedTextBox);
+            this.transmittedTabPage.Location = new System.Drawing.Point(4, 22);
+            this.transmittedTabPage.Name = "transmittedTabPage";
+            this.transmittedTabPage.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTabPage.TabIndex = 7;
+            this.transmittedTabPage.Text = "Transmitted";
+            this.transmittedTabPage.UseVisualStyleBackColor = true;
+            // 
+            // transmittedTextBox
+            // 
+            this.transmittedTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.transmittedTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.transmittedTextBox.Location = new System.Drawing.Point(0, 0);
+            this.transmittedTextBox.Multiline = true;
+            this.transmittedTextBox.Name = "transmittedTextBox";
+            this.transmittedTextBox.ReadOnly = true;
+            this.transmittedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.transmittedTextBox.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTextBox.TabIndex = 6;
             // 
             // Form1
             // 
@@ -320,7 +475,19 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.allTabPage.ResumeLayout(false);
+            this.allTabPage.PerformLayout();
+            this.receivedTabPage.ResumeLayout(false);
+            this.receivedTabPage.PerformLayout();
+            this.sentTabPage.ResumeLayout(false);
+            this.sentTabPage.PerformLayout();
+            this.errorsTabPage.ResumeLayout(false);
+            this.errorsTabPage.PerformLayout();
+            this.infoTabPage.ResumeLayout(false);
+            this.infoTabPage.PerformLayout();
+            this.transmittedTabPage.ResumeLayout(false);
+            this.transmittedTabPage.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -346,8 +513,20 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
         private System.Windows.Forms.Button incDegreeButton;
         private System.Windows.Forms.Button decDegreeButton;
-        private System.Windows.Forms.TextBox logTextBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.TextBox receivedLogTextBox;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TextBox allLogTextBox;
+        private System.Windows.Forms.TabPage receivedTabPage;
+        private System.Windows.Forms.TabPage sentTabPage;
+        private System.Windows.Forms.TextBox sentLogTextBox;
+        private System.Windows.Forms.TabPage errorsTabPage;
+        private System.Windows.Forms.TextBox errorsLogTextBox;
+        private System.Windows.Forms.TabPage infoTabPage;
+        private System.Windows.Forms.TextBox infoLogTextBox;
+        private System.Windows.Forms.TabPage allTabPage;
+        private System.Windows.Forms.TabPage transmittedTabPage;
+        private System.Windows.Forms.TextBox transmittedTextBox;
     }
 }
 

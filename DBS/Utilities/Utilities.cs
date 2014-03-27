@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -32,6 +33,20 @@ namespace DBS.Utilities
                 Core.Instance.Log.Error("GetDirectorySize", ex);
                 return 0L;
             }
+        }
+
+        public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+            where TValue : new()
+        {
+            TValue val;
+
+            if (!dict.TryGetValue(key, out val))
+            {
+                val = new TValue();
+                dict.Add(key, val);
+            }
+
+            return val;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -14,11 +15,45 @@ namespace PeerGUI
     {
         private readonly CommandSwitch _commandSwitch = new CommandSwitch();
 
+        private static void AppendTextBox(TextBox tb, string s)
+        {
+            tb.AppendText(s + Environment.NewLine);
+        }
+
         public Form1()
         {
             InitializeComponent();
-            Core.Instance.Log.ObserveOn(SynchronizationContext.Current).
-                Subscribe(s => logTextBox.AppendText(s + Environment.NewLine));
+
+            var sc = SynchronizationContext.Current;
+            var appendAll = new Action<string>(s => AppendTextBox(allLogTextBox, s));
+            var appendTransmitted = new Action<string>(s => AppendTextBox(transmittedTextBox, s));
+            var appendReceived = new Action<string>(s => AppendTextBox(receivedLogTextBox, s));
+            var appendSent = new Action<string>(s => AppendTextBox(sentLogTextBox, s));
+            var appendErrors = new Action<string>(s => AppendTextBox(errorsLogTextBox, s));
+            var appendInfo = new Action<string>(s => AppendTextBox(infoLogTextBox, s));
+
+            Core.Instance.Log.SubscribeCustomOn("receive", Observer.Create<string>(s =>
+            {
+                appendTransmitted(s);
+                appendReceived(s);
+                appendAll(s);
+            }), sc);
+            Core.Instance.Log.SubscribeCustomOn("send", Observer.Create<string>(s =>
+            {
+                appendTransmitted(s);
+                appendSent(s);
+                appendAll(s);
+            }), sc);
+            Core.Instance.Log.SubscribeErrorOn(Observer.Create<string>(s =>
+            {
+                appendErrors(s);
+                appendAll(s);
+            }), sc);
+            Core.Instance.Log.SubscribeInfoOn(Observer.Create<string>(s =>
+            {
+                appendInfo(s);
+                appendAll(s);
+            }), sc);
 
             IPAddress localIP;
             if (!IPAddress.TryParse(Config.Global.LocalIP, out localIP))

@@ -28,7 +28,7 @@ namespace DBS
                     continue;
                 }
 
-                Core.Instance.Log.InfoFormat("R -  {0}: {1}", Name, msg);
+                Core.Instance.Log.CustomFormat("receive", "R[{0}]: {1} from {2}", Name.PadLeft(3), msg, msg.RemoteEndPoint);
                 _subject.OnNext(msg);
             }
 // ReSharper disable once FunctionNeverReturns
@@ -58,7 +58,7 @@ namespace DBS
         public void Send(Message msg)
         {
             _broadcaster.Broadcast(msg.Serialize());
-            Core.Instance.Log.InfoFormat("S -  {0}: {1}", Name, msg);
+            Core.Instance.Log.CustomFormat("send", "S[{0}]: {1}", Name.PadLeft(3), msg);
         }
 
         private Message Receive()
