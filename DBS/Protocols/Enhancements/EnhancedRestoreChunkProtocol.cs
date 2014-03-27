@@ -13,7 +13,7 @@ namespace DBS.Protocols.Enhancements
     {
         private readonly FileChunk _fileChunk;
         private const int Timeout = 5000;
-        public ChunkMessage ChunkMessage { get; private set; }
+        public ChunkMessage Message { get; private set; }
         public EnhancedRestoreChunkProtocol(FileChunk fileChunk)
         {
             _fileChunk = fileChunk;
@@ -54,7 +54,7 @@ namespace DBS.Protocols.Enhancements
 
                 if (msg.MessageType == MessageType.Chunk) // same behaviour as the regular protocol
                 {
-                    ChunkMessage = msg as ChunkMessage;
+                    Message = msg as ChunkMessage;
                     return;
                 }
 
@@ -83,7 +83,7 @@ namespace DBS.Protocols.Enhancements
                     var stream = clientTask.Result.GetStream();
                     var bytes = new byte[Core.Instance.Config.ChunkSize];
                     stream.Read(bytes, 0, bytes.Length);
-                    ChunkMessage = new ChunkMessage(_fileChunk, bytes);
+                    Message = new ChunkMessage(_fileChunk, bytes);
                     clientTask.Result.Close();
                 }
                 catch (Exception)
