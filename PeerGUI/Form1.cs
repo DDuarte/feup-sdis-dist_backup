@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reactive;
@@ -103,14 +104,31 @@ namespace PeerGUI
             var fileNames = openFileDialog.FileNames;
             foreach (var fileName in fileNames)
             {
+                double fileSize = GetFileSize(fileName);
+                var numberOfChunks =  Math.Ceiling(fileSize/Core.Instance.Config.ChunkSize);
+                var strNumber = numberOfChunks.ToString(CultureInfo.InvariantCulture);
+
                 var listViewItem1 = new ListViewItem(new []
                 {
                     fileName,
                     "1",
-                    NOT_BACKED_UP
+                    NOT_BACKED_UP,
+                    strNumber
                 }, -1);
 
                 filesListView.Items.Add(listViewItem1);
+            }
+        }
+
+        private long GetFileSize(string fileName)
+        {
+            try
+            {
+                return new FileInfo(fileName).Length;
+            }
+            catch (Exception)
+            {
+                return -1;
             }
         }
 

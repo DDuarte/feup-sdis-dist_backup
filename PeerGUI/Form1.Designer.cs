@@ -63,6 +63,7 @@
             this.infoLogTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.enhanCheckBox = new System.Windows.Forms.CheckBox();
+            this.chunksHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -223,7 +224,8 @@
             this.filesListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.fileHeader,
             this.backupDegreeHeader,
-            this.statusHeader});
+            this.statusHeader,
+            this.chunksHeader});
             this.filesListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesListView.Location = new System.Drawing.Point(3, 16);
             this.filesListView.MultiSelect = false;
@@ -237,16 +239,17 @@
             // fileHeader
             // 
             this.fileHeader.Text = "File";
+            this.fileHeader.Width = 89;
             // 
             // backupDegreeHeader
             // 
             this.backupDegreeHeader.Text = "D";
-            this.backupDegreeHeader.Width = 27;
+            this.backupDegreeHeader.Width = 20;
             // 
             // statusHeader
             // 
             this.statusHeader.Text = "Status";
-            this.statusHeader.Width = 85;
+            this.statusHeader.Width = 51;
             // 
             // tableLayoutPanel1
             // 
@@ -488,6 +491,10 @@
             this.enhanCheckBox.Text = "Enhancements";
             this.enhanCheckBox.UseVisualStyleBackColor = true;
             // 
+            // chunksHeader
+            // 
+            this.chunksHeader.Text = "#";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -559,6 +566,7 @@
         private System.Windows.Forms.TextBox transmittedTextBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.CheckBox enhanCheckBox;
+        private System.Windows.Forms.ColumnHeader chunksHeader;
     }
 }
 
