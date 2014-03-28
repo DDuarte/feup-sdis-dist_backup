@@ -164,7 +164,15 @@ namespace DBS.Persistence
                 DBFields<TKey>.Values(key), DBFields<TValue>.Values(value));
 
             if (ExecuteNonQuery(stm))
-                _dict.Add(key, value);
+            {
+                try
+                {
+                    _dict.Add(key, value);
+                }
+                catch (ArgumentException) // dup keys, np
+                {
+                }
+            }
         }
 
         public bool Remove(TKey key)
@@ -209,20 +217,14 @@ namespace DBS.Persistence
 
         protected virtual void Dispose(bool d)
         {
-            if (d)
+            if (!d) return;
+            if (_conn == null) return;
+            try
             {
-                if (_conn != null)
-                {
-                    try
-                    {
-                        _conn.Close();
-                        _conn.Dispose();
-                    }
-                    catch (SqliteException) { } // the unseen exception is the deadliest
-                    // but we are just disposing stuff, who
-                    // cares if it fails?
-                }
+                _conn.Close();
+                _conn.Dispose();
             }
+            catch (SqliteException) { }
         }
 
         public void Dispose()
