@@ -47,7 +47,15 @@ namespace DBS.Protocols
                     Task.Delay(Core.Instance.RandomDelay).Wait(); // random delay uniformly distributed
 
                     if (!putChunkReceived)
-                        new BackupChunkSubprotocol(fileChunk, rd.WantedDegree, fileChunk.GetData()).Run();
+                    {
+                        var data = fileChunk.GetData();
+                        if (data == null)
+                            Core.Instance.Log.ErrorFormat(
+                                "SpaceReclaimingService: Could not start BackupChunkProtocol" +
+                                " for {0} because it no longer exists here.", fileChunk);
+                        else
+                            new BackupChunkSubprotocol(fileChunk, rd.WantedDegree, data).Run();
+                    }
 
                     disposable.Dispose();
                 }

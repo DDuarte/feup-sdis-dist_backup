@@ -225,7 +225,7 @@ namespace PeerGUI
             if (files.Count != 1)
                 return;
 
-            _commandSwitch.Execute(new RestoreFileCommand(files[0]));
+            _commandSwitch.Execute(new RestoreFileCommand(files[0], true));
             filesListView.SelectedItems[0].SubItems[2].Text = RESTORED;
         }
 

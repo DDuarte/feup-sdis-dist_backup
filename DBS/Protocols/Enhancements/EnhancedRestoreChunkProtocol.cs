@@ -48,7 +48,7 @@ namespace DBS.Protocols.Enhancements
                 }
                 catch (TimeoutException)
                 {
-                    Core.Instance.Log.ErrorFormat("RestoreChunkSubprotocol: Could not fetch {0} from the network.", _fileChunk);
+                    Core.Instance.Log.ErrorFormat("EnhancedRestoreChunkProtocol: Could not fetch {0} from the network (timeout).", _fileChunk);
                     return;
                 }
 
