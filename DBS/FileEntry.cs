@@ -9,8 +9,14 @@ namespace DBS
         public string OriginalFileName { get; set; }
         public int ReplicationDegree { get; set; }
 
+        public override string ToString()
+        {
+            return string.Format("FileId: {0}, FileName: {1}, OriginalFileName: {2}, ReplicationDegree: {3}",
+                FileId.ToStringSmall(), FileName, OriginalFileName, ReplicationDegree);
+        }
+
         /// <summary>
-        /// Two FileEntry are equal if they have the same FileName
+        /// Two FileEntry are equal if they have the same FileId
         /// </summary>
         public class Comparer : IEqualityComparer<FileEntry>
         {
@@ -20,12 +26,12 @@ namespace DBS
                     return true;
                 if (x == null || y == null)
                     return false;
-                if (x.FileName == null && y.FileName == null)
+                if (x.FileId == null && y.FileId == null)
                     return true;
-                if (x.FileName == null || y.FileName == null)
+                if (x.FileId == null || y.FileId == null)
                     return false;
 
-                return x.FileName == y.FileName;
+                return x.FileId == y.FileId;
             }
 
             public int GetHashCode(FileEntry obj)
