@@ -64,11 +64,11 @@
             this.infoLogTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
-            this.enhanCheckBox = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
             this.startServicesButton = new System.Windows.Forms.Button();
             this.stopServicesButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
+            this.enhanCheckBox = new System.Windows.Forms.CheckBox();
             this.clearLogsButton = new System.Windows.Forms.Button();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -130,6 +130,7 @@
             // reclaimButton
             // 
             this.reclaimButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.reclaimButton.Enabled = false;
             this.reclaimButton.Location = new System.Drawing.Point(3, 143);
             this.reclaimButton.Name = "reclaimButton";
             this.reclaimButton.Size = new System.Drawing.Size(498, 32);
@@ -510,17 +511,6 @@
             this.tableLayoutPanel7.Size = new System.Drawing.Size(162, 198);
             this.tableLayoutPanel7.TabIndex = 7;
             // 
-            // enhanCheckBox
-            // 
-            this.enhanCheckBox.AutoSize = true;
-            this.enhanCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.enhanCheckBox.Location = new System.Drawing.Point(3, 3);
-            this.enhanCheckBox.Name = "enhanCheckBox";
-            this.enhanCheckBox.Size = new System.Drawing.Size(150, 40);
-            this.enhanCheckBox.TabIndex = 7;
-            this.enhanCheckBox.Text = "Enhancements";
-            this.enhanCheckBox.UseVisualStyleBackColor = true;
-            // 
             // tableLayoutPanel8
             // 
             this.tableLayoutPanel8.ColumnCount = 1;
@@ -574,6 +564,17 @@
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel9.Size = new System.Drawing.Size(156, 93);
             this.tableLayoutPanel9.TabIndex = 9;
+            // 
+            // enhanCheckBox
+            // 
+            this.enhanCheckBox.AutoSize = true;
+            this.enhanCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.enhanCheckBox.Location = new System.Drawing.Point(3, 3);
+            this.enhanCheckBox.Name = "enhanCheckBox";
+            this.enhanCheckBox.Size = new System.Drawing.Size(150, 40);
+            this.enhanCheckBox.TabIndex = 7;
+            this.enhanCheckBox.Text = "Enhancements";
+            this.enhanCheckBox.UseVisualStyleBackColor = true;
             // 
             // clearLogsButton
             // 

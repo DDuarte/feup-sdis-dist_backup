@@ -287,6 +287,8 @@ namespace PeerGUI
             _servicesStarted = true;
             startServicesButton.Enabled = false;
             stopServicesButton.Enabled = true;
+            enhanCheckBox.Enabled = false;
+            reclaimButton.Enabled = true;
         }
 
         private void stopServicesButton_Click(object sender, EventArgs e)
@@ -295,6 +297,8 @@ namespace PeerGUI
             _servicesStarted = false;
             startServicesButton.Enabled = true;
             stopServicesButton.Enabled = false;
+            enhanCheckBox.Enabled = true;
+            reclaimButton.Enabled = false;
         }
 
         private void clearLogsButton_Click(object sender, EventArgs e)
