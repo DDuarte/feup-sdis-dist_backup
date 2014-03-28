@@ -15,13 +15,22 @@ namespace DBS.Protocols.Enhancements
             if (!fileChunk.Exists()) // we don't have this chunk, do nothing
                 return;
 
-            var client = new TcpClient();
-            client.Connect(msg.RemoteEndPoint.Address, msg.InitiatorPort);
-            var stream = client.GetStream();
+            try
+            {
+                var client = new TcpClient();
+                client.Connect(msg.RemoteEndPoint.Address, msg.InitiatorPort);
+                var stream = client.GetStream();
 
-            var bytes = fileChunk.GetData();
-            stream.Write(bytes, 0, bytes.Length);
-            client.Close();
+                var bytes = fileChunk.GetData();
+                stream.Write(bytes, 0, bytes.Length);
+                client.Close();
+            }
+            catch (Exception ex)
+            {
+                Core.Instance.Log.ErrorFormat("EnhancedRestoreChunkConnInfoService: {0}", ex);
+            }
+
+            Core.Instance.Log.InfoFormat("EnhancedRestoreChunkConnInfoService: {0} sent", msg);
         }
 
         public void OnError(Exception error)

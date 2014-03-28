@@ -8,6 +8,7 @@ namespace DBS.Protocols.Enhancements
     class EnhancedRestoreFileProtocol : IProtocol
     {
         private readonly FileEntry _fileEntry;
+
         public EnhancedRestoreFileProtocol(FileEntry fileEntry)
         {
             if (fileEntry == null)
@@ -19,6 +20,7 @@ namespace DBS.Protocols.Enhancements
         private void RestoreFile()
         {
             var fileName = Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName);
+            var success = true;
             using (var file = File.OpenWrite(fileName))
             {
                 var chunkNo = 0;
@@ -29,11 +31,21 @@ namespace DBS.Protocols.Enhancements
                     restoreChunkProtocol.Run().Wait();
                     chunk = restoreChunkProtocol.Message;
                     if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
+                    {
+                        success = false;
                         break;
+                    }
 
                     file.Write(chunk.Body, 0, chunk.Body.Length);
                     ++chunkNo;
                 } while (chunk.Body.Length == Core.Instance.Config.ChunkSize);
+
+                if (success)
+                    Core.Instance.Log.InfoFormat("EnhancedRestoreFileProtocol: file '{0}' was sucessfuly restored",
+                        _fileEntry.FileName);
+                else
+                    Core.Instance.Log.ErrorFormat("EnhancedRestoreFileProtocol: file '{0}' restore failed",
+                        _fileEntry.FileName);
             }
         }
 

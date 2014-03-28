@@ -71,7 +71,7 @@ namespace DBS.Protocols.Enhancements
 
                 Core.Instance.MCChannel.Send(new ConnInfoMessage(_fileChunk, ((IPEndPoint) listener.LocalEndpoint).Port,
                     ackMessage.RemoteEndPoint.Address));
-
+                
                 var clientTask = listener.AcceptTcpClientAsync();
                 if (!clientTask.Wait(Timeout))
                 {
@@ -79,6 +79,7 @@ namespace DBS.Protocols.Enhancements
                     return;
                 }
 
+                Core.Instance.Log.Info("EnhancedRestoreChunkProtocol: TcpClient accepted");
                 try
                 {
                     var stream = clientTask.Result.GetStream();
@@ -91,6 +92,8 @@ namespace DBS.Protocols.Enhancements
                 {
                     Core.Instance.Log.Error("EnhancedRestoreChunkProtocol: error receiving chunk");
                 }
+
+                Core.Instance.Log.Info("EnhancedRestoreChunkProtocol: chunk was received with success");
             });
         }
     }
