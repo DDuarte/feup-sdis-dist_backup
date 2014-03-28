@@ -84,8 +84,8 @@ namespace DBS.Protocols.Enhancements
                 {
                     var stream = clientTask.Result.GetStream();
                     var bytes = new byte[Core.Instance.Config.ChunkSize];
-                    stream.Read(bytes, 0, bytes.Length);
-                    Message = new ChunkMessage(_fileChunk, bytes);
+                    var bytesRead = stream.Read(bytes, 0, bytes.Length);
+                    Message = new ChunkMessage(_fileChunk, bytes.Take(bytesRead).ToArray());
                     clientTask.Result.Close();
                 }
                 catch (Exception)
