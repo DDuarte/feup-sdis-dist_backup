@@ -36,8 +36,13 @@ namespace DBS.Messages
 
         public override string ToString()
         {
-            return string.Format("{0} {1}#{2} |{3}|", MessageType,
-            FileId.ToStringSmall(), ChunkNo, Body.Length);
+            return string.Format("{0} {1} {2}#{3} |{4}|", MessageType,
+            GetVersion(), FileId.ToStringSmall(), ChunkNo, Body.Length);
+        }
+
+        public string GetVersion()
+        {
+            return string.Format("{0}.{1}", VersionM, VersionN);
         }
 
         public override byte[] Serialize()

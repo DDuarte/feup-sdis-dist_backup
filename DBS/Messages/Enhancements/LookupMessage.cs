@@ -29,7 +29,12 @@ namespace DBS.Messages.Enhancements
 
         public override string ToString()
         {
-            return string.Format("{0} {1}", MessageType, FileId.ToStringSmall());
+            return string.Format("{0} {1} {2} ", MessageType, GetVersion(), FileId.ToStringSmall());
+        }
+
+        public string GetVersion()
+        {
+            return string.Format("{0}.{1}", VersionM, VersionN);
         }
 
         public override byte[] Serialize()

@@ -39,11 +39,18 @@ namespace DBS.Messages.Enhancements
         public int ChunkNo { get; private set; }
         public int InitiatorPort { get; private set; }
         public IPAddress PassiveIP { get; private set; }
+
         public override string ToString()
         {
-            return string.Format("{0} {1}#{2} {3}:{4} [{5}]", MessageType,
+            return string.Format("{0} {1} {2}#{3} {4}:{5} [{6}]", MessageType, GetVersion(),
                 FileId.ToStringSmall(), ChunkNo, RemoteEndPoint.Address, InitiatorPort, PassiveIP);
         }
+
+        public string GetVersion()
+        {
+            return string.Format("{0}.{1}", VersionM, VersionN);
+        }
+
         public override byte[] Serialize()
         {
             using (var stream = new MemoryStream())

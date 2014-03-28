@@ -27,6 +27,7 @@ namespace DBSTests
             Assert.AreEqual(MessageType.PutChunk, msg.MessageType);
             Assert.AreEqual(1, msg.VersionM);
             Assert.AreEqual(0, msg.VersionN);
+            Assert.AreEqual("1.0", msg.GetVersion());
             Assert.AreEqual(FileId1, msg.FileId);
             Assert.AreEqual(50, msg.ChunkNo);
             Assert.AreEqual(5, msg.ReplicationDeg);
