@@ -9,6 +9,7 @@ namespace DBS.Protocols.Enhancements
         private const int MinutesTimeSpan = 1;
         public void Start()
         {
+            Core.Instance.Log.Info("Starting EnhancedSpaceReclaimingWatcher");
             Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ => CheckChunks());
         }
 

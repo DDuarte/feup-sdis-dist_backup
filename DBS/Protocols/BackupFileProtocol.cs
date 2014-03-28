@@ -18,6 +18,7 @@ namespace DBS.Protocols
 
         public Task Run()
         {
+            Core.Instance.Log.InfoFormat("Starting BackupFileProtocol: {0}", _fileEntry);
             return Task.Factory.StartNew(() =>
             {
                 using (var file = File.OpenRead(_fileEntry.OriginalFileName))

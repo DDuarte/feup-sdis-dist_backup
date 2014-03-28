@@ -39,6 +39,7 @@ namespace DBS.Protocols.Enhancements
 
         public Task Run()
         {
+            Core.Instance.Log.InfoFormat("Starting EnhancedRestoreFileProtocol: {0}", _fileEntry);
             return Task.Factory.StartNew(() =>
             {
                 try

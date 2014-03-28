@@ -87,11 +87,10 @@ namespace Peer
 
             try
             {
-                var config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
+                Core.Instance.Config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
                     backupChunkTimeoutMultiplier, backupChunkRetries, versionM, versionN,
                     randomDelayMin, randomDelayMax, backupDirectory, restoreDirectory,
                     mcIP, mcPort, mdbIP, mdbPort, mdrIP, mdrPort);
-                Core.Instance.Config = config;
             }
             catch (Exception ex)
             {

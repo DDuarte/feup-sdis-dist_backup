@@ -12,6 +12,7 @@ namespace DBS.Protocols
     {
         public void Start()
         {
+            Core.Instance.Log.Info("Starting SpaceReclaimingWatcher");
             // Create a new FileSystemWatcher and set its properties.
             var watcher = new FileSystemWatcher
             {

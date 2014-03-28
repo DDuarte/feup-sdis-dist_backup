@@ -21,6 +21,7 @@ namespace DBS.Protocols.Enhancements
 
         public Task Run()
         {
+            Core.Instance.Log.InfoFormat("Starting EnhancedRestoreChunkProtocol: {0}", _fileChunk);
             return Task.Factory.StartNew(() =>
             {
                 Core.Instance.MCChannel.Send(new GetChunkMessage(_fileChunk));

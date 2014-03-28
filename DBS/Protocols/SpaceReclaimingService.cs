@@ -14,6 +14,7 @@ namespace DBS.Protocols
     {
         public void Start()
         {
+            Core.Instance.Log.Info("Starting SpaceReclaimingService");
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.Removed)
                 .Cast<RemovedMessage>()

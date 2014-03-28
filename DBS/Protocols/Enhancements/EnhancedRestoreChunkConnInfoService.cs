@@ -26,14 +26,17 @@ namespace DBS.Protocols.Enhancements
 
         public void OnError(Exception error)
         {
+            Core.Instance.Log.Error("EnhancedRestoreChunkConnInfoService:OnError", error);
         }
 
         public void OnCompleted()
         {
+            Core.Instance.Log.Info("EnhancedRestoreChunkConnInfoService:OnCompleted");
         }
 
         public void Start()
         {
+            Core.Instance.Log.Info("Starting EnhancedRestoreChunkConnInfoService");
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == Messages.MessageType.ConnInfo)
                 .Cast<ConnInfoMessage>().Where(message => NetworkUtilities.GetLocalIPAddresses().Contains(message.PassiveIP))

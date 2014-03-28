@@ -44,6 +44,7 @@ namespace DBS.Protocols
 
         public Task Run()
         {
+            Core.Instance.Log.InfoFormat("Starting RestoreChunkSubprotocol: {0}", _fileChunk);
             return Task.Factory.StartNew(SendGetChunk);
         }
     }

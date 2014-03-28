@@ -29,6 +29,7 @@ namespace DBS.Protocols
 
         public Task Run()
         {
+            Core.Instance.Log.Info("Starting SpaceReclaimingProtocol");
             return Task.Factory.StartNew(() =>
             {
                 foreach (var fc in Core.Instance.Store

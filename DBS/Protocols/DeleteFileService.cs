@@ -12,6 +12,7 @@ namespace DBS.Protocols
     {
         public void Start()
         {
+            Core.Instance.Log.Info("Starting DeleteFileService");
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.Delete)
                 .Cast<DeleteMessage>()

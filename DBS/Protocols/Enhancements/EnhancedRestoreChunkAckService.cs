@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
@@ -35,16 +34,17 @@ namespace DBS.Protocols.Enhancements
 
         public void OnError(Exception error)
         {
-            
+            Core.Instance.Log.Error("EnhancedRestoreChunkACKService:OnError", error);
         }
 
         public void OnCompleted()
         {
-            
+            Core.Instance.Log.Info("EnhancedRestoreChunkACKService:OnCompleted");
         }
 
         public void Start()
         {
+            Core.Instance.Log.Info("Starting EnhancedRestoreChunkACKService");
             Core.Instance.MCChannel.Received
                  .Where(message => message.MessageType == MessageType.GetChunk)
                  .Cast<GetChunkMessage>()

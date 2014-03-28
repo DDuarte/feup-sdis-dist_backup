@@ -13,6 +13,7 @@ namespace DBS.Protocols
     {
         public void Start()
         {
+            Core.Instance.Log.Info("Starting RestoreChunkService");
             Core.Instance.MCChannel.Received
                 .Where(message => message.MessageType == MessageType.GetChunk)
                 .Cast<GetChunkMessage>()

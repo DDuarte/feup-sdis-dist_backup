@@ -40,6 +40,7 @@ namespace DBS.Protocols
 
         public Task Run()
         {
+            Core.Instance.Log.InfoFormat("Starting RestoreFileProtocol: {0}", _fileEntry);
             return Task.Factory.StartNew(() =>
             {
                 try

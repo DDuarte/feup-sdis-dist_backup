@@ -19,16 +19,17 @@ namespace DBS.Protocols.Enhancements
 
         public void OnError(Exception error)
         {
-
+            Core.Instance.Log.Error("LookUpService:OnError", error);
         }
 
         public void OnCompleted()
         {
-
+            Core.Instance.Log.Info("LookUpService:OnCompleted");
         }
 
         public void Start()
         {
+            Core.Instance.Log.Info("Starting LookUpService");
             Core.Instance.MCChannel.Received.Where(message =>
                 message.MessageType == MessageType.Lookup)
                 .Cast<LookupMessage>().Subscribe(this);
