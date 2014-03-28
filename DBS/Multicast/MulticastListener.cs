@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using DBS.Utilities;
 
 namespace DBS.Multicast
 {
     class MulticastListener : IMulticastListener
     {
+        private Subject<Tuple<byte[], IPEndPoint>> _subj = new Subject<Tuple<byte[], IPEndPoint>>();
+        public IObservable<Tuple<byte[], IPEndPoint>> Received { get { return _subj.AsObservable(); } }
+        private readonly Task _receiveTask;
+
         public MulticastSettings Settings { get; private set; }
 
         public bool IsBound
@@ -31,6 +39,31 @@ namespace DBS.Multicast
             Settings = settings;
 
             if (autoBindJoinConnect) BindAndJoin();
+
+            _receiveTask = new Task(StartReceiving, TaskCreationOptions.LongRunning);
+            _receiveTask.Start();
+        }
+
+        private void StartReceiving()
+        {
+            while (true)
+            {
+                byte[] data;
+                IPEndPoint ep;
+                try
+                {
+                    data = Receive(out ep);
+                }
+                catch (Exception ex)
+                {
+                    Core.Instance.Log.Error("Failed to receive on {0}:{1}".FormatWith(Settings.Address, Settings.Port), ex);
+                    continue;
+                }
+
+                if (data != null)
+                    _subj.OnNext(Tuple.Create(data, ep));
+            }
+            // ReSharper disable once FunctionNeverReturns
         }
 
         private void BindAndJoin()
@@ -88,6 +121,9 @@ namespace DBS.Multicast
 
         public void Dispose()
         {
+            _subj.OnCompleted();
+            _subj.Dispose();
+            _receiveTask.Dispose();
             if (IsBound) UnbindAndLeave();
         }
     }

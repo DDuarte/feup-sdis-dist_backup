@@ -2,10 +2,8 @@
 using System.Net;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Multicast;
-using DBS.Utilities;
 
 namespace DBS
 {
@@ -13,30 +11,8 @@ namespace DBS
     {
         public string Name { get; set; }
 
-        private void StartReceiving()
-        {
-            while (true)
-            {
-                Message msg;
-                try
-                {
-                    msg = Receive();
-                }
-                catch (Exception ex)
-                {
-                    Core.Instance.Log.Error("Failed to receive a message on channel {0}".FormatWith(Name), ex);
-                    continue;
-                }
-
-                Core.Instance.Log.CustomFormat("receive", "R[{0}]: {1} from {2}", Name.PadLeft(3), msg, msg.RemoteEndPoint);
-                _subject.OnNext(msg);
-            }
-// ReSharper disable once FunctionNeverReturns
-        }
-
         private readonly IMulticastListener _listener;
         private readonly IMulticastBroadcaster _broadcaster;
-        private readonly Task _receiveTask;
 
         private readonly Subject<Message> _subject;
 
@@ -51,8 +27,22 @@ namespace DBS
 
             _subject = new Subject<Message>();
 
-            _receiveTask = new Task(StartReceiving, TaskCreationOptions.LongRunning);
-            _receiveTask.Start();
+            ((MulticastListener) _listener).Received.Subscribe(OnReceive);
+        }
+
+        private void OnReceive(Tuple<byte[], IPEndPoint> tuple)
+        {
+            try
+            {
+                var msg = Message.Deserialize(tuple.Item1);
+                msg.RemoteEndPoint = tuple.Item2;
+                Core.Instance.Log.CustomFormat("receive", "R[{0}]: {1} from {2}", Name.PadLeft(3), msg, msg.RemoteEndPoint);
+                _subject.OnNext(msg);
+            }
+            catch (Exception ex)
+            {
+                Core.Instance.Log.Error("Failed on deserialization", ex);
+            }
         }
 
         public void Send(Message msg)
@@ -61,18 +51,9 @@ namespace DBS
             Core.Instance.Log.CustomFormat("send", "S[{0}]: {1}", Name.PadLeft(3), msg);
         }
 
-        private Message Receive()
-        {
-            IPEndPoint ep;
-            var msg = Message.Deserialize(_listener.Receive(out ep));
-            msg.RemoteEndPoint = ep;
-            return msg;
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing) return;
-            _receiveTask.Dispose();
             _broadcaster.Dispose();
             _listener.Dispose();
 
