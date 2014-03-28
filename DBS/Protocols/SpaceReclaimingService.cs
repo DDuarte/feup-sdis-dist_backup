@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Persistence;
 
@@ -43,7 +44,7 @@ namespace DBS.Protocols
                             message.FileId == fileChunk.FileId)
                         .Subscribe(_ => putChunkReceived = true);
 
-                    Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
+                    Task.Delay(Core.Instance.RandomDelay).Wait(); // random delay uniformly distributed
 
                     if (!putChunkReceived)
                         new BackupChunkSubprotocol(fileChunk, rd.WantedDegree, fileChunk.GetData()).Run();

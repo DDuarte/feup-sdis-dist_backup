@@ -51,6 +51,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.allTabPage = new System.Windows.Forms.TabPage();
             this.allLogTextBox = new System.Windows.Forms.TextBox();
+            this.transmittedTabPage = new System.Windows.Forms.TabPage();
+            this.transmittedTextBox = new System.Windows.Forms.TextBox();
             this.receivedTabPage = new System.Windows.Forms.TabPage();
             this.receivedLogTextBox = new System.Windows.Forms.TextBox();
             this.sentTabPage = new System.Windows.Forms.TabPage();
@@ -59,8 +61,7 @@
             this.errorsLogTextBox = new System.Windows.Forms.TextBox();
             this.infoTabPage = new System.Windows.Forms.TabPage();
             this.infoLogTextBox = new System.Windows.Forms.TextBox();
-            this.transmittedTabPage = new System.Windows.Forms.TabPage();
-            this.transmittedTextBox = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -70,11 +71,12 @@
             this.tableLayoutPanel3.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.allTabPage.SuspendLayout();
+            this.transmittedTabPage.SuspendLayout();
             this.receivedTabPage.SuspendLayout();
             this.sentTabPage.SuspendLayout();
             this.errorsTabPage.SuspendLayout();
             this.infoTabPage.SuspendLayout();
-            this.transmittedTabPage.SuspendLayout();
+            this.tableLayoutPanel6.SuspendLayout();
             this.SuspendLayout();
             // 
             // backupButton
@@ -210,7 +212,7 @@
             this.filesGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesGroupBox.Location = new System.Drawing.Point(3, 3);
             this.filesGroupBox.Name = "filesGroupBox";
-            this.filesGroupBox.Size = new System.Drawing.Size(168, 391);
+            this.filesGroupBox.Size = new System.Drawing.Size(162, 189);
             this.filesGroupBox.TabIndex = 6;
             this.filesGroupBox.TabStop = false;
             this.filesGroupBox.Text = "Files";
@@ -225,7 +227,7 @@
             this.filesListView.Location = new System.Drawing.Point(3, 16);
             this.filesListView.MultiSelect = false;
             this.filesListView.Name = "filesListView";
-            this.filesListView.Size = new System.Drawing.Size(162, 328);
+            this.filesListView.Size = new System.Drawing.Size(156, 126);
             this.filesListView.TabIndex = 1;
             this.filesListView.UseCompatibleStateImageBehavior = false;
             this.filesListView.View = System.Windows.Forms.View.Details;
@@ -253,11 +255,11 @@
             this.tableLayoutPanel1.Controls.Add(this.addFileButton, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.removeFileButton, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 344);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 142);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(162, 44);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(156, 44);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // addFileButton
@@ -265,7 +267,7 @@
             this.addFileButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.addFileButton.Location = new System.Drawing.Point(3, 3);
             this.addFileButton.Name = "addFileButton";
-            this.addFileButton.Size = new System.Drawing.Size(75, 38);
+            this.addFileButton.Size = new System.Drawing.Size(72, 38);
             this.addFileButton.TabIndex = 7;
             this.addFileButton.Text = "Add File";
             this.addFileButton.UseVisualStyleBackColor = true;
@@ -274,9 +276,9 @@
             // removeFileButton
             // 
             this.removeFileButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.removeFileButton.Location = new System.Drawing.Point(84, 3);
+            this.removeFileButton.Location = new System.Drawing.Point(81, 3);
             this.removeFileButton.Name = "removeFileButton";
-            this.removeFileButton.Size = new System.Drawing.Size(75, 38);
+            this.removeFileButton.Size = new System.Drawing.Size(72, 38);
             this.removeFileButton.TabIndex = 8;
             this.removeFileButton.Text = "Remove File";
             this.removeFileButton.UseVisualStyleBackColor = true;
@@ -288,7 +290,7 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75F));
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.filesGroupBox, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel6, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -349,6 +351,28 @@
             this.allLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.allLogTextBox.Size = new System.Drawing.Size(502, 164);
             this.allLogTextBox.TabIndex = 4;
+            // 
+            // transmittedTabPage
+            // 
+            this.transmittedTabPage.Controls.Add(this.transmittedTextBox);
+            this.transmittedTabPage.Location = new System.Drawing.Point(4, 22);
+            this.transmittedTabPage.Name = "transmittedTabPage";
+            this.transmittedTabPage.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTabPage.TabIndex = 7;
+            this.transmittedTabPage.Text = "Transmitted";
+            this.transmittedTabPage.UseVisualStyleBackColor = true;
+            // 
+            // transmittedTextBox
+            // 
+            this.transmittedTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.transmittedTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.transmittedTextBox.Location = new System.Drawing.Point(0, 0);
+            this.transmittedTextBox.Multiline = true;
+            this.transmittedTextBox.Name = "transmittedTextBox";
+            this.transmittedTextBox.ReadOnly = true;
+            this.transmittedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.transmittedTextBox.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTextBox.TabIndex = 6;
             // 
             // receivedTabPage
             // 
@@ -438,27 +462,19 @@
             this.infoLogTextBox.Size = new System.Drawing.Size(502, 164);
             this.infoLogTextBox.TabIndex = 5;
             // 
-            // transmittedTabPage
+            // tableLayoutPanel6
             // 
-            this.transmittedTabPage.Controls.Add(this.transmittedTextBox);
-            this.transmittedTabPage.Location = new System.Drawing.Point(4, 22);
-            this.transmittedTabPage.Name = "transmittedTabPage";
-            this.transmittedTabPage.Size = new System.Drawing.Size(502, 164);
-            this.transmittedTabPage.TabIndex = 7;
-            this.transmittedTabPage.Text = "Transmitted";
-            this.transmittedTabPage.UseVisualStyleBackColor = true;
-            // 
-            // transmittedTextBox
-            // 
-            this.transmittedTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.transmittedTextBox.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.transmittedTextBox.Location = new System.Drawing.Point(0, 0);
-            this.transmittedTextBox.Multiline = true;
-            this.transmittedTextBox.Name = "transmittedTextBox";
-            this.transmittedTextBox.ReadOnly = true;
-            this.transmittedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.transmittedTextBox.Size = new System.Drawing.Size(502, 164);
-            this.transmittedTextBox.TabIndex = 6;
+            this.tableLayoutPanel6.ColumnCount = 1;
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel6.Controls.Add(this.filesGroupBox, 0, 0);
+            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
+            this.tableLayoutPanel6.RowCount = 2;
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(168, 391);
+            this.tableLayoutPanel6.TabIndex = 8;
             // 
             // Form1
             // 
@@ -478,6 +494,8 @@
             this.tabControl1.ResumeLayout(false);
             this.allTabPage.ResumeLayout(false);
             this.allTabPage.PerformLayout();
+            this.transmittedTabPage.ResumeLayout(false);
+            this.transmittedTabPage.PerformLayout();
             this.receivedTabPage.ResumeLayout(false);
             this.receivedTabPage.PerformLayout();
             this.sentTabPage.ResumeLayout(false);
@@ -486,8 +504,7 @@
             this.errorsTabPage.PerformLayout();
             this.infoTabPage.ResumeLayout(false);
             this.infoTabPage.PerformLayout();
-            this.transmittedTabPage.ResumeLayout(false);
-            this.transmittedTabPage.PerformLayout();
+            this.tableLayoutPanel6.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -527,6 +544,7 @@
         private System.Windows.Forms.TabPage allTabPage;
         private System.Windows.Forms.TabPage transmittedTabPage;
         private System.Windows.Forms.TextBox transmittedTextBox;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
     }
 }
 

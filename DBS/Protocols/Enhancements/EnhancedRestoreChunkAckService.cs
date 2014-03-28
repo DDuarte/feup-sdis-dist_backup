@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
 
@@ -22,7 +23,7 @@ namespace DBS.Protocols.Enhancements
                     message.FileId == msg.FileId)
                 .Subscribe(_ => ackReceived = true);
 
-            Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
+            Task.Delay(Core.Instance.RandomDelay).Wait(); // random delay uniformly distributed
             disposable.Dispose();
 
             if (!ackReceived)

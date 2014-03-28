@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="Log.cs" />
+    <Compile Include="ObservableLog.cs" />
     <Compile Include="Messages\ChunkMessage.cs" />
     <Compile Include="Messages\DeleteMessage.cs" />
     <Compile Include="Messages\Enhancements\ACKMessage.cs" />

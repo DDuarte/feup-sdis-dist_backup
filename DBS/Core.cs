@@ -95,12 +95,12 @@ namespace DBS
             Store = new PersistentStore();
             Rnd = new Random();
             BackupFiles = new HashSet<FileEntry>(new FileEntry.Comparer());
-            Log = new Log();
+            Log = new ObservableLog();
         }
 
         public PersistentStore Store { get; private set; }
         private Random Rnd { get; set; }
-        public Log Log { get; private set; }
+        public ObservableLog Log { get; private set; }
 
         public Channel MCChannel { get; private set; }
         public Channel MDBChannel { get; private set; }

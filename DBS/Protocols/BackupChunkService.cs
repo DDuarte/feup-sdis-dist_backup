@@ -1,6 +1,7 @@
 using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DBS.Messages;
 using Util = DBS.Utilities.Utilities;
 
@@ -34,7 +35,7 @@ namespace DBS.Protocols
             {
                 Core.Instance.Log.InfoFormat(
                     "BackupChunkService:OnNext: Got no space to store {0}, trying to evict some other chunks", fileChunk);
-                new SpaceReclaimingProtocol().Run();
+                new SpaceReclaimingProtocol().Run().Wait();
 
                 dirSize = Util.GetDirectorySize(Core.Instance.Config.BackupDirectory);
                 if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)
@@ -56,7 +57,7 @@ namespace DBS.Protocols
             }
             // otherwise file is already created: send Stored but do not increment degrees
 
-            Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
+            Task.Delay(Core.Instance.RandomDelay).Wait();
             Core.Instance.MCChannel.Send(new StoredMessage(fileChunk));
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using DBS.Messages;
 
 namespace DBS.Protocols
@@ -48,7 +49,7 @@ namespace DBS.Protocols
                         message.FileId == msg.FileId)
                     .Subscribe(_ => chunkReceived = true);
 
-                Thread.Sleep(Core.Instance.RandomDelay); // random delay uniformly distributed
+                Task.Delay(Core.Instance.RandomDelay).Wait();
                 disposable.Dispose();
 
                 if (!chunkReceived)

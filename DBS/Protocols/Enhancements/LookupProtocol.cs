@@ -47,7 +47,7 @@ namespace DBS.Protocols.Enhancements
                 });
 
                 // wait
-                Thread.Sleep(WaitPeriod);
+                Task.Delay(WaitPeriod).Wait();
 
                 foreach (var subscription in subscriptions)
                     subscription.Dispose();

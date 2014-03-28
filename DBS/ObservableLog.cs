@@ -8,7 +8,7 @@ using DBS.Utilities;
 
 namespace DBS
 {
-    public interface ILog : IObservable<string>, IDisposable
+    public interface ILog : IDisposable
     {
         void Error(string msg, Exception ex);
         void ErrorFormat(string format, params object[] args);
@@ -16,11 +16,12 @@ namespace DBS
         void Info(string msg, Exception ex);
         void InfoFormat(string format, params object[] args);
         void Info(string msg);
-        void Custom(string t, string msg);
+        void Custom(string t, string msg, Exception ex);
         void CustomFormat(string t, string format, params object[] args);
+        void Custom(string t, string msg);
     }
 
-    public class Log : ILog
+    public class ObservableLog : IObservable<string>
     {
         private readonly Subject<string> _infoSubj = new Subject<string>();
         private readonly Subject<string> _errorSubj = new Subject<string>();
@@ -56,7 +57,7 @@ namespace DBS
 
         public void Info(string msg, Exception ex)
         {
-            Error(msg + " - " + ex);
+            Info(msg + " - " + ex);
         }
 
         public void InfoFormat(string format, params object[] args)
@@ -69,6 +70,11 @@ namespace DBS
             var date = DateTime.UtcNow.ToLongTimeString();
             var log = "I" + date + ": " + msg;
             _infoSubj.OnNext(log);
+        }
+
+        public void Custom(string t, string msg, Exception ex)
+        {
+            Custom(t, msg + " - " + ex);
         }
 
         public void Custom(string t, string msg)

@@ -48,7 +48,7 @@ namespace DBS.Protocols
                 var msg = new PutChunkMessage(_fileChunk, _replicationDegree, _data);
                 Core.Instance.MDBChannel.Send(msg);
 
-                Thread.Sleep(timeout);
+                Task.Delay(timeout).Wait();
 
                 if (_count >= _replicationDegree)
                     break;
