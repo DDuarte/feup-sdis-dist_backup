@@ -25,6 +25,8 @@ namespace DBS.Protocols
             if (!Directory.Exists(dir))
                 return;
 
+            Core.Instance.BackupFiles.RemoveWhere(entry => entry.FileId == msg.FileId);
+
             var fileIdStr = msg.FileId.ToString();
 
             // Possible idea: store all chunks of the same file in a directory (name = FileId) and do Directory.Delete(dir, true);
