@@ -62,6 +62,7 @@
             this.infoTabPage = new System.Windows.Forms.TabPage();
             this.infoLogTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.enhanCheckBox = new System.Windows.Forms.CheckBox();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -85,7 +86,7 @@
             this.backupButton.Enabled = false;
             this.backupButton.Location = new System.Drawing.Point(3, 3);
             this.backupButton.Name = "backupButton";
-            this.backupButton.Size = new System.Drawing.Size(498, 28);
+            this.backupButton.Size = new System.Drawing.Size(498, 29);
             this.backupButton.TabIndex = 0;
             this.backupButton.Text = "Backup File";
             this.backupButton.UseVisualStyleBackColor = true;
@@ -96,9 +97,9 @@
             this.restoreButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.restoreButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.restoreButton.Enabled = false;
-            this.restoreButton.Location = new System.Drawing.Point(3, 37);
+            this.restoreButton.Location = new System.Drawing.Point(3, 38);
             this.restoreButton.Name = "restoreButton";
-            this.restoreButton.Size = new System.Drawing.Size(498, 28);
+            this.restoreButton.Size = new System.Drawing.Size(498, 29);
             this.restoreButton.TabIndex = 1;
             this.restoreButton.Text = "Restore File";
             this.restoreButton.UseVisualStyleBackColor = true;
@@ -108,9 +109,9 @@
             // 
             this.deleteButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.deleteButton.Enabled = false;
-            this.deleteButton.Location = new System.Drawing.Point(3, 71);
+            this.deleteButton.Location = new System.Drawing.Point(3, 73);
             this.deleteButton.Name = "deleteButton";
-            this.deleteButton.Size = new System.Drawing.Size(498, 28);
+            this.deleteButton.Size = new System.Drawing.Size(498, 29);
             this.deleteButton.TabIndex = 2;
             this.deleteButton.Text = "Delete File";
             this.deleteButton.UseVisualStyleBackColor = true;
@@ -119,9 +120,9 @@
             // reclaimButton
             // 
             this.reclaimButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.reclaimButton.Location = new System.Drawing.Point(3, 139);
+            this.reclaimButton.Location = new System.Drawing.Point(3, 143);
             this.reclaimButton.Name = "reclaimButton";
-            this.reclaimButton.Size = new System.Drawing.Size(498, 28);
+            this.reclaimButton.Size = new System.Drawing.Size(498, 32);
             this.reclaimButton.TabIndex = 3;
             this.reclaimButton.Text = "Reclaim Space";
             this.reclaimButton.UseVisualStyleBackColor = true;
@@ -133,7 +134,7 @@
             this.actionsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.actionsGroupBox.Location = new System.Drawing.Point(3, 3);
             this.actionsGroupBox.Name = "actionsGroupBox";
-            this.actionsGroupBox.Size = new System.Drawing.Size(510, 189);
+            this.actionsGroupBox.Size = new System.Drawing.Size(510, 197);
             this.actionsGroupBox.TabIndex = 4;
             this.actionsGroupBox.TabStop = false;
             this.actionsGroupBox.Text = "Actions";
@@ -156,7 +157,7 @@
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(504, 170);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(504, 178);
             this.tableLayoutPanel4.TabIndex = 0;
             // 
             // tableLayoutPanel5
@@ -167,12 +168,12 @@
             this.tableLayoutPanel5.Controls.Add(this.incDegreeButton, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.decDegreeButton, 1, 0);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 105);
+            this.tableLayoutPanel5.Location = new System.Drawing.Point(3, 108);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(498, 28);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(498, 29);
             this.tableLayoutPanel5.TabIndex = 3;
             // 
             // incDegreeButton
@@ -182,7 +183,7 @@
             this.incDegreeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.incDegreeButton.Location = new System.Drawing.Point(3, 3);
             this.incDegreeButton.Name = "incDegreeButton";
-            this.incDegreeButton.Size = new System.Drawing.Size(243, 22);
+            this.incDegreeButton.Size = new System.Drawing.Size(243, 23);
             this.incDegreeButton.TabIndex = 0;
             this.incDegreeButton.Text = "+ Replication Degree";
             this.incDegreeButton.UseVisualStyleBackColor = true;
@@ -194,7 +195,7 @@
             this.decDegreeButton.Enabled = false;
             this.decDegreeButton.Location = new System.Drawing.Point(252, 3);
             this.decDegreeButton.Name = "decDegreeButton";
-            this.decDegreeButton.Size = new System.Drawing.Size(243, 22);
+            this.decDegreeButton.Size = new System.Drawing.Size(243, 23);
             this.decDegreeButton.TabIndex = 1;
             this.decDegreeButton.Text = "- Replication Degree";
             this.decDegreeButton.UseVisualStyleBackColor = true;
@@ -212,7 +213,7 @@
             this.filesGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesGroupBox.Location = new System.Drawing.Point(3, 3);
             this.filesGroupBox.Name = "filesGroupBox";
-            this.filesGroupBox.Size = new System.Drawing.Size(162, 189);
+            this.filesGroupBox.Size = new System.Drawing.Size(162, 197);
             this.filesGroupBox.TabIndex = 6;
             this.filesGroupBox.TabStop = false;
             this.filesGroupBox.Text = "Files";
@@ -227,7 +228,7 @@
             this.filesListView.Location = new System.Drawing.Point(3, 16);
             this.filesListView.MultiSelect = false;
             this.filesListView.Name = "filesListView";
-            this.filesListView.Size = new System.Drawing.Size(156, 126);
+            this.filesListView.Size = new System.Drawing.Size(156, 134);
             this.filesListView.TabIndex = 1;
             this.filesListView.UseCompatibleStateImageBehavior = false;
             this.filesListView.View = System.Windows.Forms.View.Details;
@@ -255,7 +256,7 @@
             this.tableLayoutPanel1.Controls.Add(this.addFileButton, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.removeFileButton, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 142);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 150);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -296,7 +297,7 @@
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(696, 397);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(696, 413);
             this.tableLayoutPanel2.TabIndex = 7;
             // 
             // tableLayoutPanel3
@@ -312,7 +313,7 @@
             this.tableLayoutPanel3.RowCount = 2;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(516, 391);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(516, 407);
             this.tableLayoutPanel3.TabIndex = 7;
             // 
             // tabControl1
@@ -324,10 +325,10 @@
             this.tabControl1.Controls.Add(this.errorsTabPage);
             this.tabControl1.Controls.Add(this.infoTabPage);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(3, 198);
+            this.tabControl1.Location = new System.Drawing.Point(3, 206);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(510, 190);
+            this.tabControl1.Size = new System.Drawing.Size(510, 198);
             this.tabControl1.TabIndex = 5;
             // 
             // allTabPage
@@ -335,7 +336,7 @@
             this.allTabPage.Controls.Add(this.allLogTextBox);
             this.allTabPage.Location = new System.Drawing.Point(4, 22);
             this.allTabPage.Name = "allTabPage";
-            this.allTabPage.Size = new System.Drawing.Size(502, 164);
+            this.allTabPage.Size = new System.Drawing.Size(502, 172);
             this.allTabPage.TabIndex = 6;
             this.allTabPage.Text = "All";
             this.allTabPage.UseVisualStyleBackColor = true;
@@ -349,7 +350,7 @@
             this.allLogTextBox.Name = "allLogTextBox";
             this.allLogTextBox.ReadOnly = true;
             this.allLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.allLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.allLogTextBox.Size = new System.Drawing.Size(502, 172);
             this.allLogTextBox.TabIndex = 4;
             // 
             // transmittedTabPage
@@ -467,20 +468,31 @@
             this.tableLayoutPanel6.ColumnCount = 1;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel6.Controls.Add(this.filesGroupBox, 0, 0);
+            this.tableLayoutPanel6.Controls.Add(this.enhanCheckBox, 0, 1);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 2;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(168, 391);
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(168, 407);
             this.tableLayoutPanel6.TabIndex = 8;
+            // 
+            // enhanCheckBox
+            // 
+            this.enhanCheckBox.AutoSize = true;
+            this.enhanCheckBox.Location = new System.Drawing.Point(3, 206);
+            this.enhanCheckBox.Name = "enhanCheckBox";
+            this.enhanCheckBox.Size = new System.Drawing.Size(97, 17);
+            this.enhanCheckBox.TabIndex = 7;
+            this.enhanCheckBox.Text = "Enhancements";
+            this.enhanCheckBox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(696, 397);
+            this.ClientSize = new System.Drawing.Size(696, 413);
             this.Controls.Add(this.tableLayoutPanel2);
             this.Name = "Form1";
             this.Text = "Distributed Backup Service";
@@ -505,6 +517,7 @@
             this.infoTabPage.ResumeLayout(false);
             this.infoTabPage.PerformLayout();
             this.tableLayoutPanel6.ResumeLayout(false);
+            this.tableLayoutPanel6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -545,6 +558,7 @@
         private System.Windows.Forms.TabPage transmittedTabPage;
         private System.Windows.Forms.TextBox transmittedTextBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.CheckBox enhanCheckBox;
     }
 }
 

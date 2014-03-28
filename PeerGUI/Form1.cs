@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using DBS;
@@ -15,7 +14,7 @@ namespace PeerGUI
     {
         private readonly CommandSwitch _commandSwitch = new CommandSwitch();
 
-        private static void AppendTextBox(TextBox tb, string s)
+        private static void AppendTextBox(TextBoxBase tb, string s)
         {
             tb.AppendText(s + Environment.NewLine);
         }
@@ -84,10 +83,9 @@ namespace PeerGUI
 
             try
             {
-                var config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
+                Core.Instance.Config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
                     backupChunkTimeoutMultiplier, backupChunkRetries, versionM, versionN,
                     randomDelayMin, randomDelayMax, backupDirectory, restoreDirectory);
-                Core.Instance.Config = config;
             }
             catch (Exception ex)
             {
@@ -225,7 +223,7 @@ namespace PeerGUI
             if (files.Count != 1)
                 return;
 
-            _commandSwitch.Execute(new RestoreFileCommand(files[0], true));
+            _commandSwitch.Execute(new RestoreFileCommand(files[0], enhanCheckBox.Checked));
             filesListView.SelectedItems[0].SubItems[2].Text = RESTORED;
         }
 
