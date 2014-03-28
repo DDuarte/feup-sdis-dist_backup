@@ -8,13 +8,16 @@ using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols
 {
-    class SpaceReclaimingWatcher
+    class SpaceReclaimingWatcher : IService
     {
+        private FileSystemWatcher _watcher;
+        private IDisposable _watcherCreatedSubs;
+
         public void Start()
         {
             Core.Instance.Log.Info("Starting SpaceReclaimingWatcher");
             // Create a new FileSystemWatcher and set its properties.
-            var watcher = new FileSystemWatcher
+            _watcher = new FileSystemWatcher
             {
                 Path = Core.Instance.Config.BackupDirectory,
                 Filter = "*_*",
@@ -22,8 +25,20 @@ namespace DBS.Protocols
                 EnableRaisingEvents = true
             };
 
-            var watcherCreated = Observable.FromEventPattern<FileSystemEventArgs>(watcher, "Created");
-            watcherCreated.Subscribe(OnCreated);
+            var watcherCreated = Observable.FromEventPattern<FileSystemEventArgs>(_watcher, "Created");
+            _watcherCreatedSubs = watcherCreated.Subscribe(OnCreated);
+        }
+
+        public void Stop()
+        {
+            if (_watcherCreatedSubs != null)
+                _watcherCreatedSubs.Dispose();
+
+            if (_watcher != null)
+            {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Dispose();
+            }
         }
 
         private void OnCreated(EventPattern<FileSystemEventArgs> pattern)

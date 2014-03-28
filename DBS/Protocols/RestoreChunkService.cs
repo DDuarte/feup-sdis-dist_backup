@@ -9,7 +9,7 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to GETCHUNK messages on MC
     /// </summary>
-    class RestoreChunkService : IService<GetChunkMessage>
+    class RestoreChunkService : IServiceObserver<GetChunkMessage>
     {
         public void Start()
         {

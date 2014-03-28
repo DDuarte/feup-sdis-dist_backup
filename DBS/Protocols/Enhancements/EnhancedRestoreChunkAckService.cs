@@ -6,7 +6,7 @@ using DBS.Messages.Enhancements;
 
 namespace DBS.Protocols.Enhancements
 {
-    class EnhancedRestoreChunkACKService : IService<GetChunkMessage>
+    class EnhancedRestoreChunkACKService : IServiceObserver<GetChunkMessage>
     {
         public void OnNext(GetChunkMessage msg)
         {

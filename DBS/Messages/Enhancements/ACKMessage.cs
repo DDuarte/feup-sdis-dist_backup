@@ -33,8 +33,8 @@ namespace DBS.Messages.Enhancements
 
         public override string ToString()
         {
-            return string.Format("{0} {1} {2}#{3} {4}", MessageType, GetVersion(),
-                FileId.ToStringSmall(), ChunkNo, RemoteEndPoint.Address);
+            return string.Format("{0} {1} {2}#{3}", MessageType, GetVersion(),
+                FileId.ToStringSmall(), ChunkNo);
         }
 
         public string GetVersion()

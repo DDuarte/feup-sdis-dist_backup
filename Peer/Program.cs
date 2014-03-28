@@ -99,6 +99,8 @@ namespace Peer
             }
 
             Core.Instance.Log.Subscribe(Console.WriteLine);
+
+            Core.Instance.Start(false);
             Core.Instance.Start();
         }
 

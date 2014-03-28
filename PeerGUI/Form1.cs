@@ -155,22 +155,22 @@ namespace PeerGUI
                 if (e.Item.SubItems[2].Text == BACKED_UP)
                 {
                     backupButton.Enabled = false;
-                    restoreButton.Enabled = true;
-                    deleteButton.Enabled = true;
+                    restoreButton.Enabled = _servicesStarted;
+                    deleteButton.Enabled = _servicesStarted;
                     incDegreeButton.Enabled = false;
                     decDegreeButton.Enabled = false;
                 }
                 else if (e.Item.SubItems[2].Text == RESTORED)
                 {
                     backupButton.Enabled = false;
-                    restoreButton.Enabled = true;
-                    deleteButton.Enabled = true;
+                    restoreButton.Enabled = _servicesStarted;
+                    deleteButton.Enabled = _servicesStarted;
                     incDegreeButton.Enabled = false;
                     decDegreeButton.Enabled = false;
                 }
                 else if (e.Item.SubItems[2].Text == NOT_BACKED_UP)
                 {
-                    backupButton.Enabled = true;
+                    backupButton.Enabled = _servicesStarted;
                     restoreButton.Enabled = false;
                     deleteButton.Enabled = false;
                     incDegreeButton.Enabled = true;
@@ -211,8 +211,8 @@ namespace PeerGUI
                 return;
 
             backupButton.Enabled = false;
-            restoreButton.Enabled = true;
-            deleteButton.Enabled = true;
+            restoreButton.Enabled = _servicesStarted;
+            deleteButton.Enabled = _servicesStarted;
             incDegreeButton.Enabled = false;
             decDegreeButton.Enabled = false;
 
@@ -262,7 +262,7 @@ namespace PeerGUI
             _commandSwitch.Execute(new DeleteFileCommand(files[0]));
             filesListView.SelectedItems[0].SubItems[2].Text = NOT_BACKED_UP;
 
-            backupButton.Enabled = true;
+            backupButton.Enabled = _servicesStarted;
             restoreButton.Enabled = false;
             deleteButton.Enabled = false;
             incDegreeButton.Enabled = true;
@@ -276,6 +276,35 @@ namespace PeerGUI
         private void reclaimButton_Click(object sender, EventArgs e)
         {
             _commandSwitch.Execute(new SpaceReclaimingCommand());
+        }
+
+        private bool _servicesStarted;
+
+        private void startServicesButton_Click(object sender, EventArgs e)
+        {
+            var useEnhanced = enhanCheckBox.Checked;
+            Core.Instance.StartServices(useEnhanced);
+            _servicesStarted = true;
+            startServicesButton.Enabled = false;
+            stopServicesButton.Enabled = true;
+        }
+
+        private void stopServicesButton_Click(object sender, EventArgs e)
+        {
+            Core.Instance.StopServices();
+            _servicesStarted = false;
+            startServicesButton.Enabled = true;
+            stopServicesButton.Enabled = false;
+        }
+
+        private void clearLogsButton_Click(object sender, EventArgs e)
+        {
+            allLogTextBox.Clear();
+            transmittedTextBox.Clear();
+            receivedLogTextBox.Clear();
+            sentLogTextBox.Clear();
+            errorsLogTextBox.Clear();
+            infoLogTextBox.Clear();
         }
     }
 }

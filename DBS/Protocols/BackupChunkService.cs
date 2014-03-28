@@ -10,7 +10,7 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to PUTCHUNK messages on MDB
     /// </summary>
-    public class BackupChunkService : IService<PutChunkMessage>
+    public class BackupChunkService : IServiceObserver<PutChunkMessage>
     {
         public void Start()
         {

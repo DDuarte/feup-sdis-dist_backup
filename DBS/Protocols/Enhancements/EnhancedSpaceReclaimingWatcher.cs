@@ -4,13 +4,21 @@ using System.Reactive.Linq;
 
 namespace DBS.Protocols.Enhancements
 {
-    class EnhancedSpaceReclaimingWatcher
+    class EnhancedSpaceReclaimingWatcher : IService
     {
         private const int MinutesTimeSpan = 1;
+        private IDisposable _intervalSubs;
+
         public void Start()
         {
             Core.Instance.Log.Info("Starting EnhancedSpaceReclaimingWatcher");
-            Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ => CheckChunks());
+            _intervalSubs = Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ => CheckChunks());
+        }
+
+        public void Stop()
+        {
+            if (_intervalSubs != null)
+                _intervalSubs.Dispose();
         }
 
         private static void CheckChunks()
@@ -21,6 +29,14 @@ namespace DBS.Protocols.Enhancements
                 try
                 {
                     var fileChunk = new FileChunk(chunk1.Key);
+                    if (!fileChunk.Exists())
+                    {
+                        Core.Instance.Log.ErrorFormat(
+                                "EnhancedSpaceReclaimingWatcher: Could not start BackupChunkProtocol" +
+                                " for {0} because it no longer exists here.", fileChunk);
+                        continue;
+                    }
+
                     new BackupChunkSubprotocol(fileChunk, chunk1.Value.WantedDegree, fileChunk.GetData()).Run().Wait();
                 }
                 catch (Exception ex)

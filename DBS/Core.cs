@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using DBS.Persistence;
 using DBS.Protocols;
+using DBS.Protocols.Enhancements;
 using DBS.Utilities;
 
 namespace DBS
@@ -96,6 +97,7 @@ namespace DBS
             Rnd = new Random();
             BackupFiles = new HashSet<FileEntry>(new FileEntry.Comparer());
             Log = new ObservableLog();
+            RunningServices = new List<IService>();
         }
 
         public PersistentStore Store { get; private set; }
@@ -167,17 +169,6 @@ namespace DBS
         {
             if (_config == null)
                 throw new Exception("Called Start() without setting config.");
-
-            new BackupChunkService().Start(); // 3.2 Chunk backup subprotocol
-            new RestoreChunkService().Start(); // 3.3 Chunk restore protocol
-            new DeleteFileService().Start(); // 3.4 File deletion subprotocol
-            new SpaceReclaimingService().Start(); // 3.5 Space reclaiming subprotocol
-            //new SpaceReclaimingWatcher().Start();
-
-            foreach (var backupFile in BackupFiles)
-            {
-                new BackupFileProtocol(backupFile).Run();
-            }
 
             if (!console)
                 return;
@@ -291,6 +282,47 @@ namespace DBS
                         break;
                 }
             }
+        }
+
+        private List<IService> RunningServices { get; set; }
+
+        public void StartServices(bool enhanced)
+        {
+            if (enhanced)
+            {
+                RunningServices.AddRange(new IService[]
+                {
+                    new BackupChunkService(), // 3.2 Chunk backup subprotocol
+                    new EnhancedRestoreChunkACKService(), // 3.3 Chunk ENH restore protocol
+                    new EnhancedRestoreChunkConnInfoService(), // 3.3 Chunk ENH restore protocol
+                    new DeleteFileService(), // 3.4 File deletion subprotocol
+                    //new EnhancedSpaceReclaimingWatcher()
+                });
+            }
+            else
+            {
+                RunningServices.AddRange(new IService[]
+                {
+                    new BackupChunkService(), // 3.2 Chunk backup subprotocol
+                    new RestoreChunkService(), // 3.3 Chunk restore protocol
+                    new DeleteFileService(), // 3.4 File deletion subprotocol
+                    new SpaceReclaimingService(), // 3.5 Space reclaiming subprotocol
+                    //new SpaceReclaimingWatcher()
+                });
+            }
+
+            foreach (var runningService in RunningServices)
+                runningService.Start();
+
+            foreach (var backupFile in BackupFiles)
+                new BackupFileProtocol(backupFile).Run();
+        }
+
+        public void StopServices()
+        {
+            foreach (var runningService in RunningServices)
+                runningService.Stop();
+            RunningServices.Clear();
         }
 
         private FileEntry ConsoleGetFileEntry(string fileName)

@@ -7,7 +7,7 @@ using DBS.Utilities;
 
 namespace DBS.Protocols.Enhancements
 {
-    class EnhancedRestoreChunkConnInfoService : IService<ConnInfoMessage>
+    class EnhancedRestoreChunkConnInfoService : IServiceObserver<ConnInfoMessage>
     {
         public void OnNext(ConnInfoMessage msg)
         {

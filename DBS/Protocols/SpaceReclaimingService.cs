@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Persistence;
@@ -10,7 +9,7 @@ namespace DBS.Protocols
     /// <summary>
     /// Listens to REMOVED messages on MC
     /// </summary>
-    public class SpaceReclaimingService : IService<RemovedMessage>
+    public class SpaceReclaimingService : IServiceObserver<RemovedMessage>
     {
         public void Start()
         {

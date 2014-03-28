@@ -6,7 +6,7 @@ using DBS.Messages.Enhancements;
 
 namespace DBS.Protocols.Enhancements
 {
-    class LookUpService : IService<LookupMessage>
+    class LookUpService : IServiceObserver<LookupMessage>
     {
         public void OnNext(LookupMessage msg)
         {

@@ -43,6 +43,7 @@
             this.fileHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.backupDegreeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.chunksHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.addFileButton = new System.Windows.Forms.Button();
             this.removeFileButton = new System.Windows.Forms.Button();
@@ -62,8 +63,13 @@
             this.infoTabPage = new System.Windows.Forms.TabPage();
             this.infoLogTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
             this.enhanCheckBox = new System.Windows.Forms.CheckBox();
-            this.chunksHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
+            this.startServicesButton = new System.Windows.Forms.Button();
+            this.stopServicesButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
+            this.clearLogsButton = new System.Windows.Forms.Button();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -79,6 +85,9 @@
             this.errorsTabPage.SuspendLayout();
             this.infoTabPage.SuspendLayout();
             this.tableLayoutPanel6.SuspendLayout();
+            this.tableLayoutPanel7.SuspendLayout();
+            this.tableLayoutPanel8.SuspendLayout();
+            this.tableLayoutPanel9.SuspendLayout();
             this.SuspendLayout();
             // 
             // backupButton
@@ -173,7 +182,7 @@
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.RowCount = 1;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutPanel5.Size = new System.Drawing.Size(498, 29);
             this.tableLayoutPanel5.TabIndex = 3;
             // 
@@ -250,6 +259,10 @@
             // 
             this.statusHeader.Text = "Status";
             this.statusHeader.Width = 51;
+            // 
+            // chunksHeader
+            // 
+            this.chunksHeader.Text = "#";
             // 
             // tableLayoutPanel1
             // 
@@ -361,7 +374,7 @@
             this.transmittedTabPage.Controls.Add(this.transmittedTextBox);
             this.transmittedTabPage.Location = new System.Drawing.Point(4, 22);
             this.transmittedTabPage.Name = "transmittedTabPage";
-            this.transmittedTabPage.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTabPage.Size = new System.Drawing.Size(502, 172);
             this.transmittedTabPage.TabIndex = 7;
             this.transmittedTabPage.Text = "Transmitted";
             this.transmittedTabPage.UseVisualStyleBackColor = true;
@@ -375,7 +388,7 @@
             this.transmittedTextBox.Name = "transmittedTextBox";
             this.transmittedTextBox.ReadOnly = true;
             this.transmittedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.transmittedTextBox.Size = new System.Drawing.Size(502, 164);
+            this.transmittedTextBox.Size = new System.Drawing.Size(502, 172);
             this.transmittedTextBox.TabIndex = 6;
             // 
             // receivedTabPage
@@ -383,7 +396,7 @@
             this.receivedTabPage.Controls.Add(this.receivedLogTextBox);
             this.receivedTabPage.Location = new System.Drawing.Point(4, 22);
             this.receivedTabPage.Name = "receivedTabPage";
-            this.receivedTabPage.Size = new System.Drawing.Size(502, 164);
+            this.receivedTabPage.Size = new System.Drawing.Size(502, 172);
             this.receivedTabPage.TabIndex = 5;
             this.receivedTabPage.Text = "Received";
             this.receivedTabPage.UseVisualStyleBackColor = true;
@@ -397,7 +410,7 @@
             this.receivedLogTextBox.Name = "receivedLogTextBox";
             this.receivedLogTextBox.ReadOnly = true;
             this.receivedLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.receivedLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.receivedLogTextBox.Size = new System.Drawing.Size(502, 172);
             this.receivedLogTextBox.TabIndex = 5;
             // 
             // sentTabPage
@@ -405,7 +418,7 @@
             this.sentTabPage.Controls.Add(this.sentLogTextBox);
             this.sentTabPage.Location = new System.Drawing.Point(4, 22);
             this.sentTabPage.Name = "sentTabPage";
-            this.sentTabPage.Size = new System.Drawing.Size(502, 164);
+            this.sentTabPage.Size = new System.Drawing.Size(502, 172);
             this.sentTabPage.TabIndex = 2;
             this.sentTabPage.Text = "Sent";
             this.sentTabPage.UseVisualStyleBackColor = true;
@@ -419,7 +432,7 @@
             this.sentLogTextBox.Name = "sentLogTextBox";
             this.sentLogTextBox.ReadOnly = true;
             this.sentLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.sentLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.sentLogTextBox.Size = new System.Drawing.Size(502, 172);
             this.sentLogTextBox.TabIndex = 5;
             // 
             // errorsTabPage
@@ -427,7 +440,7 @@
             this.errorsTabPage.Controls.Add(this.errorsLogTextBox);
             this.errorsTabPage.Location = new System.Drawing.Point(4, 22);
             this.errorsTabPage.Name = "errorsTabPage";
-            this.errorsTabPage.Size = new System.Drawing.Size(502, 164);
+            this.errorsTabPage.Size = new System.Drawing.Size(502, 172);
             this.errorsTabPage.TabIndex = 3;
             this.errorsTabPage.Text = "Errors";
             this.errorsTabPage.UseVisualStyleBackColor = true;
@@ -441,7 +454,7 @@
             this.errorsLogTextBox.Name = "errorsLogTextBox";
             this.errorsLogTextBox.ReadOnly = true;
             this.errorsLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.errorsLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.errorsLogTextBox.Size = new System.Drawing.Size(502, 172);
             this.errorsLogTextBox.TabIndex = 5;
             // 
             // infoTabPage
@@ -449,7 +462,7 @@
             this.infoTabPage.Controls.Add(this.infoLogTextBox);
             this.infoTabPage.Location = new System.Drawing.Point(4, 22);
             this.infoTabPage.Name = "infoTabPage";
-            this.infoTabPage.Size = new System.Drawing.Size(502, 164);
+            this.infoTabPage.Size = new System.Drawing.Size(502, 172);
             this.infoTabPage.TabIndex = 4;
             this.infoTabPage.Text = "Info";
             this.infoTabPage.UseVisualStyleBackColor = true;
@@ -463,7 +476,7 @@
             this.infoLogTextBox.Name = "infoLogTextBox";
             this.infoLogTextBox.ReadOnly = true;
             this.infoLogTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.infoLogTextBox.Size = new System.Drawing.Size(502, 164);
+            this.infoLogTextBox.Size = new System.Drawing.Size(502, 172);
             this.infoLogTextBox.TabIndex = 5;
             // 
             // tableLayoutPanel6
@@ -471,7 +484,7 @@
             this.tableLayoutPanel6.ColumnCount = 1;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel6.Controls.Add(this.filesGroupBox, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.enhanCheckBox, 0, 1);
+            this.tableLayoutPanel6.Controls.Add(this.tableLayoutPanel7, 0, 1);
             this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
@@ -481,19 +494,97 @@
             this.tableLayoutPanel6.Size = new System.Drawing.Size(168, 407);
             this.tableLayoutPanel6.TabIndex = 8;
             // 
+            // tableLayoutPanel7
+            // 
+            this.tableLayoutPanel7.ColumnCount = 1;
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel7.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel8, 0, 1);
+            this.tableLayoutPanel7.Controls.Add(this.tableLayoutPanel9, 0, 0);
+            this.tableLayoutPanel7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel7.Location = new System.Drawing.Point(3, 206);
+            this.tableLayoutPanel7.Name = "tableLayoutPanel7";
+            this.tableLayoutPanel7.RowCount = 2;
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(162, 198);
+            this.tableLayoutPanel7.TabIndex = 7;
+            // 
             // enhanCheckBox
             // 
             this.enhanCheckBox.AutoSize = true;
-            this.enhanCheckBox.Location = new System.Drawing.Point(3, 206);
+            this.enhanCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.enhanCheckBox.Location = new System.Drawing.Point(3, 3);
             this.enhanCheckBox.Name = "enhanCheckBox";
-            this.enhanCheckBox.Size = new System.Drawing.Size(97, 17);
+            this.enhanCheckBox.Size = new System.Drawing.Size(150, 40);
             this.enhanCheckBox.TabIndex = 7;
             this.enhanCheckBox.Text = "Enhancements";
             this.enhanCheckBox.UseVisualStyleBackColor = true;
             // 
-            // chunksHeader
+            // tableLayoutPanel8
             // 
-            this.chunksHeader.Text = "#";
+            this.tableLayoutPanel8.ColumnCount = 1;
+            this.tableLayoutPanel8.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel8.Controls.Add(this.startServicesButton, 0, 0);
+            this.tableLayoutPanel8.Controls.Add(this.stopServicesButton, 0, 1);
+            this.tableLayoutPanel8.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel8.Location = new System.Drawing.Point(3, 102);
+            this.tableLayoutPanel8.Name = "tableLayoutPanel8";
+            this.tableLayoutPanel8.RowCount = 2;
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(156, 93);
+            this.tableLayoutPanel8.TabIndex = 8;
+            // 
+            // startServicesButton
+            // 
+            this.startServicesButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.startServicesButton.Location = new System.Drawing.Point(3, 3);
+            this.startServicesButton.Name = "startServicesButton";
+            this.startServicesButton.Size = new System.Drawing.Size(150, 40);
+            this.startServicesButton.TabIndex = 8;
+            this.startServicesButton.Text = "Start Services";
+            this.startServicesButton.UseVisualStyleBackColor = true;
+            this.startServicesButton.Click += new System.EventHandler(this.startServicesButton_Click);
+            // 
+            // stopServicesButton
+            // 
+            this.stopServicesButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.stopServicesButton.Enabled = false;
+            this.stopServicesButton.Location = new System.Drawing.Point(3, 49);
+            this.stopServicesButton.Name = "stopServicesButton";
+            this.stopServicesButton.Size = new System.Drawing.Size(150, 41);
+            this.stopServicesButton.TabIndex = 9;
+            this.stopServicesButton.Text = "Stop Services";
+            this.stopServicesButton.UseVisualStyleBackColor = true;
+            this.stopServicesButton.Click += new System.EventHandler(this.stopServicesButton_Click);
+            // 
+            // tableLayoutPanel9
+            // 
+            this.tableLayoutPanel9.ColumnCount = 1;
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel9.Controls.Add(this.enhanCheckBox, 0, 0);
+            this.tableLayoutPanel9.Controls.Add(this.clearLogsButton, 0, 1);
+            this.tableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel9.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel9.Name = "tableLayoutPanel9";
+            this.tableLayoutPanel9.RowCount = 2;
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(156, 93);
+            this.tableLayoutPanel9.TabIndex = 9;
+            // 
+            // clearLogsButton
+            // 
+            this.clearLogsButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.clearLogsButton.Location = new System.Drawing.Point(3, 49);
+            this.clearLogsButton.Name = "clearLogsButton";
+            this.clearLogsButton.Size = new System.Drawing.Size(150, 23);
+            this.clearLogsButton.TabIndex = 8;
+            this.clearLogsButton.Text = "Clear Logs";
+            this.clearLogsButton.UseVisualStyleBackColor = true;
+            this.clearLogsButton.Click += new System.EventHandler(this.clearLogsButton_Click);
             // 
             // Form1
             // 
@@ -524,7 +615,10 @@
             this.infoTabPage.ResumeLayout(false);
             this.infoTabPage.PerformLayout();
             this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
+            this.tableLayoutPanel7.ResumeLayout(false);
+            this.tableLayoutPanel8.ResumeLayout(false);
+            this.tableLayoutPanel9.ResumeLayout(false);
+            this.tableLayoutPanel9.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -567,6 +661,12 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.CheckBox enhanCheckBox;
         private System.Windows.Forms.ColumnHeader chunksHeader;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel7;
+        private System.Windows.Forms.Button startServicesButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel8;
+        private System.Windows.Forms.Button stopServicesButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
+        private System.Windows.Forms.Button clearLogsButton;
     }
 }
 

@@ -42,8 +42,8 @@ namespace DBS.Messages.Enhancements
 
         public override string ToString()
         {
-            return string.Format("{0} {1} {2}#{3} {4}:{5} [{6}]", MessageType, GetVersion(),
-                FileId.ToStringSmall(), ChunkNo, RemoteEndPoint.Address, InitiatorPort, PassiveIP);
+            return string.Format("{0} {1} {2}#{3} :{4} [{5}]", MessageType, GetVersion(),
+                FileId.ToStringSmall(), ChunkNo, InitiatorPort, PassiveIP);
         }
 
         public string GetVersion()
