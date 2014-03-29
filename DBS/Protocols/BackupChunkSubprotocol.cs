@@ -42,6 +42,7 @@ namespace DBS.Protocols
             var multi = Core.Instance.Config.BackupChunkTimeoutMultiplier;
 
             int retryCount;
+            bool success = false;
             for (retryCount = 0; retryCount < maxRetries; retryCount++)
             {
                 var msg = new PutChunkMessage(_fileChunk, _replicationDegree, _data);
@@ -50,7 +51,10 @@ namespace DBS.Protocols
                 Task.Delay(timeout).Wait();
 
                 if (_count >= _replicationDegree)
+                {
+                    success = true;
                     break;
+                }
 
                 timeout = (int) (timeout * multi);
                 if (retryCount != maxRetries - 1) // not last iter
@@ -58,7 +62,10 @@ namespace DBS.Protocols
                         _fileChunk, _count, _replicationDegree, timeout);
             }
 
-            Core.Instance.Log.InfoFormat("{0}: Stored or giving up: retries {1}, rep degree {2}", _fileChunk, retryCount, _count);
+            Core.Instance.Log.InfoFormat(
+                success ? "{0}: Stored: retries {1}, rep degree {2}" : "{0}: Giving up: retries {1}, rep degree {2}",
+                _fileChunk, retryCount, _count);
+
             Core.Instance.Store.UpdateDegrees(_fileChunk.FileName, _count, _replicationDegree);
         }
 
