@@ -53,7 +53,7 @@ namespace DBS.Protocols.Enhancements
                             .Cast<GotMessage>()
                             .Where(message => message.FileId == id)
                             // ReSharper disable once AccessToDisposedClosure
-                            .Subscribe(msg => RemoveElement(backedUpFilesId, msg.FileId));
+                            .Subscribe(msg => backedUpFilesId.Remove(msg.FileId));
                     }).ToList();
 
                     // wait
@@ -61,8 +61,6 @@ namespace DBS.Protocols.Enhancements
 
                     foreach (var subscription in subscriptions)
                         subscription.Dispose();
-
-                    Core.Instance.Log.InfoFormat("backedUpFilesId size: {0} - {1}", backedUpFilesId.Count, waitPeriod);
 
                     // if we got a Got for all the files we don't need to wait longer
                     if (backedUpFilesId.Count == 0)
@@ -88,7 +86,6 @@ namespace DBS.Protocols.Enhancements
 
         private void RemoveElement<T>(ConcurrentHashSet<T> set, T item)
         {
-            Core.Instance.Log.InfoFormat("Removed {0} from {1}", item, set);
             set.Remove(item);
         }
     }
