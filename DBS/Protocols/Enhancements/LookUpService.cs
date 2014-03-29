@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
@@ -10,11 +11,8 @@ namespace DBS.Protocols.Enhancements
     {
         public void OnNext(LookupMessage msg)
         {
-            var fileIds = Directory.GetFiles(Core.Instance.Config.BackupDirectory, msg.FileId + "_*");
-            if (fileIds.Length == 0)
-                return;
-            
-            Core.Instance.MCChannel.Send(new GotMessage(msg.FileId));
+            if (Core.Instance.BackupFiles.Any(entry => entry.FileId == msg.FileId))
+                Core.Instance.MCChannel.Send(new GotMessage(msg.FileId));
         }
 
         public void OnError(Exception error)

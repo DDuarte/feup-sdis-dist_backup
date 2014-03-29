@@ -13,7 +13,7 @@
         {
             private const int MaxRetries = 5;
 
-            public Task Run() // should this run in a separate thread? We're deleting files...
+            public Task Run()
             {
                 var backupDir = Core.Instance.Config.BackupDirectory;
                 Core.Instance.Log.InfoFormat("Starting LookUpProtocol: {0}", backupDir);
