@@ -8,16 +8,17 @@ namespace DBS.Persistence
 {
     public class PersistentChunkPeers : IEnumerable<ChunkPeer>, IDisposable
     {
-        private class Nothing
-        {
+        private class Nothing // FIXME: we need this placeholder because PersistentHashSet was not implemented
+        {                     // so we are using a dictionary from keys to this placeholder
             public byte N { get; set; }
         }
 
+        // FIXME: using two different dbs because PersistentDictionary is not thread safe per tables
         private readonly PersistentDictionary<ChunkPeer, Nothing> _chunkPeers = // ((FileId, ChunkNo), IP) -> nothing
-            new PersistentDictionary<ChunkPeer, Nothing>("store", "chunkpeer");
+            new PersistentDictionary<ChunkPeer, Nothing>("chunkpeer", "chunkpeer");
 
         private readonly PersistentDictionary<string, int> _wantedRepDegs = // (FileId, ChunkNo) -> wanted rep deg
-            new PersistentDictionary<string, int>("store", "wanteddeg");
+            new PersistentDictionary<string, int>("wanteddeg", "wanteddeg");
 
         public int CountChunkPeer(FileChunk chunk)
         {
