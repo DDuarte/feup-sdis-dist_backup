@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace DBS.Multicast
 {
-    class MulticastBroadcaster : IMulticastBroadcaster
+    class MulticastBroadcaster
     {
         public MulticastSettings Settings { get; private set; }
 
@@ -30,7 +30,6 @@ namespace DBS.Multicast
             if (settings == null) throw new ArgumentNullException("settings");
 
             Settings = settings;
-
 
             if (autoBindJoinConnect) BindJoinConnect();
         }
@@ -59,24 +58,7 @@ namespace DBS.Multicast
         public void Broadcast(byte[] data)
         {
             if (!IsBound) BindJoinConnect();
-
-            var broadcastCallback = new AsyncCallback(BroadcastCallback);
-            UdpClient.BeginSend(data, data.Length, broadcastCallback, this);
-        }
-
-        private void BroadcastCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var broadcaster = (MulticastBroadcaster)(ar.AsyncState);
-
-                var udpClient = broadcaster.UdpClient;
-                udpClient.EndSend(ar);
-            }
-            catch (ObjectDisposedException)
-            {
-                // expected exception fired when the socket is closed - swallow it up
-            }
+            UdpClient.Send(data, data.Length);
         }
 
         public void Dispose()

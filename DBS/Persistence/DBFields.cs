@@ -18,7 +18,7 @@ namespace DBS.Persistence
         public static string FieldsWithType { get { return _fieldsWithType.Value; } }
 
         public static string Values(T obj) {  return GetValues(obj); }
-        public static string FieldsAndValues(T obj) { return GetFieldsAndValues(obj); }
+        public static string FieldsAndValues(T obj, string separator) { return GetFieldsAndValues(obj, separator); }
 
         private static string GetFields()
         {
@@ -71,7 +71,7 @@ namespace DBS.Persistence
             return str;
         }
 
-        private static string GetFieldsAndValues(T obj)
+        private static string GetFieldsAndValues(T obj, string separator)
         {
             var type = typeof(T);
             if (type.IsPrimitive || type == typeof (string))
@@ -86,7 +86,7 @@ namespace DBS.Persistence
 
                 str += f + " = '" + v + "'";
                 if (i != props.Length - 1)
-                    str += ',';
+                    str += separator;
             }
             return str;
         }

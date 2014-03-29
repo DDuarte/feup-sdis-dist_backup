@@ -2,7 +2,6 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DBS.Messages;
-using DBS.Persistence;
 
 namespace DBS.Protocols
 {

@@ -298,7 +298,10 @@ namespace DBS
                     new BackupChunkStoredService(), // 3.2 Chunk backup subprotocol
                     new EnhancedRestoreChunkACKService(), // 3.3 Chunk ENH restore protocol
                     new EnhancedRestoreChunkConnInfoService(), // 3.3 Chunk ENH restore protocol
-                    new DeleteFileService() // 3.4 File deletion subprotocol
+                    new DeleteFileService(), // 3.4 File deletion subprotocol
+                    new SpaceReclaimingService(), // 3.5 Space reclaiming subprotocol
+                    new LookUpService(),
+                    new EnhancedSpaceReclaimingWatcher()
                     //new EnhancedSpaceReclaimingWatcher()
                 });
             }

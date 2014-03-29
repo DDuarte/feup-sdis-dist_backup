@@ -24,7 +24,7 @@ namespace DBS.Persistence
                 throw new ArgumentNullException("table");
 
             _tableName = table;
-            _dict = new Dictionary<TKey, TValue>(/*new DBFields<TKey>()*/);
+            _dict = new Dictionary<TKey, TValue>();
 
             var cs = "Data Source=file:" + db + ".sqlite";
 
@@ -57,7 +57,6 @@ namespace DBS.Persistence
                         {
                             while (reader.Read())
                             {
-                                //var newKey = typeof (TKey).IsValueType ? default(TKey) : new TKey();v
                                 var keyType = typeof (TKey);
                                 TKey newKey;
                                 if (keyType.IsPrimitive || keyType == typeof (string))
@@ -177,7 +176,7 @@ namespace DBS.Persistence
 
         public bool Remove(TKey key)
         {
-            var stm = string.Format("DELETE FROM {0} WHERE {1}", _tableName, DBFields<TKey>.FieldsAndValues(key));
+            var stm = string.Format("DELETE FROM {0} WHERE {1}", _tableName, DBFields<TKey>.FieldsAndValues(key, " AND "));
             return ExecuteNonQuery(stm) && _dict.Remove(key);
         }
 
@@ -197,8 +196,8 @@ namespace DBS.Persistence
                 {
                     var stm = string.Format("UPDATE {0} SET {1} WHERE {2}",
                         _tableName,
-                        DBFields<TValue>.FieldsAndValues(value),
-                        DBFields<TKey>.FieldsAndValues(key));
+                        DBFields<TValue>.FieldsAndValues(value, " , "),
+                        DBFields<TKey>.FieldsAndValues(key, " AND "));
                     if (ExecuteNonQuery(stm))
                         _dict[key] = value;
                 }

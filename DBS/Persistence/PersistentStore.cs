@@ -102,13 +102,12 @@ namespace DBS.Persistence
         public bool RemoveChunkPeer(FileChunk chunk, IPAddress ip)
         {
             var toRemove = _chunkPeers.Where(pair => pair.Key.Chunk == chunk.FileName && pair.Key.IP == ip.GetHashCode())
-                .Select(pair => pair.Key);
+                .Select(pair => pair.Key).ToList();
 
             var any = false;
             foreach (var key in toRemove)
             {
-                any = true;
-                _chunkPeers.Remove(key);
+                any = any || _chunkPeers.Remove(key);
             }
 
             return any;
@@ -117,7 +116,7 @@ namespace DBS.Persistence
         public bool RemoveAllChunkPeer(FileChunk chunk)
         {
             var toRemove = _chunkPeers.Where(pair => pair.Key.Chunk == chunk.FileName)
-                .Select(pair => pair.Key);
+                .Select(pair => pair.Key).ToList();
 
             var any = false;
             foreach (var key in toRemove)
@@ -132,7 +131,7 @@ namespace DBS.Persistence
         public bool RemoveAllChunkPeer(FileId fileId)
         {
             var toRemove = _chunkPeers.Where(pair => pair.Key.Chunk.StartsWith(fileId.ToString()))
-                .Select(pair => pair.Key);
+                .Select(pair => pair.Key).ToList();
 
             var any = false;
             foreach (var key in toRemove)
@@ -147,7 +146,7 @@ namespace DBS.Persistence
         public bool RemoveAllChunkPeer(IPAddress ip)
         {
             var toRemove = _chunkPeers.Where(pair => pair.Key.IP == ip.GetHashCode())
-                .Select(pair => pair.Key);
+                .Select(pair => pair.Key).ToList();
 
             var any = false;
             foreach (var key in toRemove)

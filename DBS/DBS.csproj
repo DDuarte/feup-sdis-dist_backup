@@ -89,8 +89,6 @@
     <Compile Include="FileId.cs" />
     <Compile Include="Protocols\IProtocol.cs" />
     <Compile Include="Protocols\IService.cs" />
-    <Compile Include="Multicast\IMulticastBroadcaster.cs" />
-    <Compile Include="Multicast\IMulticastListener.cs" />
     <Compile Include="Protocols\SpaceReclaimingService.cs" />
     <Compile Include="Protocols\SpaceReclaimingWatcher.cs" />
     <Compile Include="Utilities\ConcurrentHashSet.cs" />

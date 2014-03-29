@@ -8,13 +8,13 @@ namespace DBS.Protocols.Enhancements
 {
     class EnhancedSpaceReclaimingWatcher : IService
     {
-        private const int MinutesTimeSpan = 1;
+        private const int SecondsTimeSpan = 30;
         private IDisposable _intervalSubs;
 
         public void Start()
         {
             Core.Instance.Log.Info("Starting EnhancedSpaceReclaimingWatcher");
-            _intervalSubs = Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ =>
+            _intervalSubs = Observable.Interval(TimeSpan.FromSeconds(SecondsTimeSpan)).Subscribe(_ =>
             {
                 new LookUpProtocol().Run().Wait();
                 CheckChunks();
@@ -29,9 +29,6 @@ namespace DBS.Protocols.Enhancements
 
         private static void CheckChunks()
         {
-            //var chunkList =
-            //    Core.Instance.Store.Where(pair => pair.Value.ActualDegree < pair.Value.WantedDegree).ToList();
-
             var chunks = Core.Instance.ChunkPeers.Select(peer => peer.Chunk).Distinct();
             var chunkList = new List<KeyValuePair<string, Tuple<int, int>>>();
             foreach (var c in chunks)
@@ -43,7 +40,8 @@ namespace DBS.Protocols.Enhancements
                     continue;
                 }
 
-                chunkList.Add(new KeyValuePair<string, Tuple<int, int>>(c, Tuple.Create(wantedDegree, actualDegree)));
+                if (actualDegree < wantedDegree)
+                    chunkList.Add(new KeyValuePair<string, Tuple<int, int>>(c, Tuple.Create(wantedDegree, actualDegree)));
             }
 
             chunkList.Sort((pair1, pair2) =>

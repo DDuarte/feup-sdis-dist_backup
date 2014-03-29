@@ -11,8 +11,8 @@ namespace DBS
     {
         public string Name { get; set; }
 
-        private readonly IMulticastListener _listener;
-        private readonly IMulticastBroadcaster _broadcaster;
+        private readonly MulticastListener _listener;
+        private readonly MulticastBroadcaster _broadcaster;
 
         private readonly Subject<Message> _subject;
 

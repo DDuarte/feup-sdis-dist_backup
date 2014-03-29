@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Reactive.Linq;
@@ -10,7 +9,7 @@ using DBS.Utilities;
 
 namespace DBS.Multicast
 {
-    class MulticastListener : IMulticastListener
+    class MulticastListener
     {
         private readonly Subject<Tuple<byte[], IPEndPoint>> _subj = new Subject<Tuple<byte[], IPEndPoint>>();
         public IObservable<Tuple<byte[], IPEndPoint>> Received { get { return _subj.AsObservable(); } }
@@ -66,7 +65,6 @@ namespace DBS.Multicast
                 catch (Exception ex)
                 {
                     Core.Instance.Log.Error("Failed to receive on {0}:{1}".FormatWith(Settings.Address, Settings.Port), ex);
-                    continue;
                 }
             }
             // ReSharper disable once FunctionNeverReturns
