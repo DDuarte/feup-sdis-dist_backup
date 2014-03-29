@@ -23,7 +23,24 @@ namespace DBS.Protocols.Enhancements
 
         private static void CheckChunks()
         {
-            foreach (var chunk in Core.Instance.Store.Where(pair => pair.Value.ActualDegree < pair.Value.WantedDegree))
+            var chunkList =
+                Core.Instance.Store.Where(pair => pair.Value.ActualDegree < pair.Value.WantedDegree).ToList();
+
+            chunkList.Sort(
+                (pair1, pair2) =>
+                {
+                    var delta1 = Math.Abs(pair1.Value.WantedDegree - pair1.Value.ActualDegree);
+                    var delta2 = Math.Abs(pair2.Value.WantedDegree - pair2.Value.ActualDegree);
+
+                    if (delta1 > delta2)
+                        return -1;
+                    else if (delta1 < delta2)
+                        return 1;
+                    else
+                        return 0;
+                });
+
+            foreach (var chunk in chunkList)
             {
                 var chunk1 = chunk;
                 try
