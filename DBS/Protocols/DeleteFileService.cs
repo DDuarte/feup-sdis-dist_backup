@@ -26,6 +26,7 @@ namespace DBS.Protocols
                 return;
 
             Core.Instance.BackupFiles.RemoveWhere(entry => entry.FileId == msg.FileId);
+            Core.Instance.ChunkPeers.RemoveAllChunkPeer(msg.FileId);
 
             var fileIdStr = msg.FileId.ToString();
 
@@ -35,7 +36,6 @@ namespace DBS.Protocols
             {
                 File.Delete(file);
                 Core.Instance.Log.InfoFormat("DeleteFileService: Deleting file {0}", file);
-                Core.Instance.Store.RemoveDegrees(file);
             }
         }
 

@@ -66,8 +66,10 @@
     <Compile Include="Messages\PutChunkMessage.cs" />
     <Compile Include="Messages\RemovedMessage.cs" />
     <Compile Include="Messages\StoredMessage.cs" />
+    <Compile Include="Persistence\ChunkPeer.cs" />
     <Compile Include="Persistence\DBFields.cs" />
     <Compile Include="Protocols\BackupChunkSubprotocol.cs" />
+    <Compile Include="Protocols\BackupChunkStoredService.cs" />
     <Compile Include="Protocols\BackupFileProtocol.cs" />
     <Compile Include="Protocols\BackupChunkService.cs" />
     <Compile Include="Channel.cs" />

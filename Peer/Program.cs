@@ -5,8 +5,6 @@ using System.Net;
 using DBS;
 using JsonConfig;
 
-/* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
-
 namespace Peer
 {
     static class Program

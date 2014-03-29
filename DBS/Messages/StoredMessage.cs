@@ -5,7 +5,7 @@ using DBS.Utilities;
 
 namespace DBS.Messages
 {
-    class StoredMessage : Message // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
+    public class StoredMessage : Message // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
     {
         public StoredMessage(FileChunk fileChunk)
             : this(Core.Instance.Config.VersionM, Core.Instance.Config.VersionN,

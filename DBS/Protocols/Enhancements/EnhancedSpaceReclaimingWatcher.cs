@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using DBS.Messages;
@@ -24,22 +25,34 @@ namespace DBS.Protocols.Enhancements
 
         private static void CheckChunks()
         {
-            var chunkList =
-                Core.Instance.Store.Where(pair => pair.Value.ActualDegree < pair.Value.WantedDegree).ToList();
+            //var chunkList =
+            //    Core.Instance.Store.Where(pair => pair.Value.ActualDegree < pair.Value.WantedDegree).ToList();
 
-            chunkList.Sort(
-                (pair1, pair2) =>
+            var chunks = Core.Instance.ChunkPeers.Select(peer => peer.Chunk).Distinct();
+            var chunkList = new List<KeyValuePair<string, Tuple<int, int>>>();
+            foreach (var c in chunks)
+            {
+                int wantedDegree, actualDegree;
+                if (!Core.Instance.ChunkPeers.TryGetDegrees(c, out wantedDegree, out actualDegree))
                 {
-                    var delta1 = Math.Abs(pair1.Value.WantedDegree - pair1.Value.ActualDegree);
-                    var delta2 = Math.Abs(pair2.Value.WantedDegree - pair2.Value.ActualDegree);
+                    Core.Instance.Log.ErrorFormat("SpaceReclaimingProtocol: Could not get degrees for {0}", c);
+                    continue;
+                }
 
-                    if (delta1 > delta2)
-                        return -1;
-                    else if (delta1 < delta2)
-                        return 1;
-                    else
-                        return 0;
-                });
+                chunkList.Add(new KeyValuePair<string, Tuple<int, int>>(c, Tuple.Create(wantedDegree, actualDegree)));
+            }
+
+            chunkList.Sort((pair1, pair2) =>
+            {
+                var delta1 = Math.Abs(pair1.Value.Item1 - pair1.Value.Item2);
+                var delta2 = Math.Abs(pair2.Value.Item1 - pair2.Value.Item2);
+
+                if (delta1 > delta2)
+                    return -1;
+                if (delta1 < delta2)
+                    return 1;
+                return 0;
+            });
 
             foreach (var chunk in chunkList)
             {
@@ -56,7 +69,7 @@ namespace DBS.Protocols.Enhancements
                         continue;
                     }
 
-                    new BackupChunkSubprotocol(fileChunk, chunk1.Value.WantedDegree, fileChunk.GetData()).Run().Wait();
+                    new BackupChunkSubprotocol(fileChunk, chunk1.Value.Item1, fileChunk.GetData()).Run().Wait();
                 }
                 catch (Exception ex)
                 {

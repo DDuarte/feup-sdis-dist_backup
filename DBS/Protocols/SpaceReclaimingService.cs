@@ -29,40 +29,40 @@ namespace DBS.Protocols
         {
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
 
-            Core.Instance.Store.DecrementActualDegree(fileChunk.FileName);
-            ReplicationDegrees rd;
-            Core.Instance.Store.TryGetDegrees(fileChunk.FileName, out rd);
-            if (rd.ActualDegree < rd.WantedDegree)
+            if (!Core.Instance.ChunkPeers.RemoveChunkPeer(fileChunk, msg.RemoteEndPoint.Address))
+                return; // we don't have this file, ignore
+
+            int wantedDegree, actualDegree;
+            Core.Instance.ChunkPeers.TryGetDegrees(fileChunk, out wantedDegree, out actualDegree);
+            if (actualDegree >= wantedDegree) return; // can't delete because 
+            try
             {
-                try
+                var putChunkReceived = false;
+                var disposable = Core.Instance.MDBChannel.Received
+                    .Where(message => message.MessageType == MessageType.PutChunk)
+                    .Cast<PutChunkMessage>()
+                    .Where(message => message.ChunkNo == fileChunk.ChunkNo &&
+                                      message.FileId == fileChunk.FileId)
+                    .Subscribe(_ => putChunkReceived = true);
+
+                Task.Delay(Core.Instance.RandomDelay).Wait(); // random delay uniformly distributed
+
+                if (!putChunkReceived)
                 {
-                    var putChunkReceived = false;
-                    var disposable = Core.Instance.MDBChannel.Received
-                        .Where(message => message.MessageType == MessageType.PutChunk)
-                        .Cast<PutChunkMessage>()
-                        .Where(message => message.ChunkNo == fileChunk.ChunkNo &&
-                            message.FileId == fileChunk.FileId)
-                        .Subscribe(_ => putChunkReceived = true);
-
-                    Task.Delay(Core.Instance.RandomDelay).Wait(); // random delay uniformly distributed
-
-                    if (!putChunkReceived)
-                    {
-                        var data = fileChunk.GetData();
-                        if (data == null)
-                            Core.Instance.Log.ErrorFormat(
-                                "SpaceReclaimingService: Could not start BackupChunkProtocol" +
-                                " for {0} because it no longer exists here.", fileChunk);
-                        else
-                            new BackupChunkSubprotocol(fileChunk, rd.WantedDegree, data).Run();
-                    }
-
-                    disposable.Dispose();
+                    var data = fileChunk.GetData();
+                    if (data == null)
+                        Core.Instance.Log.ErrorFormat(
+                            "SpaceReclaimingService: Could not start BackupChunkProtocol" +
+                            " for {0} because it no longer exists here.", fileChunk);
+                    else
+                        new BackupChunkSubprotocol(fileChunk, wantedDegree, data).Run();
                 }
-                catch (Exception ex)
-                {
-                    Core.Instance.Log.Error("SpaceReclaimingService", ex);
-                }
+
+                disposable.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Core.Instance.Log.Error("SpaceReclaimingService", ex);
             }
         }
 

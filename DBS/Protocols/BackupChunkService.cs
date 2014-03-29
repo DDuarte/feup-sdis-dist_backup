@@ -1,6 +1,5 @@
 using System;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DBS.Messages;
 using Util = DBS.Utilities.Utilities;
@@ -29,6 +28,7 @@ namespace DBS.Protocols
         public void OnNext(PutChunkMessage msg)
         {
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
+            Core.Instance.ChunkPeers.SetWantedReplicationDegree(fileChunk, msg.ReplicationDeg);
 
             var dirSize = Util.GetDirectorySize(Core.Instance.Config.BackupDirectory);
             if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)
@@ -48,14 +48,12 @@ namespace DBS.Protocols
             }
 
             var stored = fileChunk.SetData(msg.Body);
-            if (stored.HasValue && stored.Value)
-                Core.Instance.Store.IncrementActualDegree(fileChunk.FileName, msg.ReplicationDeg);
-            else if (!stored.HasValue)
+            if (!stored.HasValue)
             {
                 Core.Instance.Log.ErrorFormat("BackupChunkService: Could not store file {0}", fileChunk);
                 return;
             }
-            // otherwise file is already created: send Stored but do not increment degrees
+            // otherwise file is already created
 
             Task.Delay(Core.Instance.RandomDelay).Wait();
             Core.Instance.MCChannel.Send(new StoredMessage(fileChunk));

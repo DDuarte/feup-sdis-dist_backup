@@ -9,6 +9,8 @@ using DBS.Protocols;
 using DBS.Protocols.Enhancements;
 using DBS.Utilities;
 
+/* http://web.fe.up.pt/~pfs/aulas/sd2014/proj1.html */
+
 namespace DBS
 {
     public sealed class Core
@@ -93,14 +95,14 @@ namespace DBS
 
         private Core()
         {
-            Store = new PersistentStore();
+            ChunkPeers = new PersistentChunkPeers();
             Rnd = new Random();
             BackupFiles = new HashSet<FileEntry>(new FileEntry.Comparer());
             Log = new ObservableLog();
             RunningServices = new List<IService>();
         }
 
-        public PersistentStore Store { get; private set; }
+        public PersistentChunkPeers ChunkPeers { get; private set; }
         private Random Rnd { get; set; }
         public ObservableLog Log { get; private set; }
 
@@ -293,6 +295,7 @@ namespace DBS
                 RunningServices.AddRange(new IService[]
                 {
                     new BackupChunkService(), // 3.2 Chunk backup subprotocol
+                    new BackupChunkStoredService(), // 3.2 Chunk backup subprotocol
                     new EnhancedRestoreChunkACKService(), // 3.3 Chunk ENH restore protocol
                     new EnhancedRestoreChunkConnInfoService(), // 3.3 Chunk ENH restore protocol
                     new DeleteFileService() // 3.4 File deletion subprotocol
@@ -304,6 +307,7 @@ namespace DBS
                 RunningServices.AddRange(new IService[]
                 {
                     new BackupChunkService(), // 3.2 Chunk backup subprotocol
+                    new BackupChunkStoredService(), // 3.2 Chunk backup subprotocol
                     new RestoreChunkService(), // 3.3 Chunk restore protocol
                     new DeleteFileService(), // 3.4 File deletion subprotocol
                     new SpaceReclaimingService() // 3.5 Space reclaiming subprotocol

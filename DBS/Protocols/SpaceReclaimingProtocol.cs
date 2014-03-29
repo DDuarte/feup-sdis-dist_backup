@@ -32,12 +32,25 @@ namespace DBS.Protocols
             Core.Instance.Log.Info("Starting SpaceReclaimingProtocol");
             return Task.Factory.StartNew(() =>
             {
-                foreach (var fc in Core.Instance.Store
-                    .Where(f => f.Value.ActualDegree > f.Value.WantedDegree)
-                    .Select(d => new FileChunk(d.Key)))
+                var chunks = Core.Instance.ChunkPeers.Select(peer => peer.Chunk).Distinct();
+
+                foreach (var c in chunks)
                 {
-                    Core.Instance.Log.InfoFormat("BackupChunkService:OnNext: Starting SpaceReclaimingProtocol for {0}", fc);
-                    DeleteChunk(fc);
+                    int wantedDegree, actualDegree;
+                    if (!Core.Instance.ChunkPeers.TryGetDegrees(c, out wantedDegree, out actualDegree))
+                    {
+                        Core.Instance.Log.ErrorFormat("SpaceReclaimingProtocol: Could not get degrees for {0}", c);
+                        continue;
+                    }
+
+                    if (actualDegree > wantedDegree)
+                    {
+                        var fc = new FileChunk(c);
+                        Core.Instance.Log.InfoFormat(@"SpaceReclaimingProtocol: Deleting chunk {0} because
+                                                   degree {1} is higher than the desired {2}", fc,
+                                                   actualDegree, wantedDegree);
+                        DeleteChunk(fc);
+                    }
                 }
             });
         }

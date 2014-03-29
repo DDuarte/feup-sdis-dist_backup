@@ -62,7 +62,6 @@ namespace DBS.Multicast
                     var ipEndPoint = LocalIPEndPoint;
                     var data = UdpClient.Receive(ref ipEndPoint);
                     _queue.Add(Tuple.Create(data, ipEndPoint));
-                    Core.Instance.Log.Error(UdpClient.Available.ToString(CultureInfo.InvariantCulture));
                 }
                 catch (Exception ex)
                 {

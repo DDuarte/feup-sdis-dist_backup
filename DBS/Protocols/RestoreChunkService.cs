@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using DBS.Messages;
 
@@ -31,12 +30,8 @@ namespace DBS.Protocols
             if (!fileChunk.Exists())
             {
                 // we were supposed to have this chunk: send removed message and remove the entry in the local count
-                if (Core.Instance.Store.ContainsFile(fileChunk.FileName)) 
-                {
+                if (Core.Instance.ChunkPeers.HasChunkPeer(fileChunk)) 
                     Core.Instance.MCChannel.Send(new RemovedMessage(fileChunk));
-                    Core.Instance.Store.RemoveDegrees(fileChunk.FileName);
-                }
-
                 return;
             }
 

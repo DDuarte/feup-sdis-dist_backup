@@ -104,7 +104,7 @@ namespace DBS
             }
             catch (Exception ex)
             {
-                Core.Instance.Log.Error("SetData()", ex);
+                Core.Instance.Log.Error("FileChunk:SetData", ex);
                 return null;
             }
         }
