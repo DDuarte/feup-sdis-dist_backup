@@ -1,4 +1,5 @@
 ﻿    using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reactive.Linq;
@@ -57,6 +58,7 @@
                         waitPeriod *= 2;
                     }
 
+                    var toRemove = new List<FileId>();
                     // delete all the unused chunks
                     foreach (var unusedFile in backedUpFiles)
                     {
@@ -64,8 +66,11 @@
                         foreach (var backedUpChunk in fileList)
                             File.Delete(backedUpChunk);
 
-                        backedUpFiles.Remove(unusedFile);
+                        toRemove.Add(unusedFile);
                     }
+
+                    foreach (var fileId in toRemove)
+                        backedUpFiles.Remove(fileId);
 
                     backedUpFiles.Dispose();
                 });
