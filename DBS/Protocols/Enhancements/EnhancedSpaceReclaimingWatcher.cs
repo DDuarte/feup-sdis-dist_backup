@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using DBS.Messages;
 
 namespace DBS.Protocols.Enhancements
 {
@@ -51,6 +52,7 @@ namespace DBS.Protocols.Enhancements
                         Core.Instance.Log.ErrorFormat(
                                 "EnhancedSpaceReclaimingWatcher: Could not start BackupChunkProtocol" +
                                 " for {0} because it no longer exists here.", fileChunk);
+                        Core.Instance.MCChannel.Send(new RemovedMessage(fileChunk)); // we were supposed to have the file chunk
                         continue;
                     }
 
