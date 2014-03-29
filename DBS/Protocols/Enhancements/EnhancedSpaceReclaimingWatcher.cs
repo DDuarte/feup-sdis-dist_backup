@@ -14,7 +14,11 @@ namespace DBS.Protocols.Enhancements
         public void Start()
         {
             Core.Instance.Log.Info("Starting EnhancedSpaceReclaimingWatcher");
-            _intervalSubs = Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ => CheckChunks());
+            _intervalSubs = Observable.Interval(TimeSpan.FromMinutes(MinutesTimeSpan)).Subscribe(_ =>
+            {
+                new LookUpProtocol().Run().Wait();
+                CheckChunks();
+            });
         }
 
         public void Stop()
