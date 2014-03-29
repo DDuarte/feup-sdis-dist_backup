@@ -8,6 +8,7 @@ namespace DBS.Protocols.Enhancements
     class EnhancedRestoreFileProtocol : IProtocol
     {
         private readonly FileEntry _fileEntry;
+        private const int MaxEntries = 5;
 
         public EnhancedRestoreFileProtocol(FileEntry fileEntry)
         {
@@ -20,25 +21,35 @@ namespace DBS.Protocols.Enhancements
         private void RestoreFile()
         {
             var fileName = Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName);
-            var success = true;
             using (var file = File.OpenWrite(fileName))
             {
                 var chunkNo = 0;
-                ChunkMessage chunk;
+                ChunkMessage chunk = null;
+                bool success;
                 do
                 {
-                    var restoreChunkProtocol = new EnhancedRestoreChunkProtocol(new FileChunk(_fileEntry.FileId, chunkNo));
-                    restoreChunkProtocol.Run().Wait();
-                    chunk = restoreChunkProtocol.Message;
-                    if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
+                    success = true;
+                    for (int retryCount = 0; retryCount < MaxEntries; retryCount++)
                     {
-                        success = false;
-                        break;
+                        var restoreChunkProtocol =
+                            new EnhancedRestoreChunkProtocol(new FileChunk(_fileEntry.FileId, chunkNo));
+                        restoreChunkProtocol.Run().Wait();
+                        chunk = restoreChunkProtocol.Message;
+                        if (chunk != null && chunk.Body != null && chunk.Body.Length > 0)
+                        {
+                            file.Write(chunk.Body, 0, chunk.Body.Length);
+                            break;
+                        }
+
+                        if (retryCount == MaxEntries)
+                            success = false;
                     }
 
-                    file.Write(chunk.Body, 0, chunk.Body.Length);
+                    if (!success)
+                        break;
+
                     ++chunkNo;
-                } while (chunk.Body.Length == Core.Instance.Config.ChunkSize);
+                } while (chunk != null && chunk.Body != null && chunk.Body.Length == Core.Instance.Config.ChunkSize);
 
                 if (success)
                     Core.Instance.Log.InfoFormat("EnhancedRestoreFileProtocol: file '{0}' was sucessfuly restored",
