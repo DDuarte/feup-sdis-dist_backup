@@ -9,8 +9,8 @@ namespace DBS.Multicast
 
         bool IsBound { get; }
 
-        byte[] Receive();
-        byte[] Receive(out IPEndPoint ep);
+        //byte[] Receive();
+        //byte[] Receive(out IPEndPoint ep);
 
         void StopListening();
     }

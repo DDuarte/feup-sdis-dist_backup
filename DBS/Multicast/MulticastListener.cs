@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Reactive.Linq;
@@ -10,9 +12,10 @@ namespace DBS.Multicast
 {
     class MulticastListener : IMulticastListener
     {
-        private Subject<Tuple<byte[], IPEndPoint>> _subj = new Subject<Tuple<byte[], IPEndPoint>>();
+        private readonly Subject<Tuple<byte[], IPEndPoint>> _subj = new Subject<Tuple<byte[], IPEndPoint>>();
         public IObservable<Tuple<byte[], IPEndPoint>> Received { get { return _subj.AsObservable(); } }
         private readonly Task _receiveTask;
+        private readonly Task _onNextingTask;
 
         public MulticastSettings Settings { get; private set; }
 
@@ -42,28 +45,40 @@ namespace DBS.Multicast
 
             _receiveTask = new Task(StartReceiving, TaskCreationOptions.LongRunning);
             _receiveTask.Start();
+
+            _onNextingTask = new Task(StartOnNexting, TaskCreationOptions.LongRunning);
+            _onNextingTask.Start();
         }
+
+        //private ConcurrentQueue<Tuple<byte[], IPEndPoint>> _queue = new ConcurrentQueue<Tuple<byte[], IPEndPoint>>();
+        private readonly BlockingCollection<Tuple<byte[], IPEndPoint>> _queue = new BlockingCollection<Tuple<byte[], IPEndPoint>>();
 
         private void StartReceiving()
         {
             while (true)
             {
-                byte[] data;
-                IPEndPoint ep;
                 try
                 {
-                    data = Receive(out ep);
+                    var ipEndPoint = LocalIPEndPoint;
+                    var data = UdpClient.Receive(ref ipEndPoint);
+                    _queue.Add(Tuple.Create(data, ipEndPoint));
+                    Core.Instance.Log.Error(UdpClient.Available.ToString(CultureInfo.InvariantCulture));
                 }
                 catch (Exception ex)
                 {
                     Core.Instance.Log.Error("Failed to receive on {0}:{1}".FormatWith(Settings.Address, Settings.Port), ex);
                     continue;
                 }
-
-                if (data != null)
-                    _subj.OnNext(Tuple.Create(data, ep));
             }
             // ReSharper disable once FunctionNeverReturns
+        }
+
+        private void StartOnNexting()
+        {
+            while (true)
+            {
+                _subj.OnNext(_queue.Take());
+            }
         }
 
         private void BindAndJoin()
@@ -76,29 +91,6 @@ namespace DBS.Multicast
 
             UdpClient.Client.Bind(LocalIPEndPoint);
             UdpClient.JoinMulticastGroup(Settings.Address, Settings.TimeToLive);
-        }
-
-        public byte[] Receive(out IPEndPoint ep)
-        {
-            var ipEndPoint = LocalIPEndPoint;
-
-            try
-            {
-                var msg = UdpClient.Receive(ref ipEndPoint);
-                ep = ipEndPoint;
-                return msg;
-            }
-            catch (SocketException)
-            {
-                ep = null;
-                return null;
-            }
-        }
-
-        public byte[] Receive()
-        {
-            IPEndPoint _;
-            return Receive(out _);
         }
 
         public void StopListening()
@@ -124,6 +116,7 @@ namespace DBS.Multicast
             _subj.OnCompleted();
             _subj.Dispose();
             _receiveTask.Dispose();
+            _onNextingTask.Dispose();
             if (IsBound) UnbindAndLeave();
         }
     }
