@@ -71,7 +71,7 @@ namespace DBS.Persistence
                                     foreach (var prop in props)
                                     {
                                         var obj = reader[prop.Name];
-                                        prop.SetValue(newKey, obj);
+                                        prop.SetValue(newKey, Convert.ChangeType(obj, prop.PropertyType));
                                     }
                                 }
 
@@ -88,7 +88,7 @@ namespace DBS.Persistence
                                     foreach (var prop in props)
                                     {
                                         var obj = reader[prop.Name];
-                                        prop.SetValue(newValue, obj);
+                                        prop.SetValue(newValue, Convert.ChangeType(obj, prop.PropertyType));
                                     }
                                 }
 
