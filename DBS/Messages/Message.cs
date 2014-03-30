@@ -41,8 +41,8 @@ namespace DBS.Messages
         [StringValue("GOT")] // <Version> <FileId> <CRLF> <CRLF>
         Got,
 
-        // Get chunk message reply
-        [StringValue("ACK")] // <Version> <FileId> <ChunkNo> <ChunkOwnerIP> <ChunkOwnerPort> <CRLF> <CRLF>
+        // Ack chunk message reply
+        [StringValue("ACK")] // <Version> <FileId> <ChunkNo> <CRLF> <CRLF>
         ACK,
 
         // Connection Information message
