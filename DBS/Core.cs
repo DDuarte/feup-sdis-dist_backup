@@ -293,7 +293,7 @@ namespace DBS
             {
                 RunningServices.AddRange(new IService[]
                 {
-                    new BackupChunkService(), // 3.2 Chunk backup subprotocol
+                    new EnhancedBackupChunkService(), // 3.2 Chunk backup subprotocol
                     new BackupChunkStoredService(), // 3.2 Chunk backup subprotocol
                     new EnhancedRestoreChunkACKService(), // 3.3 Chunk ENH restore protocol
                     new EnhancedRestoreChunkConnInfoService(), // 3.3 Chunk ENH restore protocol

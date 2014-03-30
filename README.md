@@ -8,7 +8,7 @@ Program written in C# (.NET 4.5.1) using Visual Studio 2013, following the speci
 
 Enhanced protocols specification and rational is described in [protocols.pdf](protocols.pdf).
 
-## Libraries:
+## Libraries
 
 - [JsonConfig](https://github.com/Dynalon/JsonConfig)
 - [Reactive Extensions (Rx)](http://msdn.microsoft.com/en-us/data/gg577609)
