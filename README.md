@@ -37,7 +37,7 @@ Default multicast channels:
     - Available commands:
         - `quit`
         - `backup <filename> <replication degree>`
-        - `restore <filename>`
+        - `restore <filename> [-e]` `-e: optional enhacement flag`
         - `delete <filename>`
 
 - GUI: Start PeerGUI.exe
