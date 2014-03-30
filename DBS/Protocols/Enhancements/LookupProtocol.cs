@@ -21,7 +21,7 @@ namespace DBS.Protocols.Enhancements
             {
                 // get array with all the fileId's associated with the backed up chunks
                 var fileIds = Core.Instance.ChunkPeers.Select(peer => new FileChunk(peer.Chunk))
-                    .Where(fc =>
+                    .ToList().Where(fc =>
                     {
                         if (!fc.Exists())
                         {
@@ -29,8 +29,7 @@ namespace DBS.Protocols.Enhancements
                             return false;
                         }
                         return true;
-                    })
-                    .Select(fc => fc.FileId).ToList();
+                    }).ToList().Select(fc => fc.FileId).ToList();
 
                 if (fileIds.Count == 0)
                 {
