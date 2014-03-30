@@ -55,8 +55,18 @@ namespace DBS.Protocols.Enhancements
                     Core.Instance.Log.InfoFormat("EnhancedRestoreFileProtocol: file '{0}' was sucessfuly restored",
                         _fileEntry.FileName);
                 else
+                {
                     Core.Instance.Log.ErrorFormat("EnhancedRestoreFileProtocol: file '{0}' restore failed",
                         _fileEntry.FileName);
+                    try
+                    {
+                        File.Delete(fileName);
+                    }
+                    catch (Exception)
+                    {
+                        // swallow exception
+                    }
+                }
             }
         }
 
