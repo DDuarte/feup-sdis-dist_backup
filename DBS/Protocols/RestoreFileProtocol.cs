@@ -24,17 +24,31 @@ namespace DBS.Protocols
             {
                 var chunkNo = 0;
                 ChunkMessage chunk;
+                bool success = true;
                 do
                 {
                     var restoreChunkProtocol = new RestoreChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo));
                     restoreChunkProtocol.Run().Wait();
                     chunk = restoreChunkProtocol.Message;
                     if (chunk == null || chunk.Body == null || chunk.Body.Length == 0)
+                    {
+                        success = false;
                         break;
+                    }
 
                     file.Write(chunk.Body, 0, chunk.Body.Length);
                     ++chunkNo;
                 } while (chunk.Body.Length == Core.Instance.Config.ChunkSize);
+
+                if (!success)
+                {
+                    Core.Instance.Log.ErrorFormat("RestoreFileProtocol:Run: could not restore file '{0}'",
+                        _fileEntry.FileName);
+                    File.Delete(fileName);
+                }
+                else
+                    Core.Instance.Log.InfoFormat("RestoreFileProtocol:Run: restore file successful '{0}'",
+                        _fileEntry.FileName);
             }
         }
 
@@ -51,6 +65,14 @@ namespace DBS.Protocols
                 {
                     Core.Instance.Log.ErrorFormat("RestoreFileProtocol:Run: could not restore file '{0}', ex: {1}",
                         _fileEntry.FileName, ex);
+                    try
+                    {
+                        File.Delete(Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName));
+                    }
+                    catch (Exception)
+                    {
+                       // swallow it up 
+                    }
                 }
             });
         }
