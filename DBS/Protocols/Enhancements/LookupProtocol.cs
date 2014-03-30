@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
 using DBS.Utilities;
+using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols.Enhancements
 {
@@ -20,16 +21,9 @@ namespace DBS.Protocols.Enhancements
             return Task.Factory.StartNew(() =>
             {
                 // get array with all the fileId's associated with the backed up chunks
-                var fileIds = Core.Instance.ChunkPeers.Select(peer => new FileChunk(peer.Chunk))
-                    .ToList().Where(fc =>
-                    {
-                        if (!fc.Exists())
-                        {
-                            Core.Instance.MCChannel.Send(new RemovedMessage(fc));
-                            return false;
-                        }
-                        return true;
-                    }).ToList().Select(fc => fc.FileId).ToList();
+                var fileIds = Util.GetLocalFileChunks()
+                    .Select(chunk => chunk.FileId)
+                    .Distinct().ToList();
 
                 if (fileIds.Count == 0)
                 {
@@ -38,7 +32,7 @@ namespace DBS.Protocols.Enhancements
                 }
 
                 // remove duplicates, transform the collection into a ConcurrentHashSet
-                var backedUpFilesId = new ConcurrentHashSet<FileId>(fileIds.Distinct());
+                var backedUpFilesId = new ConcurrentHashSet<FileId>(fileIds);
 
                 var waitPeriod = 1000;
                 for (int retry = 0; retry < MaxRetries; ++retry)

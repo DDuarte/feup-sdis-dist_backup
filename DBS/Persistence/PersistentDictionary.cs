@@ -14,7 +14,7 @@ namespace DBS.Persistence
         private readonly Dictionary<TKey, TValue> _dict;
         private readonly SqliteConnection _conn;
 // ReSharper disable once StaticFieldInGenericType
-        private static object _syncRoot = new object();
+        private static readonly object _syncRoot = new object();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
         public PersistentDictionary(string db, string table)

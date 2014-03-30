@@ -37,6 +37,10 @@
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.incDegreeButton = new System.Windows.Forms.Button();
             this.decDegreeButton = new System.Windows.Forms.Button();
+            this.tableLayoutPanel10 = new System.Windows.Forms.TableLayoutPanel();
+            this.tableLayoutPanel11 = new System.Windows.Forms.TableLayoutPanel();
+            this.reclaimSizeNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            this.sizeTypeListBox = new System.Windows.Forms.ListBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.filesGroupBox = new System.Windows.Forms.GroupBox();
             this.filesListView = new System.Windows.Forms.ListView();
@@ -74,6 +78,9 @@
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
+            this.tableLayoutPanel10.SuspendLayout();
+            this.tableLayoutPanel11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.reclaimSizeNumericUpDown)).BeginInit();
             this.filesGroupBox.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -132,9 +139,9 @@
             // 
             this.reclaimButton.Dock = System.Windows.Forms.DockStyle.Fill;
             this.reclaimButton.Enabled = false;
-            this.reclaimButton.Location = new System.Drawing.Point(3, 143);
+            this.reclaimButton.Location = new System.Drawing.Point(252, 3);
             this.reclaimButton.Name = "reclaimButton";
-            this.reclaimButton.Size = new System.Drawing.Size(498, 32);
+            this.reclaimButton.Size = new System.Drawing.Size(243, 26);
             this.reclaimButton.TabIndex = 3;
             this.reclaimButton.Text = "Reclaim Space";
             this.reclaimButton.UseVisualStyleBackColor = true;
@@ -155,11 +162,11 @@
             // 
             this.tableLayoutPanel4.ColumnCount = 1;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.Controls.Add(this.reclaimButton, 0, 4);
             this.tableLayoutPanel4.Controls.Add(this.backupButton, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.deleteButton, 0, 2);
             this.tableLayoutPanel4.Controls.Add(this.restoreButton, 0, 1);
             this.tableLayoutPanel4.Controls.Add(this.tableLayoutPanel5, 0, 3);
+            this.tableLayoutPanel4.Controls.Add(this.tableLayoutPanel10, 0, 4);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
@@ -212,6 +219,63 @@
             this.decDegreeButton.Text = "- Replication Degree";
             this.decDegreeButton.UseVisualStyleBackColor = true;
             this.decDegreeButton.Click += new System.EventHandler(this.decDegreeButton_Click);
+            // 
+            // tableLayoutPanel10
+            // 
+            this.tableLayoutPanel10.ColumnCount = 2;
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel10.Controls.Add(this.reclaimButton, 1, 0);
+            this.tableLayoutPanel10.Controls.Add(this.tableLayoutPanel11, 0, 0);
+            this.tableLayoutPanel10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel10.Location = new System.Drawing.Point(3, 143);
+            this.tableLayoutPanel10.Name = "tableLayoutPanel10";
+            this.tableLayoutPanel10.RowCount = 1;
+            this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(498, 32);
+            this.tableLayoutPanel10.TabIndex = 4;
+            // 
+            // tableLayoutPanel11
+            // 
+            this.tableLayoutPanel11.ColumnCount = 2;
+            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75F));
+            this.tableLayoutPanel11.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel11.Controls.Add(this.reclaimSizeNumericUpDown, 0, 0);
+            this.tableLayoutPanel11.Controls.Add(this.sizeTypeListBox, 1, 0);
+            this.tableLayoutPanel11.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel11.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel11.Name = "tableLayoutPanel11";
+            this.tableLayoutPanel11.RowCount = 1;
+            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel11.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+            this.tableLayoutPanel11.Size = new System.Drawing.Size(243, 26);
+            this.tableLayoutPanel11.TabIndex = 4;
+            // 
+            // reclaimSizeNumericUpDown
+            // 
+            this.reclaimSizeNumericUpDown.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.reclaimSizeNumericUpDown.Location = new System.Drawing.Point(3, 3);
+            this.reclaimSizeNumericUpDown.Name = "reclaimSizeNumericUpDown";
+            this.reclaimSizeNumericUpDown.Size = new System.Drawing.Size(176, 20);
+            this.reclaimSizeNumericUpDown.TabIndex = 1;
+            this.reclaimSizeNumericUpDown.ThousandsSeparator = true;
+            this.reclaimSizeNumericUpDown.ValueChanged += new System.EventHandler(this.reclaimSizeNumericUpDown_ValueChanged);
+            // 
+            // sizeTypeListBox
+            // 
+            this.sizeTypeListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sizeTypeListBox.FormattingEnabled = true;
+            this.sizeTypeListBox.Items.AddRange(new object[] {
+            "B",
+            "KB",
+            "MB",
+            "GB"});
+            this.sizeTypeListBox.Location = new System.Drawing.Point(185, 3);
+            this.sizeTypeListBox.Name = "sizeTypeListBox";
+            this.sizeTypeListBox.Size = new System.Drawing.Size(55, 20);
+            this.sizeTypeListBox.TabIndex = 2;
+            this.sizeTypeListBox.SelectedIndexChanged += new System.EventHandler(this.sizeTypeListBox_SelectedIndexChanged);
             // 
             // openFileDialog
             // 
@@ -573,7 +637,7 @@
             this.enhanCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.enhanCheckBox.Location = new System.Drawing.Point(3, 3);
             this.enhanCheckBox.Name = "enhanCheckBox";
-            this.enhanCheckBox.Size = new System.Drawing.Size(150, 24);
+            this.enhanCheckBox.Size = new System.Drawing.Size(150, 25);
             this.enhanCheckBox.TabIndex = 7;
             this.enhanCheckBox.Text = "Enhancements";
             this.enhanCheckBox.UseVisualStyleBackColor = true;
@@ -581,7 +645,7 @@
             // clearLogsButton
             // 
             this.clearLogsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.clearLogsButton.Location = new System.Drawing.Point(3, 33);
+            this.clearLogsButton.Location = new System.Drawing.Point(3, 34);
             this.clearLogsButton.Name = "clearLogsButton";
             this.clearLogsButton.Size = new System.Drawing.Size(150, 23);
             this.clearLogsButton.TabIndex = 8;
@@ -592,7 +656,7 @@
             // showChunksButton
             // 
             this.showChunksButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.showChunksButton.Location = new System.Drawing.Point(3, 63);
+            this.showChunksButton.Location = new System.Drawing.Point(3, 65);
             this.showChunksButton.Name = "showChunksButton";
             this.showChunksButton.Size = new System.Drawing.Size(150, 23);
             this.showChunksButton.TabIndex = 9;
@@ -611,6 +675,9 @@
             this.actionsGroupBox.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
+            this.tableLayoutPanel10.ResumeLayout(false);
+            this.tableLayoutPanel11.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.reclaimSizeNumericUpDown)).EndInit();
             this.filesGroupBox.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -682,6 +749,10 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
         private System.Windows.Forms.Button clearLogsButton;
         private System.Windows.Forms.Button showChunksButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel10;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel11;
+        private System.Windows.Forms.NumericUpDown reclaimSizeNumericUpDown;
+        private System.Windows.Forms.ListBox sizeTypeListBox;
     }
 }
 

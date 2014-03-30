@@ -63,7 +63,7 @@ namespace Peer
                 return;
             }
 
-            int maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
+            long maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
             int chunkSize = Config.Global.ChunkSize; // Size of each chunk stored locally and sent over the network
 
             // Backup chunk protocol configurations

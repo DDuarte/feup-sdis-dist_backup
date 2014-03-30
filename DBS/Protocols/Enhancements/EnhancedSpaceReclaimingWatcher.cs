@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using DBS.Messages;
+using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols.Enhancements
 {
@@ -29,8 +29,8 @@ namespace DBS.Protocols.Enhancements
 
         private static void CheckChunks()
         {
-            var chunks = Core.Instance.ChunkPeers.Select(peer => peer.Chunk).Distinct();
-            var chunkList = new List<KeyValuePair<string, Tuple<int, int>>>();
+            var chunks = Util.GetLocalFileChunks();
+            var chunkList = new List<KeyValuePair<FileChunk, Tuple<int, int>>>();
             foreach (var c in chunks)
             {
                 int wantedDegree, actualDegree;
@@ -41,7 +41,7 @@ namespace DBS.Protocols.Enhancements
                 }
 
                 if (actualDegree < wantedDegree)
-                    chunkList.Add(new KeyValuePair<string, Tuple<int, int>>(c, Tuple.Create(wantedDegree, actualDegree)));
+                    chunkList.Add(new KeyValuePair<FileChunk, Tuple<int, int>>(c, Tuple.Create(wantedDegree, actualDegree)));
             }
 
             chunkList.Sort((pair1, pair2) =>
@@ -58,20 +58,18 @@ namespace DBS.Protocols.Enhancements
 
             foreach (var chunk in chunkList)
             {
-                var chunk1 = chunk;
                 try
                 {
-                    var fileChunk = new FileChunk(chunk1.Key);
-                    if (!fileChunk.Exists())
+                    if (!chunk.Key.Exists())
                     {
                         Core.Instance.Log.ErrorFormat(
                                 "EnhancedSpaceReclaimingWatcher: Could not start BackupChunkProtocol" +
-                                " for {0} because it no longer exists here.", fileChunk);
-                        Core.Instance.MCChannel.Send(new RemovedMessage(fileChunk)); // we were supposed to have the file chunk
+                                " for {0} because it no longer exists here.", chunk.Key);
+                        Core.Instance.MCChannel.Send(new RemovedMessage(chunk.Key)); // we were supposed to have the file chunk
                         continue;
                     }
 
-                    new BackupChunkSubprotocol(fileChunk, chunk1.Value.Item1, fileChunk.GetData()).Run().Wait();
+                    new BackupChunkSubprotocol(chunk.Key, chunk.Value.Item1, chunk.Key.GetData()).Run().Wait();
                 }
                 catch (Exception ex)
                 {

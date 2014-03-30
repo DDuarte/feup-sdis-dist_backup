@@ -35,7 +35,7 @@ namespace DBS.Protocols
             {
                 Core.Instance.Log.InfoFormat(
                     "BackupChunkService:OnNext: Got no space to store {0}, trying to evict some other chunks", fileChunk);
-                new SpaceReclaimingProtocol().Run().Wait();
+                new SpaceReclaimingProtocol(false).Run().Wait();
 
                 dirSize = Util.GetDirectorySize(Core.Instance.Config.BackupDirectory);
                 if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)

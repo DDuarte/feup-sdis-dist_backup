@@ -84,7 +84,7 @@ namespace DBS
     {
         public void Execute()
         {
-            new SpaceReclaimingProtocol().Run();
+            new SpaceReclaimingProtocol(true).Run();
         }
     }
 }

@@ -62,7 +62,7 @@ namespace PeerGUI
                 return;
             }
 
-            int maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
+            long maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
             int chunkSize = Config.Global.ChunkSize; // Size of each chunk stored locally and sent over the network
 
             // Backup chunk protocol configurations
@@ -94,7 +94,30 @@ namespace PeerGUI
                 return;
             }
 
+            reclaimSizeNumericUpDown.Maximum = decimal.MaxValue;
+            reclaimSizeNumericUpDown.Value = Core.Instance.Config.MaxBackupSize;
+
             Core.Instance.Start(false);
+        }
+
+        private int GetSizeMultiplier() // in bytes
+        {
+            if (sizeTypeListBox.SelectedItem == null)
+                sizeTypeListBox.SelectedItem = "B";
+
+            switch (sizeTypeListBox.SelectedItem.ToString())
+            {
+                case "B":
+                    return 1;
+                case "KB":
+                    return 1000;
+                case "MB":
+                    return 1000000;
+                case "GB":
+                    return 1000000000;
+                default:
+                    return 1;
+            }
         }
 
         private void addFileButton_Click(object sender, EventArgs e)
@@ -315,6 +338,28 @@ namespace PeerGUI
         {
             var f = new ChunksStoreForm();
             f.Show();
+        }
+
+        private void reclaimSizeNumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            var size = reclaimSizeNumericUpDown.Value * GetSizeMultiplier();
+            if (size > long.MaxValue)
+            {
+                size = long.MaxValue;
+                reclaimSizeNumericUpDown.Value = size;
+            }
+
+            var sizeProper = (long) size;
+            if (sizeProper == Core.Instance.Config.MaxBackupSize)
+                return;
+
+            Core.Instance.Config.MaxBackupSize = sizeProper;
+            Core.Instance.Log.InfoFormat("Updated MaxBackupSize to {0} bytes", sizeProper);
+        }
+
+        private void sizeTypeListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            reclaimSizeNumericUpDown_ValueChanged(sender, e);
         }
     }
 }

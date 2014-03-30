@@ -17,7 +17,7 @@ namespace DBS
     {
         public class Settings
         {
-            public Settings(IPAddress localIP, int maxBackupSize, int chunkSize,
+            public Settings(IPAddress localIP, long maxBackupSize, int chunkSize,
                 int backupChunkTimeout, double backupChunkTimeoutMultiplier,
                 int backupChunkRetries, int versionM, int versionN, int randomDelayMin,
                 int randomDelayMax, string backupDirectory, string restoreDirectory,
@@ -58,7 +58,7 @@ namespace DBS
                 MDRPort = mdrPort;
             }
 
-            public Settings(IPAddress localIP, int maxBackupSize, int chunkSize,
+            public Settings(IPAddress localIP, long maxBackupSize, int chunkSize,
                 int backupChunkTimeout, double backupChunkTimeoutMultiplier,
                 int backupChunkRetries, int versionM, int versionN, int randomDelayMin,
                 int randomDelayMax, string backupDirectory, string restoreDirectory) :
@@ -70,7 +70,7 @@ namespace DBS
             }
 
             public IPAddress LocalIP { get; private set; }
-            public int MaxBackupSize { get; private set; }
+            public long MaxBackupSize { get; set; }
             public int ChunkSize { get; private set; }
             public int BackupChunkTimeout { get; private set; }
             public double BackupChunkTimeoutMultiplier { get; private set; }
@@ -299,9 +299,9 @@ namespace DBS
                     new EnhancedRestoreChunkACKService(), // 3.3 Chunk ENH restore protocol
                     new EnhancedRestoreChunkConnInfoService(), // 3.3 Chunk ENH restore protocol
                     new DeleteFileService(), // 3.4 File deletion subprotocol
-                    new SpaceReclaimingService(), // 3.5 Space reclaiming subprotocol
-                    new LookUpService(),
-                    new EnhancedSpaceReclaimingWatcher()
+                    new LookUpService(), // 3.4 File ENH deletion subprotocol
+                    new EnhancedSpaceReclaimingWatcher(), // 3.4 File ENH deletion subprotocol
+                    new SpaceReclaimingService() // 3.5 Space reclaiming subprotocol
                 });
             }
             else

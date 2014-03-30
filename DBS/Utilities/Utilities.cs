@@ -48,5 +48,11 @@ namespace DBS.Utilities
 
             return val;
         }
+
+        public static IEnumerable<FileChunk> GetLocalFileChunks()
+        {
+            var fileList = Directory.GetFiles(Core.Instance.Config.BackupDirectory, "*_*");
+            return fileList.Select(file => new FileChunk(Path.GetFileName(file)));
+        }
     }
 }
