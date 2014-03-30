@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using DBS;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
@@ -268,6 +269,48 @@ namespace DBSTests
         {
 // ReSharper disable once ObjectCreationAsStatement
             new GetChunkMessage(10, 10, FileId1, 0);
+        }
+
+        [TestMethod]
+        public void TestMessageBadSerialize()
+        {
+            var rnd = new Random(1);
+            var bytes = new byte[100];
+            for (var i = 0; i < 20; ++i)
+            {
+                rnd.NextBytes(bytes);
+
+                var msg = Message.Deserialize(bytes);
+                Assert.IsNull(msg);
+            }
+
+            const string headerPart = "PUTCHUNK 1.0 ";
+            var headerPartBytes = Encoding.ASCII.GetBytes(headerPart);
+            rnd.NextBytes(bytes);
+
+            var newBytes = new byte[headerPartBytes.Length + bytes.Length];
+        }
+
+        [TestMethod]
+        public void TestMessageBadPartialSerialize()
+        {
+            var rnd = new Random();
+            var bytes = new byte[100];
+
+            const string headerPart = "PUTCHUNK 1.0 ";
+            var headerPartBytes = Encoding.ASCII.GetBytes(headerPart);
+
+            for (var i = 0; i < 20; ++i)
+            {
+                rnd.NextBytes(bytes);
+
+                var newBytes = new byte[headerPartBytes.Length + bytes.Length];
+                Array.Copy(headerPartBytes, newBytes, headerPartBytes.Length);
+                Array.Copy(bytes, 0, newBytes, headerPartBytes.Length, bytes.Length);
+
+                var msg = Message.Deserialize(newBytes);
+                Assert.IsNull(msg);
+            }
         }
     }
 }
