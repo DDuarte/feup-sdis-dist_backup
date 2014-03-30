@@ -54,7 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.cs" />
-    <Compile Include="ILog.cs" />
     <Compile Include="ObservableLog.cs" />
     <Compile Include="Messages\ChunkMessage.cs" />
     <Compile Include="Messages\DeleteMessage.cs" />
@@ -90,7 +89,6 @@
     <Compile Include="Protocols\IProtocol.cs" />
     <Compile Include="Protocols\IService.cs" />
     <Compile Include="Protocols\SpaceReclaimingService.cs" />
-    <Compile Include="Protocols\SpaceReclaimingWatcher.cs" />
     <Compile Include="Utilities\ConcurrentHashSet.cs" />
     <Compile Include="Utilities\MemoryStreamExtensions.cs" />
     <Compile Include="Messages\Message.cs" />

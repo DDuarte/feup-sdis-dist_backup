@@ -69,9 +69,10 @@ namespace DBS.Protocols
                     {
                         File.Delete(Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName));
                     }
-                    catch (Exception)
+// ReSharper disable once EmptyGeneralCatchClause
+                    catch
                     {
-                       // swallow it up 
+                        // swallow it up 
                     }
                 }
             });

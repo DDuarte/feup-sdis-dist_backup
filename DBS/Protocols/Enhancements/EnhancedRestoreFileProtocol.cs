@@ -62,7 +62,8 @@ namespace DBS.Protocols.Enhancements
                     {
                         File.Delete(fileName);
                     }
-                    catch (Exception)
+// ReSharper disable once EmptyGeneralCatchClause
+                    catch
                     {
                         // swallow exception
                     }

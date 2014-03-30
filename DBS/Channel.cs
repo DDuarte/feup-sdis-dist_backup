@@ -27,7 +27,7 @@ namespace DBS
 
             _subject = new Subject<Message>();
 
-            ((MulticastListener) _listener).Received.Subscribe(OnReceive);
+            _listener.Received.Subscribe(OnReceive);
         }
 
         private void OnReceive(Tuple<byte[], IPEndPoint> tuple)

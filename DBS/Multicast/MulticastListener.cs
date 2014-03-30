@@ -76,6 +76,7 @@ namespace DBS.Multicast
             {
                 _subj.OnNext(_queue.Take());
             }
+// ReSharper disable once FunctionNeverReturns
         }
 
         private void BindAndJoin()

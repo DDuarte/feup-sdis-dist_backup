@@ -82,10 +82,5 @@ namespace DBS.Protocols.Enhancements
                 backedUpFilesId.Dispose();
             });
         }
-
-        private void RemoveElement<T>(ConcurrentHashSet<T> set, T item)
-        {
-            set.Remove(item);
-        }
     }
 }

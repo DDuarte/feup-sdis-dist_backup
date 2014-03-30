@@ -13,6 +13,7 @@ namespace DBS.Persistence
 
         private class Nothing // FIXME: we need this placeholder because PersistentHashSet was not implemented
         {                     // so we are using a dictionary from keys to this placeholder
+// ReSharper disable once UnusedMember.Local
             public byte N { get; set; }
         }
 
