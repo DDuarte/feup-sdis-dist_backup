@@ -37,18 +37,26 @@ namespace PeerGUI
         private void FillChunksListView()
         {
             chunksListView.Items.Clear();
-            foreach (var chunkPeer in Core.Instance.ChunkPeers.ObservableCollection)
+            try
             {
-                var chunk = chunkPeer.Chunk;
-                int wantedDeg, actualDeg;
-                if (!Core.Instance.ChunkPeers.TryGetDegrees(chunk, out wantedDeg, out actualDeg))
-                    continue;
+                foreach (var chunkPeer in Core.Instance.ChunkPeers.ObservableCollection)
+                {
+                    var chunk = chunkPeer.Chunk;
+                    int wantedDeg, actualDeg;
+                    if (!Core.Instance.ChunkPeers.TryGetDegrees(chunk, out wantedDeg, out actualDeg))
+                        continue;
 
-                var ip = new IPAddress(chunkPeer.IP).ToString();
-                var actualDegStr = actualDeg.ToString(CultureInfo.InvariantCulture);
-                var wantedDegStr = wantedDeg.ToString(CultureInfo.InvariantCulture);
-                chunksListView.Items.AddWithTextAndSubItems(chunk, ip, actualDegStr, wantedDegStr);
+                    var ip = new IPAddress(chunkPeer.IP).ToString();
+                    var actualDegStr = actualDeg.ToString(CultureInfo.InvariantCulture);
+                    var wantedDegStr = wantedDeg.ToString(CultureInfo.InvariantCulture);
+                    chunksListView.Items.AddWithTextAndSubItems(chunk, ip, actualDegStr, wantedDegStr);
+                }
             }
+            catch (Exception)
+            {
+                // Silently fail, we will update it next time
+            }
+            
         }
     }
 
