@@ -70,6 +70,7 @@
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.enhanCheckBox = new System.Windows.Forms.CheckBox();
             this.clearLogsButton = new System.Windows.Forms.Button();
+            this.showChunksButton = new System.Windows.Forms.Button();
             this.actionsGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
@@ -553,15 +554,16 @@
             // 
             this.tableLayoutPanel9.ColumnCount = 1;
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel9.Controls.Add(this.enhanCheckBox, 0, 0);
             this.tableLayoutPanel9.Controls.Add(this.clearLogsButton, 0, 1);
+            this.tableLayoutPanel9.Controls.Add(this.showChunksButton, 0, 2);
             this.tableLayoutPanel9.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel9.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel9.Name = "tableLayoutPanel9";
-            this.tableLayoutPanel9.RowCount = 2;
-            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel9.RowCount = 3;
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel9.Size = new System.Drawing.Size(156, 93);
             this.tableLayoutPanel9.TabIndex = 9;
             // 
@@ -571,7 +573,7 @@
             this.enhanCheckBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.enhanCheckBox.Location = new System.Drawing.Point(3, 3);
             this.enhanCheckBox.Name = "enhanCheckBox";
-            this.enhanCheckBox.Size = new System.Drawing.Size(150, 40);
+            this.enhanCheckBox.Size = new System.Drawing.Size(150, 24);
             this.enhanCheckBox.TabIndex = 7;
             this.enhanCheckBox.Text = "Enhancements";
             this.enhanCheckBox.UseVisualStyleBackColor = true;
@@ -579,13 +581,24 @@
             // clearLogsButton
             // 
             this.clearLogsButton.Dock = System.Windows.Forms.DockStyle.Top;
-            this.clearLogsButton.Location = new System.Drawing.Point(3, 49);
+            this.clearLogsButton.Location = new System.Drawing.Point(3, 33);
             this.clearLogsButton.Name = "clearLogsButton";
             this.clearLogsButton.Size = new System.Drawing.Size(150, 23);
             this.clearLogsButton.TabIndex = 8;
             this.clearLogsButton.Text = "Clear Logs";
             this.clearLogsButton.UseVisualStyleBackColor = true;
             this.clearLogsButton.Click += new System.EventHandler(this.clearLogsButton_Click);
+            // 
+            // showChunksButton
+            // 
+            this.showChunksButton.Dock = System.Windows.Forms.DockStyle.Top;
+            this.showChunksButton.Location = new System.Drawing.Point(3, 63);
+            this.showChunksButton.Name = "showChunksButton";
+            this.showChunksButton.Size = new System.Drawing.Size(150, 23);
+            this.showChunksButton.TabIndex = 9;
+            this.showChunksButton.Text = "Show Chunks";
+            this.showChunksButton.UseVisualStyleBackColor = true;
+            this.showChunksButton.Click += new System.EventHandler(this.showChunksButton_Click);
             // 
             // Form1
             // 
@@ -668,6 +681,7 @@
         private System.Windows.Forms.Button stopServicesButton;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel9;
         private System.Windows.Forms.Button clearLogsButton;
+        private System.Windows.Forms.Button showChunksButton;
     }
 }
 

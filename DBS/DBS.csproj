@@ -99,7 +99,7 @@
     <Compile Include="Multicast\MulticastSettings.cs" />
     <Compile Include="Utilities\NetworkUtilities.cs" />
     <Compile Include="Persistence\PersistentDictionary.cs" />
-    <Compile Include="Persistence\PersistentStore.cs" />
+    <Compile Include="Persistence\PersistentChunkPeers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocols\RestoreChunkSubprotocol.cs" />
     <Compile Include="Protocols\RestoreFileProtocol.cs" />

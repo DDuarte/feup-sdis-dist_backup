@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 
@@ -8,17 +9,24 @@ namespace DBS.Persistence
 {
     public class PersistentChunkPeers : IEnumerable<ChunkPeer>, IDisposable
     {
+        public ObservableCollection<ChunkPeer> ObservableCollection { get; private set; }
+
         private class Nothing // FIXME: we need this placeholder because PersistentHashSet was not implemented
         {                     // so we are using a dictionary from keys to this placeholder
             public byte N { get; set; }
         }
 
         // FIXME: using two different dbs because PersistentDictionary is not thread safe per tables
-        private readonly PersistentDictionary<ChunkPeer, Nothing> _chunkPeers = // ((FileId, ChunkNo), IP) -> nothing
-            new PersistentDictionary<ChunkPeer, Nothing>("chunkpeer", "chunkpeer");
+        private readonly PersistentDictionary<ChunkPeer, Nothing> _chunkPeers; // ((FileId, ChunkNo), IP) -> nothing
 
-        private readonly PersistentDictionary<string, int> _wantedRepDegs = // (FileId, ChunkNo) -> wanted rep deg
-            new PersistentDictionary<string, int>("wanteddeg", "wanteddeg");
+        private readonly PersistentDictionary<string, int> _wantedRepDegs; // (FileId, ChunkNo) -> wanted rep deg
+
+        public PersistentChunkPeers()
+        {
+            _chunkPeers = new PersistentDictionary<ChunkPeer, Nothing>("chunkpeer", "chunkpeer");
+            _wantedRepDegs = new PersistentDictionary<string, int>("wanteddeg", "wanteddeg");
+            ObservableCollection = new ObservableCollection<ChunkPeer>(_chunkPeers.Select(pair => pair.Key));
+        }
 
         public int CountChunkPeer(FileChunk chunk)
         {
@@ -28,11 +36,6 @@ namespace DBS.Persistence
         public int CountChunkPeer(string fileName)
         {
             return _chunkPeers.Count(chunkPeer => chunkPeer.Key.Chunk == fileName);
-        }
-
-        public int CountChunkPeer(ChunkPeer chunkPeer)
-        {
-            return _chunkPeers.Count(cp => cp.Key == chunkPeer);
         }
 
         public bool HasChunkPeer(FileChunk chunk)
@@ -98,6 +101,8 @@ namespace DBS.Persistence
         {
             var chunkPeer = new ChunkPeer { Chunk = chunk.FileName, IP = address.GetHashCode() };
             _chunkPeers.Add(chunkPeer, new Nothing());
+
+            ObservableCollection.Add(chunkPeer);
         }
 
         public bool RemoveChunkPeer(FileChunk chunk, IPAddress ip)
@@ -109,21 +114,7 @@ namespace DBS.Persistence
             foreach (var key in toRemove)
             {
                 any = any || _chunkPeers.Remove(key);
-            }
-
-            return any;
-        }
-
-        public bool RemoveAllChunkPeer(FileChunk chunk)
-        {
-            var toRemove = _chunkPeers.Where(pair => pair.Key.Chunk == chunk.FileName)
-                .Select(pair => pair.Key).ToList();
-
-            var any = false;
-            foreach (var key in toRemove)
-            {
-                any = true;
-                _chunkPeers.Remove(key);
+                ObservableCollection.Remove(key);
             }
 
             return any;
@@ -139,21 +130,7 @@ namespace DBS.Persistence
             {
                 any = true;
                 _chunkPeers.Remove(key);
-            }
-
-            return any;
-        }
-
-        public bool RemoveAllChunkPeer(IPAddress ip)
-        {
-            var toRemove = _chunkPeers.Where(pair => pair.Key.IP == ip.GetHashCode())
-                .Select(pair => pair.Key).ToList();
-
-            var any = false;
-            foreach (var key in toRemove)
-            {
-                any = true;
-                _chunkPeers.Remove(key);
+                ObservableCollection.Remove(key);
             }
 
             return any;
@@ -172,7 +149,10 @@ namespace DBS.Persistence
         protected virtual void Dispose(bool d)
         {
             if (d)
+            {
+                ObservableCollection.Clear();
                 _chunkPeers.Dispose();
+            }
         }
 
         public void Dispose()
@@ -181,86 +161,4 @@ namespace DBS.Persistence
             GC.SuppressFinalize(this);
         }
     }
-
-    /*
-    public class PersistentStore : IEnumerable<KeyValuePair<string, ReplicationDegrees>>, IDisposable
-    {
-        private readonly PersistentDictionary<string, ReplicationDegrees> _dict =
-            new PersistentDictionary<string, ReplicationDegrees>("store", "repdegrees");
-
-        public bool ContainsFile(string fileName)
-        {
-            return _dict.ContainsKey(fileName);
-        }
-
-        public int IncrementActualDegree(string fileName, int wantedDegree)
-        {
-            return IncrementActualDegree(fileName, 1, wantedDegree);
-        }
-
-        public int DecrementActualDegree(string fileName)
-        {
-            return IncrementActualDegree(fileName, -1, 1);
-        }
-
-        public void UpdateDegrees(string fileName, int actualDegree, int wantedDegree)
-        {
-            ReplicationDegrees t;
-            if (_dict.TryGetValue(fileName, out t))
-            {
-                t.ActualDegree = actualDegree;
-                t.WantedDegree = wantedDegree;
-            }
-            else
-                _dict[fileName] = new ReplicationDegrees {ActualDegree = actualDegree, WantedDegree = wantedDegree};
-        }
-
-        public bool TryGetDegrees(string fileName, out ReplicationDegrees rd)
-        {
-            return _dict.TryGetValue(fileName, out rd);
-        }
-
-        public bool RemoveDegrees(string fileName)
-        {
-            return _dict.Remove(fileName);
-        }
-
-        private int IncrementActualDegree(string fileName, int add, int wantedDegree)
-        {
-            ReplicationDegrees t;
-            if (_dict.TryGetValue(fileName, out t))
-            {
-                t.ActualDegree += add;
-                if (t.ActualDegree < 0)
-                    t.ActualDegree = 0;
-                return t.ActualDegree;
-            }
-
-            var actualDegree = Math.Max(add, 0);
-            _dict[fileName] = new ReplicationDegrees { ActualDegree = actualDegree, WantedDegree = wantedDegree };
-            return actualDegree;
-        }
-
-        public IEnumerator<KeyValuePair<string, ReplicationDegrees>> GetEnumerator()
-        {
-            return _dict.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable) _dict).GetEnumerator();
-        }
-
-        protected virtual void Dispose(bool d)
-        {
-            if (d)
-                _dict.Dispose();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-    }*/
 }

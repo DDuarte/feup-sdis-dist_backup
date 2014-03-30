@@ -310,5 +310,11 @@ namespace PeerGUI
             errorsLogTextBox.Clear();
             infoLogTextBox.Clear();
         }
+
+        private void showChunksButton_Click(object sender, EventArgs e)
+        {
+            var f = new ChunksStoreForm();
+            f.Show();
+        }
     }
 }
