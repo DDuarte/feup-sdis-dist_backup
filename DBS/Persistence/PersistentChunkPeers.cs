@@ -43,6 +43,11 @@ namespace DBS.Persistence
             return _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == chunk.FileName);
         }
 
+        public bool HasChunkPeer(FileChunk chunk, IPAddress ip)
+        {
+            return _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == chunk.FileName && chunkPeer.Key.IP == ip.GetHashCode());
+        }
+
         public bool HasChunkPeer(string fileName)
         {
             return _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == fileName);
