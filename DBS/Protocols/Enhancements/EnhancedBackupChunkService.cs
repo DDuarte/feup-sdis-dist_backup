@@ -29,6 +29,24 @@ namespace DBS.Protocols.Enhancements
             var fileChunk = new FileChunk(msg.FileId, msg.ChunkNo);
             Core.Instance.ChunkPeers.SetWantedReplicationDegree(fileChunk, msg.ReplicationDeg);
 
+            Task.Delay(Core.Instance.RandomDelay).Wait();
+
+            // file already exists, no need to verify sizes or rep degree
+            if (fileChunk.Exists())
+            {
+                Core.Instance.MCChannel.Send(new StoredMessage(fileChunk));
+                return;
+            }
+
+            var count = Core.Instance.ChunkPeers.CountChunkPeer(fileChunk);
+            if (count >= msg.ReplicationDeg)
+            {
+                Core.Instance.Log.InfoFormat("EnhancedBackupChunkService: Not storing {0}#{1} because replication degree " +
+                                             "has been ensured by other peers (got {2}, wanted {3}",
+                                             msg.FileId.ToStringSmall(), msg.ChunkNo, count, msg.ReplicationDeg);
+                return;
+            }
+
             var dirSize = Utilities.Utilities.GetDirectorySize(Core.Instance.Config.BackupDirectory);
             if (dirSize + msg.Body.Length > Core.Instance.Config.MaxBackupSize)
             {
@@ -44,26 +62,6 @@ namespace DBS.Protocols.Enhancements
                         fileChunk);
                     return;
                 }
-            }
-
-
-            var count = 0;
-            var disp = Core.Instance.MCChannel.Received
-                .Where(message => message.MessageType == MessageType.Stored)
-                .Cast<StoredMessage>()
-                .Where(message => message.ChunkNo == msg.ChunkNo && message.FileId == msg.FileId)
-                .Subscribe(message => count++);
-
-            Task.Delay(Core.Instance.RandomDelay).Wait();
-
-            disp.Dispose();
-
-            if (count >= msg.ReplicationDeg)
-            {
-                Core.Instance.Log.InfoFormat("EnhancedBackupChunkService: Not storing {0}#{1} because replication degree " +
-                                             "has been ensured by other peers (got {2}, wanted {3}",
-                                             msg.FileId.ToStringSmall(), msg.ChunkNo, count, msg.ReplicationDeg);
-                return;
             }
 
             var stored = fileChunk.SetData(msg.Body);
