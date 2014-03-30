@@ -42,7 +42,7 @@ namespace DBS.Protocols.Enhancements
             if (count >= msg.ReplicationDeg)
             {
                 Core.Instance.Log.InfoFormat("EnhancedBackupChunkService: Not storing {0}#{1} because replication degree " +
-                                             "has been ensured by other peers (got {2}, wanted {3}",
+                                             "has been ensured by other peers (got {2}, wanted {3})",
                                              msg.FileId.ToStringSmall(), msg.ChunkNo, count, msg.ReplicationDeg);
                 return;
             }

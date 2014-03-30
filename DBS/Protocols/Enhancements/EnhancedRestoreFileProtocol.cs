@@ -21,11 +21,12 @@ namespace DBS.Protocols.Enhancements
         private void RestoreFile()
         {
             var fileName = Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName);
+            bool success;
             using (var file = File.OpenWrite(fileName))
             {
                 var chunkNo = 0;
                 ChunkMessage chunk = null;
-                bool success;
+                
                 do
                 {
                     success = true;
@@ -50,23 +51,23 @@ namespace DBS.Protocols.Enhancements
 
                     ++chunkNo;
                 } while (chunk != null && chunk.Body != null && chunk.Body.Length == Core.Instance.Config.ChunkSize);
+            }
 
-                if (success)
-                    Core.Instance.Log.InfoFormat("EnhancedRestoreFileProtocol: file '{0}' was sucessfuly restored",
-                        _fileEntry.FileName);
-                else
+            if (success)
+                Core.Instance.Log.InfoFormat("EnhancedRestoreFileProtocol: file '{0}' was sucessfuly restored",
+                    _fileEntry.FileName);
+            else
+            {
+                Core.Instance.Log.ErrorFormat("EnhancedRestoreFileProtocol: file '{0}' restore failed",
+                    _fileEntry.FileName);
+                try
                 {
-                    Core.Instance.Log.ErrorFormat("EnhancedRestoreFileProtocol: file '{0}' restore failed",
-                        _fileEntry.FileName);
-                    try
-                    {
-                        File.Delete(fileName);
-                    }
-// ReSharper disable once EmptyGeneralCatchClause
-                    catch
-                    {
-                        // swallow exception
-                    }
+                    File.Delete(fileName);
+                }
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch (Exception ex)
+                {
+                    Core.Instance.Log.ErrorFormat("EnhancedRestoreFileProtocol: delete ex", ex);
                 }
             }
         }

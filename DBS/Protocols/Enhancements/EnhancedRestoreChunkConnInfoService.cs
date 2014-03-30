@@ -17,13 +17,14 @@ namespace DBS.Protocols.Enhancements
 
             try
             {
-                var client = new TcpClient();
-                client.Connect(msg.RemoteEndPoint.Address, msg.InitiatorPort);
-                var stream = client.GetStream();
+                using (var client = new TcpClient())
+                {
+                    client.Connect(msg.RemoteEndPoint.Address, msg.InitiatorPort);
+                    var stream = client.GetStream();
 
-                var bytes = fileChunk.GetData();
-                stream.Write(bytes, 0, bytes.Length);
-                client.Close();
+                    var bytes = fileChunk.GetData();
+                    stream.Write(bytes, 0, bytes.Length);
+                }
             }
             catch (Exception ex)
             {
