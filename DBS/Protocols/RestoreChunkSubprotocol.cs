@@ -12,7 +12,7 @@ namespace DBS.Protocols
     class RestoreChunkSubprotocol : IProtocol
     {
         private readonly FileChunk _fileChunk;
-        private const int Timeout = 5000;
+        private const int Timeout = 10000;
 
         public ChunkMessage Message { get; private set; }
 
