@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using DBS.Messages;
 using DBS.Messages.Enhancements;
+using Util = DBS.Utilities.Utilities;
 
 namespace DBS.Protocols.Enhancements
 {
@@ -10,7 +11,7 @@ namespace DBS.Protocols.Enhancements
     {
         public void OnNext(LookupMessage msg)
         {
-            if (Core.Instance.BackupFiles.Any(entry => entry.FileId == msg.FileId))
+            if (Util.GetLocalFileChunks().Any(entry => entry.FileId == msg.FileId))
                 Core.Instance.MCChannel.Send(new GotMessage(msg.FileId));
         }
 

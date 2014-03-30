@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using DBS.Messages;
 
@@ -25,7 +26,11 @@ namespace DBS.Protocols
             if (!Directory.Exists(dir))
                 return;
 
-            Core.Instance.BackupFiles.RemoveWhere(entry => entry.FileId == msg.FileId);
+            var toRemove = Core.Instance.BackupFiles
+                .Where(pair => pair.Value.GetFileId() == msg.FileId)
+                .Select(pair => pair.Key);
+            foreach (var fileName in toRemove)
+                Core.Instance.BackupFiles.Remove(fileName);
             Core.Instance.ChunkPeers.RemoveAllChunkPeer(msg.FileId);
 
             var fileIdStr = msg.FileId.ToString();

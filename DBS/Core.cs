@@ -97,7 +97,7 @@ namespace DBS
         {
             ChunkPeers = new PersistentChunkPeers();
             Rnd = new Random();
-            BackupFiles = new HashSet<FileEntry>(new FileEntry.Comparer());
+            BackupFiles = new PersistentDictionary<string, FileEntry>("backupfiles", "backupfiles");
             Log = new ObservableLog();
             RunningServices = new List<IService>();
         }
@@ -110,7 +110,7 @@ namespace DBS
         public Channel MDBChannel { get; private set; }
         public Channel MDRChannel { get; private set; }
 
-        public HashSet<FileEntry> BackupFiles { get; private set; }
+        public PersistentDictionary<string, FileEntry> BackupFiles { get; private set; }
 
         private Settings _config;
 
@@ -146,7 +146,7 @@ namespace DBS
             var fileNameWithoutPath = Path.GetFileName(fileName); /* write.exe */
             var newFileName = fileNameWithoutPath;
             var count = 1;
-            while (BackupFiles.Any(entry => entry.FileName == newFileName))
+            while (BackupFiles.ContainsKey(newFileName))
             {
                 var ext = Path.GetExtension(newFileName);
                 var name = Path.GetFileNameWithoutExtension(newFileName);
@@ -157,13 +157,12 @@ namespace DBS
 
             var fileEntry = new FileEntry
             {
-                FileId = FileId.FromFile(fileName),
                 FileName = newFileName,
                 OriginalFileName = fileName,
                 ReplicationDegree = replicationDegree
             };
 
-            BackupFiles.Add(fileEntry);
+            BackupFiles.Add(newFileName, fileEntry);
             return fileEntry;
         }
 
@@ -320,7 +319,7 @@ namespace DBS
                 runningService.Start();
 
             foreach (var backupFile in BackupFiles)
-                new BackupFileProtocol(backupFile).Run();
+                new BackupFileProtocol(backupFile.Value).Run();
         }
 
         public void StopServices()
@@ -340,7 +339,7 @@ namespace DBS
                 var pattern = name + @"(_[0-9]+)?";
                 if (!string.IsNullOrEmpty(ext))
                     pattern += '\\'+ ext; // must escape .
-                return Regex.IsMatch(entry.FileName, pattern);
+                return Regex.IsMatch(entry.Key, pattern);
             }).ToList();
             if (possibleFiles.Count == 0)
             {
@@ -353,19 +352,19 @@ namespace DBS
                 Console.WriteLine("Which file do you want?");
                 foreach (var possibleFile in possibleFiles)
                 {
-                    Console.WriteLine("- {0}", possibleFile.FileName);
+                    Console.WriteLine("- {0}", possibleFile.Key);
                 }
 
                 var chosenFile = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(chosenFile))
                     return null;
 
-                possibleFiles.RemoveAll(entry => entry.FileName != chosenFile);
+                possibleFiles.RemoveAll(entry => entry.Key != chosenFile);
                 if (possibleFiles.Count == 1)
                     break;
             }
 
-            return possibleFiles[0];
+            return possibleFiles[0].Value;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace DBS.Protocols
             Core.Instance.Log.InfoFormat("Starting DeleteFileProtocol: {0}", _fileEntry);
             return Task.Factory.StartNew(() =>
             {
-                var msg = new DeleteMessage(_fileEntry.FileId);
+                var msg = new DeleteMessage(_fileEntry.GetFileId());
                 Core.Instance.MCChannel.Send(msg);
             });
         }

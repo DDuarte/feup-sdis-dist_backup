@@ -28,7 +28,7 @@ namespace DBS.Protocols
                     while ((bytesRead = file.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         var data = buffer.Take(bytesRead).ToArray(); // slice the buffer with bytesRead
-                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
+                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.GetFileId(), chunkNo), _fileEntry.ReplicationDegree,
                             data);
                         bc.Run().Wait();
                         ++chunkNo;
@@ -36,7 +36,7 @@ namespace DBS.Protocols
 
                     if ((file.Length % Core.Instance.Config.ChunkSize) == 0) // last chunk with an empty body
                     {
-                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.FileId, chunkNo), _fileEntry.ReplicationDegree,
+                        var bc = new BackupChunkSubprotocol(new FileChunk(_fileEntry.GetFileId(), chunkNo), _fileEntry.ReplicationDegree,
                             new byte[] {});
                         bc.Run();
                     }

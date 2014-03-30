@@ -32,7 +32,7 @@ namespace DBS.Protocols.Enhancements
                     for (int retryCount = 0; retryCount < MaxEntries; retryCount++)
                     {
                         var restoreChunkProtocol =
-                            new EnhancedRestoreChunkProtocol(new FileChunk(_fileEntry.FileId, chunkNo));
+                            new EnhancedRestoreChunkProtocol(new FileChunk(_fileEntry.GetFileId(), chunkNo));
                         restoreChunkProtocol.Run().Wait();
                         chunk = restoreChunkProtocol.Message;
                         if (chunk != null && chunk.Body != null && chunk.Body.Length > 0)
@@ -41,7 +41,7 @@ namespace DBS.Protocols.Enhancements
                             break;
                         }
 
-                        if (retryCount == MaxEntries)
+                        if (retryCount == MaxEntries - 1)
                             success = false;
                     }
 

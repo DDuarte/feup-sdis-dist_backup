@@ -97,6 +97,16 @@ namespace PeerGUI
             reclaimSizeNumericUpDown.Maximum = decimal.MaxValue;
             reclaimSizeNumericUpDown.Value = Core.Instance.Config.MaxBackupSize;
 
+            foreach (var backupFile in Core.Instance.BackupFiles)
+            {
+                var entry = backupFile.Value;
+                filesListView.Items.AddWithTextAndSubItems(entry.OriginalFileName,
+                    entry.ReplicationDegree.ToString(CultureInfo.InvariantCulture),
+                    BACKED_UP,
+                    GetNumberOfChunks(Path.Combine(Core.Instance.Config.BackupDirectory, entry.FileName))
+                        .ToString(CultureInfo.InvariantCulture));
+            }
+
             Core.Instance.Start(false);
         }
 
@@ -127,23 +137,23 @@ namespace PeerGUI
             var fileNames = openFileDialog.FileNames;
             foreach (var fileName in fileNames)
             {
-                double fileSize = GetFileSize(fileName);
-                var numberOfChunks =  Math.Ceiling(fileSize/Core.Instance.Config.ChunkSize);
+                var numberOfChunks = GetNumberOfChunks(fileName);
                 var strNumber = numberOfChunks.ToString(CultureInfo.InvariantCulture);
 
-                var listViewItem1 = new ListViewItem(new []
-                {
-                    fileName,
-                    "1",
-                    NOT_BACKED_UP,
-                    strNumber
-                }, -1);
-
-                filesListView.Items.Add(listViewItem1);
+                filesListView.Items.AddWithTextAndSubItems(fileName, "1", NOT_BACKED_UP, strNumber);
             }
         }
 
-        private long GetFileSize(string fileName)
+        private static double GetNumberOfChunks(string fileName)
+        {
+            var fileSize = GetFileSize(fileName);
+            if (fileSize == -1)
+                return -1;
+            var numberOfChunks = Math.Ceiling(fileSize/(double)Core.Instance.Config.ChunkSize);
+            return numberOfChunks;
+        }
+
+        private static long GetFileSize(string fileName)
         {
             try
             {
@@ -260,11 +270,11 @@ namespace PeerGUI
 
             var fileName = filesListView.SelectedItems[0].Text;
             var files = Core.Instance.BackupFiles
-                .Where(backupFile => backupFile.OriginalFileName == fileName).ToList();
+                .Where(backupFile => backupFile.Value.OriginalFileName == fileName).ToList();
             if (files.Count != 1)
                 return;
 
-            _commandSwitch.Execute(new RestoreFileCommand(files[0], enhanCheckBox.Checked));
+            _commandSwitch.Execute(new RestoreFileCommand(files[0].Value, enhanCheckBox.Checked));
             filesListView.SelectedItems[0].SubItems[2].Text = RESTORED;
         }
 
@@ -278,11 +288,12 @@ namespace PeerGUI
 
             var fileName = filesListView.SelectedItems[0].Text;
             var files = Core.Instance.BackupFiles
-                .Where(backupFile => backupFile.OriginalFileName == fileName).ToList();
+                .Where(backupFile => backupFile.Value.OriginalFileName == fileName).ToList();
             if (files.Count != 1)
                 return;
 
-            _commandSwitch.Execute(new DeleteFileCommand(files[0]));
+            Core.Instance.BackupFiles.Remove(files[0].Key);
+            _commandSwitch.Execute(new DeleteFileCommand(files[0].Value));
             filesListView.SelectedItems[0].SubItems[2].Text = NOT_BACKED_UP;
 
             backupButton.Enabled = _servicesStarted;
