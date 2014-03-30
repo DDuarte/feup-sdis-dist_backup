@@ -302,7 +302,6 @@ namespace DBS
                     new SpaceReclaimingService(), // 3.5 Space reclaiming subprotocol
                     new LookUpService(),
                     new EnhancedSpaceReclaimingWatcher()
-                    //new EnhancedSpaceReclaimingWatcher()
                 });
             }
             else
@@ -314,7 +313,6 @@ namespace DBS
                     new RestoreChunkService(), // 3.3 Chunk restore protocol
                     new DeleteFileService(), // 3.4 File deletion subprotocol
                     new SpaceReclaimingService() // 3.5 Space reclaiming subprotocol
-                    //new SpaceReclaimingWatcher()
                 });
             }
 
