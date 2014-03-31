@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using DBS.Utilities;
 
 namespace DBS.Persistence
 {
@@ -39,9 +40,15 @@ namespace DBS.Persistence
             return _chunkPeers.Count(chunkPeer => chunkPeer.Key.Chunk == fileName);
         }
 
-        public bool HasChunkPeer(FileChunk chunk)
+        public bool HasChunkPeer(FileChunk chunk, bool any)
         {
-            return _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == chunk.FileName);
+            if (any)
+                return _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == chunk.FileName);
+
+            var localIps = NetworkUtilities.GetLocalIPAddresses();
+            return localIps.Any(address =>
+                _chunkPeers.Any(chunkPeer => chunkPeer.Key.Chunk == chunk.FileName &&
+                                             chunkPeer.Key.IP == address.GetHashCode()));
         }
 
         public bool HasChunkPeer(FileChunk chunk, IPAddress ip)
@@ -75,7 +82,7 @@ namespace DBS.Persistence
 
         public bool TryGetDegrees(FileChunk chunk, out int wantedDeg, out int actualDeg)
         {
-            if (!HasChunkPeer(chunk))
+            if (!HasChunkPeer(chunk, true))
             {
                 wantedDeg = -1;
                 actualDeg = -1;

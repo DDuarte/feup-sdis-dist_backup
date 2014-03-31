@@ -30,7 +30,7 @@ namespace DBS.Protocols
             if (!fileChunk.Exists())
             {
                 // we were supposed to have this chunk: send removed message and remove the entry in the local count
-                if (Core.Instance.ChunkPeers.HasChunkPeer(fileChunk)) 
+                if (Core.Instance.ChunkPeers.HasChunkPeer(fileChunk, false)) 
                     Core.Instance.MCChannel.Send(new RemovedMessage(fileChunk));
                 return;
             }
