@@ -63,8 +63,8 @@ namespace DBS.Protocols
                 }
                 catch (Exception ex)
                 {
-                    Core.Instance.Log.ErrorFormat("RestoreFileProtocol:Run: could not restore file '{0}', ex: {1}",
-                        _fileEntry.FileName, ex);
+                    Core.Instance.Log.ErrorFormat("RestoreFileProtocol:Run: could not restore file '{0}'",
+                        _fileEntry.FileName);
                     try
                     {
                         File.Delete(Path.Combine(Core.Instance.Config.RestoreDirectory, _fileEntry.FileName));
