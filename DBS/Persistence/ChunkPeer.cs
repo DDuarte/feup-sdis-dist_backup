@@ -5,7 +5,7 @@ namespace DBS.Persistence
     public class ChunkPeer
     {
         public string Chunk { get; set; } // FileId_ChunkNo
-        public int IP { get; set; }
+        public long IP { get; set; }
 
         public override bool Equals(Object obj)
         {

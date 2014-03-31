@@ -15,23 +15,10 @@ namespace PeerGUI
         public ChunksStoreForm()
         {
             InitializeComponent();
-            FillChunksListView();
 
-            var observable = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(Core.Instance.ChunkPeers.ObservableCollection, "CollectionChanged");
-            var subs = observable.DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(500))
+            Observable.Interval(TimeSpan.FromMilliseconds(500))
                 .ObserveOn(SynchronizationContext.Current)
-                .Subscribe(OnChanged);
-        }
-
-        private void OnChanged(EventPattern<NotifyCollectionChangedEventArgs> pattern)
-        {
-            var e = pattern.EventArgs;
-
-            if (e == null || ((e.NewItems == null || e.NewItems.Count == 0) && (e.OldItems == null || e.OldItems.Count == 0)))
-                return;
-
-            FillChunksListView();
+                .Subscribe(_ => FillChunksListView());
         }
 
         private void FillChunksListView()
@@ -39,7 +26,7 @@ namespace PeerGUI
             chunksListView.Items.Clear();
             try
             {
-                foreach (var chunkPeer in Core.Instance.ChunkPeers.ObservableCollection)
+                foreach (var chunkPeer in Core.Instance.ChunkPeers)
                 {
                     var chunk = chunkPeer.Chunk;
                     int wantedDeg, actualDeg;
@@ -52,11 +39,10 @@ namespace PeerGUI
                     chunksListView.Items.AddWithTextAndSubItems(chunk, ip, actualDegStr, wantedDegStr);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Silently fail, we will update it next time
+                Core.Instance.Log.Error("FillChunksListView", ex);
             }
-            
         }
     }
 

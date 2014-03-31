@@ -27,7 +27,8 @@ namespace DBS.Protocols
         {
             var fc = new FileChunk(msg.FileId, msg.ChunkNo);
             if (!Core.Instance.ChunkPeers.HasChunkPeer(fc, msg.RemoteEndPoint.Address))
-                Core.Instance.ChunkPeers.AddChunkPeer(fc, msg.RemoteEndPoint.Address);
+                if (Core.Instance.ChunkPeers.GotWantedReplicationDegree(fc))
+                    Core.Instance.ChunkPeers.AddChunkPeer(fc, msg.RemoteEndPoint.Address);
         }
 
         public void OnError(Exception error)

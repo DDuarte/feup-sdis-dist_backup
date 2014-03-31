@@ -103,8 +103,7 @@ namespace PeerGUI
                 filesListView.Items.AddWithTextAndSubItems(entry.OriginalFileName,
                     entry.ReplicationDegree.ToString(CultureInfo.InvariantCulture),
                     BACKED_UP,
-                    GetNumberOfChunks(Path.Combine(Core.Instance.Config.BackupDirectory, entry.FileName))
-                        .ToString(CultureInfo.InvariantCulture));
+                    GetNumberOfChunks(entry.OriginalFileName).ToString(CultureInfo.InvariantCulture));
             }
 
             Core.Instance.Start(false);
@@ -170,7 +169,21 @@ namespace PeerGUI
             if (filesListView.SelectedItems.Count == 0)
                 return;
 
-            filesListView.Items.Remove(filesListView.SelectedItems[0]);
+            var removeFileItem = filesListView.SelectedItems[0];
+            var removeFileName = removeFileItem.Text;
+
+            if (deleteButton.Enabled)
+                deleteButton_Click(sender, null);
+
+            filesListView.Items.Remove(removeFileItem);
+            var toRemove = Core.Instance.BackupFiles
+                .Where(pair => pair.Value.OriginalFileName == removeFileName)
+                .Select(pair => pair.Value.OriginalFileName).ToList();
+
+            foreach (var rem in toRemove)
+            {
+                Core.Instance.BackupFiles.Remove(rem);
+            }
         }
 
         private void filesListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
