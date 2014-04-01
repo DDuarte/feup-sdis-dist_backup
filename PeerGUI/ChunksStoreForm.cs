@@ -21,27 +21,42 @@ namespace PeerGUI
                 .Subscribe(_ => FillChunksListView());
         }
 
+        private int _prevCount;
+
         private void FillChunksListView()
         {
-            chunksListView.Items.Clear();
+            var currCount = Core.Instance.ChunkPeers.GetChunkPeersCount();
+            if (_prevCount == currCount)
+                return; // no update required
+            _prevCount = currCount;
+
+            chunksListView.BeginUpdate();
             try
             {
-                foreach (var chunkPeer in Core.Instance.ChunkPeers)
+                chunksListView.Items.Clear();
+                try
                 {
-                    var chunk = chunkPeer.Chunk;
-                    int wantedDeg, actualDeg;
-                    if (!Core.Instance.ChunkPeers.TryGetDegrees(chunk, out wantedDeg, out actualDeg))
-                        continue;
+                    foreach (var chunkPeer in Core.Instance.ChunkPeers)
+                    {
+                        var chunk = chunkPeer.Chunk;
+                        int wantedDeg, actualDeg;
+                        if (!Core.Instance.ChunkPeers.TryGetDegrees(chunk, out wantedDeg, out actualDeg))
+                            continue;
 
-                    var ip = new IPAddress(chunkPeer.IP).ToString();
-                    var actualDegStr = actualDeg.ToString(CultureInfo.InvariantCulture);
-                    var wantedDegStr = wantedDeg.ToString(CultureInfo.InvariantCulture);
-                    chunksListView.Items.AddWithTextAndSubItems(chunk, ip, actualDegStr, wantedDegStr);
+                        var ip = new IPAddress(chunkPeer.IP).ToString();
+                        var actualDegStr = actualDeg.ToString(CultureInfo.InvariantCulture);
+                        var wantedDegStr = wantedDeg.ToString(CultureInfo.InvariantCulture);
+                        chunksListView.Items.AddWithTextAndSubItems(chunk, ip, actualDegStr, wantedDegStr);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Core.Instance.Log.Error("FillChunksListView", ex);
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                Core.Instance.Log.Error("FillChunksListView", ex);
+                chunksListView.EndUpdate();
             }
         }
     }

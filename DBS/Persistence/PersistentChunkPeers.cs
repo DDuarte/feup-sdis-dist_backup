@@ -187,6 +187,14 @@ namespace DBS.Persistence
             return any;
         }
 
+        public int GetChunkPeersCount()
+        {
+            lock (_sync)
+            {
+                return _chunkPeers.Count;
+            }
+        }
+
         public IEnumerator<ChunkPeer> GetEnumerator()
         {
             lock (_sync)

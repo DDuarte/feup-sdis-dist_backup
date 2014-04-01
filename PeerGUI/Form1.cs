@@ -17,7 +17,14 @@ namespace PeerGUI
 
         private static void AppendTextBox(TextBoxBase tb, string s)
         {
-            tb.AppendText(s + Environment.NewLine);
+            try
+            {
+                tb.AppendText(s + Environment.NewLine);
+            }
+            catch (ObjectDisposedException)
+            {
+                // FIXME: properly dispose subscribers created in the Form1() cctor
+            }
         }
 
         public Form1()
@@ -302,12 +309,15 @@ namespace PeerGUI
             var fileName = filesListView.SelectedItems[0].Text;
             var files = Core.Instance.BackupFiles
                 .Where(backupFile => backupFile.Value.OriginalFileName == fileName).ToList();
-            if (files.Count != 1)
-                return;
 
-            Core.Instance.BackupFiles.Remove(files[0].Key);
-            _commandSwitch.Execute(new DeleteFileCommand(files[0].Value));
-            filesListView.SelectedItems[0].SubItems[2].Text = NOT_BACKED_UP;
+            foreach (var file in files)
+            {
+                Core.Instance.BackupFiles.Remove(file.Key);
+                _commandSwitch.Execute(new DeleteFileCommand(file.Value));
+                filesListView.SelectedItems[0].SubItems[2].Text = NOT_BACKED_UP;
+            }
+
+            
 
             backupButton.Enabled = _servicesStarted;
             restoreButton.Enabled = false;
