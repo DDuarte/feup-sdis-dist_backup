@@ -71,6 +71,13 @@ namespace PeerGUI
 
             long maxBackupSize = Config.Global.DiskSpace; // Max site used to backup (locally)
             int chunkSize = Config.Global.ChunkSize; // Size of each chunk stored locally and sent over the network
+            IPAddress MCIP = IPAddress.Parse(Config.Global.MCIP);
+            IPAddress MDBIP = IPAddress.Parse(Config.Global.MDBIP);
+            IPAddress MDRIP = IPAddress.Parse(Config.Global.MDRIP);
+
+            int MCPort = Config.Global.MCPort;
+            int MDBPort = Config.Global.MDBPort;
+            int MDRPort = Config.Global.MDRPort;
 
             // Backup chunk protocol configurations
             int backupChunkTimeout = Config.Global.BackupChunkTimeout;
@@ -93,7 +100,7 @@ namespace PeerGUI
             {
                 Core.Instance.Config = new Core.Settings(localIP, maxBackupSize, chunkSize, backupChunkTimeout,
                     backupChunkTimeoutMultiplier, backupChunkRetries, versionM, versionN,
-                    randomDelayMin, randomDelayMax, backupDirectory, restoreDirectory);
+                    randomDelayMin, randomDelayMax, backupDirectory, restoreDirectory, MCIP, MCPort, MDBIP, MDBPort, MDRIP, MDRPort);
             }
             catch (Exception ex)
             {

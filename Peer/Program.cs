@@ -12,7 +12,9 @@ namespace Peer
         static void Main(string[] args)
         {
             if (args.Length == 0)
-                args = new[] {"225.0.0.10", "31000", "225.0.0.10", "31001", "225.0.0.10", "31002"}; // defaults
+                args = (string[]) new[] { Config.Global.MCIP.ToString(), Config.Global.MCPort.ToString(), 
+                    Config.Global.MDBIP.ToString(), Config.Global.MDBPort.ToString(), 
+                    Config.Global.MDRIP.ToString(), Config.Global.MDRPort.ToString() }; // defaults
 
             if (args.Length != 6)
             {
@@ -97,8 +99,6 @@ namespace Peer
             }
 
             Core.Instance.Log.Subscribe(Console.WriteLine);
-
-            Core.Instance.Start(false);
             Core.Instance.Start();
         }
 
