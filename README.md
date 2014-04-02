@@ -41,6 +41,7 @@ Default multicast channels:
         - `delete <filename>`
 
 - GUI: Start PeerGUI.exe
+	- All the arguments (Multicast channel IP's and ports) may be changed in the settings.conf JSON file
 
 ## Authors
 
